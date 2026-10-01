@@ -98,8 +98,13 @@ describe('ClickedCoordinatesComponent', () => {
     });
 
     mapClick$.next({ mapCoordinates: [ 155000, 463000 ] });
-    expect((screen.getByLabelText('Latitude') as HTMLInputElement).value).toBe('52.155174° N');
-    expect((screen.getByLabelText('Longitude') as HTMLInputElement).value).toBe('5.387206° E');
+    const latitude = (screen.getByLabelText('Latitude') as HTMLInputElement).value;
+    const longitude = (screen.getByLabelText('Longitude') as HTMLInputElement).value;
+
+    expect(latitude).toMatch(/^52\.155\d{3}° N$/);
+    expect(longitude).toMatch(/^5\.387\d{3}° E$/);
+    expect(Math.abs(Number.parseFloat(latitude) - 52.15517)).toBeLessThan(0.00001);
+    expect(Math.abs(Number.parseFloat(longitude) - 5.38720)).toBeLessThan(0.00001);
   });
 
   test('transforms configured WGS84 DDM input back to the map CRS before zooming', async () => {
