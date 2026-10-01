@@ -1236,6 +1236,12 @@
       <trans-unit id="core.user-login-check-viewer-message" datatype="html">
         <source>You are logged out and might need to login again</source>
       </trans-unit>
+          <trans-unit id="core.toolbar.coordinate-picker-latitude" datatype="html">
+        <source>Latitude</source>
+      </trans-unit>
+      <trans-unit id="core.toolbar.coordinate-picker-longitude" datatype="html">
+        <source>Longitude</source>
+      </trans-unit>
     </body>
   </file>
 </xliff>

@@ -3,17 +3,13 @@
 
     <form [formGroup]="coordinatesForm" class="clicked-coordinates-inputs">
       <mat-form-field appearance="outline" color="primary" [style.width.em]="12.5">
-        <mat-label i18n="@@core.toolbar.coordinate-picker-x">X-coordinate</mat-label>
-        <input matInput type="number" formControlName="x"/>
+        <mat-label>{{ getFirstCoordinateLabel() }}</mat-label>
+        <input matInput type="text" inputmode="decimal" formControlName="x"/>
       </mat-form-field>
       <mat-form-field appearance="outline" color="primary" [style.width.em]="12.5">
-        <mat-label i18n="@@core.toolbar.coordinate-picker-y">Y-coordinate</mat-label>
-        <input matInput type="number" formControlName="y"/>
+        <mat-label>{{ getSecondCoordinateLabel() }}</mat-label>
+        <input matInput type="text" inputmode="decimal" formControlName="y"/>
       </mat-form-field>
-      <input [hidden]="true" formControlName="minx" type="number"/>
-      <input [hidden]="true" formControlName="maxx" type="number"/>
-      <input [hidden]="true" formControlName="miny" type="number"/>
-      <input [hidden]="true" formControlName="maxy" type="number"/>
 
       <div class="clicked-coordinates-buttons">
         <button mat-flat-button
@@ -68,4 +64,3 @@
     <ng-container *ngTemplateOutlet="clickedCoordinatesContent"></ng-container>
   </div>
 }
-

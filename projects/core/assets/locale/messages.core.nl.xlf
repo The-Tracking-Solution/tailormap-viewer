@@ -1651,6 +1651,14 @@
         <source>You are logged out and might need to login again</source>
         <target>U bent uitgelogd en moet wellicht opnieuw inloggen</target>
       </trans-unit>
+          <trans-unit id="core.toolbar.coordinate-picker-latitude" datatype="html">
+        <source>Latitude</source>
+        <target>Breedtegraad</target>
+      </trans-unit>
+      <trans-unit id="core.toolbar.coordinate-picker-longitude" datatype="html">
+        <source>Longitude</source>
+        <target>Lengtegraad</target>
+      </trans-unit>
     </body>
   </file>
 </xliff>
