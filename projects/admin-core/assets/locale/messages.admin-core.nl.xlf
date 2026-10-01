@@ -2737,6 +2737,10 @@
         <source>Valid until</source>
         <target>Geldig tot</target>
       </trans-unit>
+      <trans-unit id="admin-core.components.coordinate-picker-help" datatype="html">
+        <source>Configure the projection and notation used by the coordinate picker. If no settings are configured, the map projection is used. Decimal degree and degree/minute formats are available for WGS84 (EPSG:4326).</source>
+        <target>Configureer de projectie en notatie voor de coördinatenkiezer. Als er niets is ingesteld, wordt de kaartprojectie gebruikt. Decimale graden en graden/minuten zijn beschikbaar voor WGS84 (EPSG:4326).</target>
+      </trans-unit>
     </body>
   </file>
 </xliff>

@@ -2030,6 +2030,9 @@
       <trans-unit id="admin-core.users.valid-until" datatype="html">
         <source>Valid until</source>
       </trans-unit>
+      <trans-unit id="admin-core.components.coordinate-picker-help" datatype="html">
+        <source>Configure the projection and notation used by the coordinate picker. If no settings are configured, the map projection is used. Decimal degree and degree/minute formats are available for WGS84 (EPSG:4326).</source>
+      </trans-unit>
     </body>
   </file>
 </xliff>
