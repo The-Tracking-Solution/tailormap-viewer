@@ -17,6 +17,7 @@ describe('CoordinateHelper', () => {
   test('formats WGS84 coordinates as decimal degrees in latitude-longitude display order', () => {
     expect(CoordinateHelper.formatCoordinates(
       [ 5, 52 ],
+      'EPSG:4326',
       'decimal-degrees',
     )).toEqual([ '52.000000° N', '5.000000° E' ]);
   });
@@ -24,6 +25,7 @@ describe('CoordinateHelper', () => {
   test('formats WGS84 coordinates as degrees and decimal minutes', () => {
     expect(CoordinateHelper.formatCoordinates(
       [ 5, 52 ],
+      'EPSG:4326',
       'degrees-decimal-minutes',
     )).toEqual([ "52° 00.000' N", "005° 00.000' E" ]);
   });
@@ -31,6 +33,7 @@ describe('CoordinateHelper', () => {
   test('formats negative WGS84 coordinates with southern and western hemispheres', () => {
     expect(CoordinateHelper.formatCoordinates(
       [ -4.25, -33.5 ],
+      'EPSG:4326',
       'decimal-degrees',
     )).toEqual([ '33.500000° S', '4.250000° W' ]);
   });
@@ -38,6 +41,7 @@ describe('CoordinateHelper', () => {
   test('rounds degree decimal minutes without producing 60 minutes', () => {
     expect(CoordinateHelper.formatCoordinates(
       [ 4.9999999, 51.9999999 ],
+      'EPSG:4326',
       'degrees-decimal-minutes',
     )).toEqual([ "52° 00.000' N", "005° 00.000' E" ]);
   });
@@ -53,7 +57,10 @@ describe('CoordinateHelper', () => {
     expect(CoordinateHelper.parseCoordinates(
       [ "52° 09.310' N", "005° 23.232' E" ],
       'degrees-decimal-minutes',
-    )).toEqual([ 5.3872, 52.15516666666667 ]);
+    )).toEqual([
+      expect.closeTo(5.3872, 10),
+      expect.closeTo(52.15516666666667, 10),
+    ]);
   });
 
   test('rejects invalid degree decimal minute values', () => {
