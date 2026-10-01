@@ -1,0 +1,16 @@
+.coordinate-picker-help {
+  display: block;
+  margin-left: 8px;
+  margin-top: 16px;
+}
+
+.coordinate-picker-form {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 8px;
+}
+
+.coordinate-picker-form mat-form-field {
+  width: 250px;
+}
