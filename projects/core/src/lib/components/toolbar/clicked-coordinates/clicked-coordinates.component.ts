@@ -3,7 +3,7 @@ import { combineLatest, filter, map, of, Subject, switchMap, take, takeUntil, ta
 import { CoordinateHelper, MapClickEvent, MapClickToolConfigModel, MapClickToolModel, MapService, ToolTypeEnum } from '@tailormap-viewer/map';
 import { Clipboard } from '@angular/cdk/clipboard';
 import { Store } from '@ngrx/store';
-import { AbstractControl, FormControl, FormGroup, ValidationErrors, ReactiveFormsModule } from '@angular/forms';
+import { FormControl, FormGroup, ValidationErrors, ReactiveFormsModule } from '@angular/forms';
 import {
   BaseComponentTypeEnum,
   COORDINATE_DISPLAY_MAP_PROJECTION,
@@ -240,7 +240,7 @@ export class ClickedCoordinatesComponent implements OnInit, OnDestroy {
       this.mapService.getRoundedCoordinates$(mapClick.mapCoordinates)
         .pipe(take(1))
         .subscribe(coordinates => {
-          this.coordinatesForm.patchValue({ x: coordinates[0] || '', y: coordinates[1] || '' });
+          this.coordinatesForm.patchValue({ x: coordinates[0] ?? '', y: coordinates[1] ?? '' });
         });
       return;
     }
@@ -266,7 +266,6 @@ export class ClickedCoordinatesComponent implements OnInit, OnDestroy {
     const targetProjection = this.getTargetProjection();
     const targetCoordinates = CoordinateHelper.parseCoordinates(
       [ values.x, values.y ],
-      targetProjection,
       this.getFormat(),
     );
     if (!targetCoordinates) {

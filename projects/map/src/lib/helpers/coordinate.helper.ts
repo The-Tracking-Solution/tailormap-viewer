@@ -38,7 +38,6 @@ export class CoordinateHelper {
 
   public static parseCoordinates(
     coordinates: [string, string],
-    projection: string,
     format: CoordinateDisplayFormat,
   ): [number, number] | null {
     switch (format) {
