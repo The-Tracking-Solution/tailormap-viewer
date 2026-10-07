@@ -6,7 +6,6 @@ import {
   MOUSE_COORDINATES_MAP_PROJECTION,
   MouseCoordinatesConfigModel,
   MouseCoordinatesDisplayConfigModel,
-  MouseCoordinatesFormat,
 } from '@tailormap-viewer/api';
 import { AsyncPipe } from '@angular/common';
 import { Store } from '@ngrx/store';
@@ -111,7 +110,7 @@ export class MouseCoordinatesComponent implements OnInit, OnDestroy {
 
         return [{
           id: display.id || `coordinate-display-${index}`,
-          label: display.label?.trim() || this.getDisplayLabel(targetProjection, display.format),
+          label: display.label?.trim() || targetProjection,
           coordinates: CoordinateHelper.formatCoordinates(projectedCoordinates, targetProjection, display.format),
         }];
       } catch {
@@ -120,14 +119,4 @@ export class MouseCoordinatesComponent implements OnInit, OnDestroy {
     });
   }
 
-  private getDisplayLabel(projection: string, format: MouseCoordinatesFormat): string {
-    switch (format) {
-      case 'decimal-degrees':
-        return `${projection} DD`;
-      case 'degrees-decimal-minutes':
-        return `${projection} DDM`;
-      default:
-        return projection;
-    }
-  }
 }
