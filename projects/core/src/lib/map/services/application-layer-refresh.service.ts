@@ -1,7 +1,7 @@
 import { DestroyRef, Injectable, inject } from '@angular/core';
 import { Store } from '@ngrx/store';
 import { selectAutoRefreshableLayers } from '../state/map.selectors';
-import { Subscription, timer } from 'rxjs';
+import { Subject, Subscription, timer } from 'rxjs';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { LayerManagerModel, MapService } from '@tailormap-viewer/map';
 import { ExtendedAppLayerModel } from '../models';
@@ -22,6 +22,9 @@ export class ApplicationLayerRefreshService {
 
   private refreshingLayers = new Map<string, Subscription>();
   private layerManager: LayerManagerModel | undefined;
+  private layerRefreshed = new Subject<string>();
+
+  public readonly layerRefreshed$ = this.layerRefreshed.asObservable();
 
   constructor() {
     this.mapService.getLayerManager$()
@@ -51,7 +54,11 @@ export class ApplicationLayerRefreshService {
         const refreshSubscription = timer(interval, interval)
           .pipe(takeUntilDestroyed(this.destroyRef))
           .subscribe(() => {
-            this.layerManager?.refreshLayer(layer.id);
+            if (!this.layerManager) {
+              return;
+            }
+            this.layerManager.refreshLayer(layer.id);
+            this.layerRefreshed.next(layer.id);
           });
         this.refreshingLayers.set(layer.id, refreshSubscription);
       }
