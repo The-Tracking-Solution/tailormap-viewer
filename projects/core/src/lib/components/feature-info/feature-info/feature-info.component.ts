@@ -4,8 +4,8 @@ import { combineLatest, concatMap, filter, Observable, of, Subject, switchMap, t
 import { Store } from '@ngrx/store';
 import { featureInfoLoaded } from '../state/feature-info.actions';
 import {
-  selectCurrentlySelectedFeatureGeometry, selectFeatureInfoFeatures, selectLoadingFeatureInfo,
-  selectMapCoordinates,
+  selectCurrentlySelectedFeature, selectCurrentlySelectedFeatureGeometry, selectFeatureInfoDialogVisible, selectFeatureInfoFeatures,
+  selectLoadingFeatureInfo, selectMapCoordinates,
 } from '../state/feature-info.selectors';
 import { FeatureStylingHelper } from '../../../shared/helpers/feature-styling.helper';
 import { FeatureInfoService } from '../feature-info.service';
@@ -19,6 +19,7 @@ import { MobileLayoutService } from '../../../services/viewer-layout/mobile-layo
 import { MapSpinnerComponent } from '../../../map/components/map-spinner/map-spinner.component';
 import { FeatureInfoDialogComponent } from '../feature-info-dialog/feature-info-dialog.component';
 import { AsyncPipe } from '@angular/common';
+import { ApplicationLayerRefreshService } from '../../../map/services/application-layer-refresh.service';
 
 @Component({
     selector: 'tm-feature-info',
@@ -36,6 +37,7 @@ export class FeatureInfoComponent implements OnInit, OnDestroy {
   private featureInfoService = inject(FeatureInfoService);
   private store$ = inject(Store);
   private featureUpdatedService = inject(FeatureUpdatedService);
+  private applicationLayerRefreshService = inject(ApplicationLayerRefreshService);
   private mobileLayoutService = inject(MobileLayoutService);
 
 
@@ -82,6 +84,21 @@ export class FeatureInfoComponent implements OnInit, OnDestroy {
         if (updatedFeatureInFeatureInfo) {
           this.featureInfoService.updateSingleFeature(updatedFeatureInFeatureInfo.__fid, updatedFeatureInFeatureInfo.layerId);
         }
+      });
+
+    this.applicationLayerRefreshService.layerRefreshed$
+      .pipe(
+        takeUntil(this.destroyed),
+        withLatestFrom(
+          this.store$.select(selectCurrentlySelectedFeature),
+          this.store$.select(selectFeatureInfoDialogVisible),
+        ),
+      )
+      .subscribe(([ layerId, feature, dialogVisible ]) => {
+        if (!dialogVisible || !feature || feature.layer.id !== layerId || !feature.layer.hasAttributes) {
+          return;
+        }
+        this.featureInfoService.updateSingleFeature(feature.__fid, layerId);
       });
   }
 
