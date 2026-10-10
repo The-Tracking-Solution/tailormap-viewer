@@ -92,7 +92,9 @@ export const selectCurrentlySelectedFeature = createSelector(
     if (!selectedLayer || !selectedLayer.selectedFeatureId) {
       return null;
     }
-    return features.find(f => f.__fid === selectedLayer.selectedFeatureId) || null;
+    return features.find(
+      f => f.layer.id === selectedLayer.id && f.__fid === selectedLayer.selectedFeatureId,
+    ) || null;
   },
 );
 
