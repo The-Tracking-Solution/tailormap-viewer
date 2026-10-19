@@ -4,4 +4,5 @@ export interface FeatureInfoConfigModel extends ComponentBaseConfigModel {
   defaultShowDropdown: boolean;
   showEditButton?: boolean;
   hideEmptyValues?: boolean;
+  showEmbeddedVideos?: boolean;
 }

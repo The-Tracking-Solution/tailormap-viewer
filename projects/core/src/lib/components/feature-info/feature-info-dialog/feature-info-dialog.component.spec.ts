@@ -1,14 +1,14 @@
 import { describe, test, expect, vi } from 'vitest';
-import { render, screen } from '@testing-library/angular';
+import { fireEvent, render, screen } from '@testing-library/angular';
 import { FeatureInfoDialogComponent } from './feature-info-dialog.component';
 import { MockStore, provideMockStore } from '@ngrx/store/testing';
 import { featureInfoStateKey, initialFeatureInfoState } from '../state/feature-info.state';
 import { LoadingStateEnum } from '@tailormap-viewer/shared';
 import {
-  selectCurrentlySelectedFeature, selectFeatureInfoDialogVisible, selectFeatureInfoMetadata, selectIsNextButtonDisabled,
+  selectCurrentlySelectedFeature, selectFeatureInfoDialogCollapsed, selectFeatureInfoDialogVisible, selectFeatureInfoMetadata, selectIsNextButtonDisabled,
   selectIsPrevButtonDisabled, selectSelectedFeatureInfoLayer,
 } from '../state/feature-info.selectors';
-import { AuthenticatedUserService, getAppLayerModel, TAILORMAP_API_V1_SERVICE, TailormapApiV1MockService } from '@tailormap-viewer/api';
+import { AuthenticatedUserService, BaseComponentTypeEnum, getAppLayerModel, TAILORMAP_API_V1_SERVICE, TailormapApiV1MockService } from '@tailormap-viewer/api';
 import { TestBed } from '@angular/core/testing';
 import { FeatureInfoModel } from '../models/feature-info.model';
 import { showNextFeatureInfoFeature, showPreviousFeatureInfoFeature } from '../state/feature-info.actions';
@@ -37,7 +37,11 @@ const getFeatureInfo = (updated?: boolean): FeatureInfoModel => {
   };
 };
 
-const setup = async (withState = false) => {
+const setup = async (withState = false, withVideo = false) => {
+  const feature = getFeatureInfo();
+  if (withVideo) {
+    feature.sortedAttributes[0].attributeValue = 'https://www.youtube.com/embed/EH6GNSEvmQE';
+  }
   const mockMobileLayoutService = { isMobileLayoutEnabled$: of(false) };
   const mockFeatureSelectionBookmarkService = { getFidSelectionUrl$: () => of(null) };
   return await render(FeatureInfoDialogComponent, {
@@ -49,12 +53,14 @@ const setup = async (withState = false) => {
         initialState: { [featureInfoStateKey]: { ...initialFeatureInfoState } },
         selectors: withState ? [
           { selector: selectSelectedFeatureInfoLayer, value: { id: '1', title: 'test', loading: LoadingStateEnum.LOADED } },
-          { selector: selectCurrentlySelectedFeature, value: getFeatureInfo() },
+          { selector: selectCurrentlySelectedFeature, value: feature },
           { selector: selectFeatureInfoDialogVisible, value: true },
           { selector: selectIsPrevButtonDisabled, value: false },
           { selector: selectIsNextButtonDisabled, value: false },
           { selector: selectViewerLoadingState, value: LoadingStateEnum.LOADED },
-          { selector: selectComponentsConfig, value: [] },
+          { selector: selectComponentsConfig, value: withVideo
+            ? [{ type: BaseComponentTypeEnum.FEATURE_INFO, config: { enabled: true, showEmbeddedVideos: true } }]
+            : [] },
           { selector: selectIn3dView, value: false },
           { selector: selectFeatureInfoMetadata, value: { columnMetadata: [], attachmentMetadata: [] } },
           { selector: selectAllFilterGroupsForLayerId('1'), value: [] },
@@ -92,6 +98,28 @@ describe('FeatureInfoDialogComponent', () => {
   test('runs without feature info', async () => {
     const { container } = await setup();
     expect(container.querySelector('.feature-info')).toBeNull();
+  });
+
+  test('stops the player when the desktop dialog is collapsed or closed', async () => {
+    const { fixture, container, getByRole } = await setup(true, true);
+    const store = TestBed.inject(MockStore);
+    fireEvent.click(getByRole('button', { name: 'Play video' }));
+    fixture.detectChanges();
+    expect(container.querySelector('iframe')).not.toBeNull();
+    store.overrideSelector(selectFeatureInfoDialogCollapsed, true);
+    store.refreshState();
+    fixture.detectChanges();
+    expect(container.querySelector('iframe')).toBeNull();
+    store.overrideSelector(selectFeatureInfoDialogCollapsed, false);
+    store.refreshState();
+    fixture.detectChanges();
+    fireEvent.click(getByRole('button', { name: 'Play video' }));
+    fixture.detectChanges();
+    expect(container.querySelector('iframe')).not.toBeNull();
+    store.overrideSelector(selectFeatureInfoDialogVisible, false);
+    store.refreshState();
+    fixture.detectChanges();
+    expect(container.querySelector('iframe')).toBeNull();
   });
 
   test('shows feature info', async () => {

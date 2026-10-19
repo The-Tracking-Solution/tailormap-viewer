@@ -1,0 +1,17 @@
+@if (videoId) {
+  <div class="video">
+    @if (playerUrl(); as url) {
+      <iframe #player [src]="url"
+              title="YouTube video"
+              i18n-title="@@core.feature-info.video-title"
+              allow="autoplay; encrypted-media; picture-in-picture; fullscreen"
+              referrerpolicy="strict-origin-when-cross-origin"
+              allowfullscreen></iframe>
+      <button mat-button type="button" (click)="stopVideo()" i18n="@@core.feature-info.stop-video">Stop video</button>
+    } @else {
+      <button mat-stroked-button type="button" (click)="playVideo()" i18n="@@core.feature-info.play-video">Play video</button>
+    }
+    <a [href]="watchUrl" target="_blank" rel="noopener noreferrer" i18n="@@core.feature-info.open-youtube">Open in YouTube</a>
+    <p i18n="@@core.feature-info.video-fallback">If playback is unavailable, open the video in YouTube.</p>
+  </div>
+}

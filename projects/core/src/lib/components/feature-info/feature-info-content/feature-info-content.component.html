@@ -12,12 +12,18 @@
           <div class="toggle attributes-toggle" (click)="toggleAttributes()"><mat-icon [svgIcon]="attributesToggleIcon()"></mat-icon></div>
         }
         <div class="content attributes-list">
-          @for (att of feature.sortedAttributes; track att) {
+          @for (att of feature.sortedAttributes; track att.key) {
             @if (shouldShowAttribute(att)) {
               <div class="row">
                 <strong>{{att.label}}</strong>
                 <div class="row-content">
-                  <div class="attribute-value" [innerHTML]="att.attributeValue | htmlify"></div>
+                  <div class="attribute-value">
+                    <div [innerHTML]="att.attributeValue | htmlify"></div>
+                    @if (showEmbeddedVideos() && mediaVisible() && !(attributesCollapsed() && layer.template)) {
+                      <tm-feature-info-video [source]="att.attributeValue"
+                                             [featureKey]="feature.layer.id + ':' + feature.__fid"></tm-feature-info-video>
+                    }
+                  </div>
                   <div
                     class="filter-button-wrapper"
                     [class.filter-active]="getExactFilters$(feature.layer.id, att.key, att.attributeValue) | async"

@@ -17,6 +17,7 @@ import { MatIcon } from '@angular/material/icon';
 import { MatIconButton, MatButton } from '@angular/material/button';
 import { MatTooltip } from '@angular/material/tooltip';
 import { AsyncPipe } from '@angular/common';
+import { FeatureInfoVideoComponent } from '../feature-info-video/feature-info-video.component';
 
 @Component({
     selector: 'tm-feature-info-content',
@@ -33,6 +34,7 @@ import { AsyncPipe } from '@angular/common';
         MatButton,
         AsyncPipe,
         HtmlifyPipe,
+        FeatureInfoVideoComponent,
     ],
 })
 export class FeatureInfoContentComponent {
@@ -49,6 +51,8 @@ export class FeatureInfoContentComponent {
   public isNextButtonDisabled = input<boolean>(false);
   public isEditPossible = input<boolean>(false);
   public hideEmptyValues = input<boolean>(false);
+  public showEmbeddedVideos = input<boolean>(false);
+  public mediaVisible = input<boolean>(true);
 
   public showNextFeatureInfoFeature = output<void>();
   public showPreviousFeatureInfoFeature = output<void>();

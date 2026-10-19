@@ -1,0 +1,28 @@
+:host {
+  display: block;
+  min-width: 0;
+}
+
+.video {
+  margin-top: 8px;
+}
+
+iframe {
+  display: block;
+  width: 100%;
+  min-width: 200px;
+  min-height: 200px;
+  aspect-ratio: 16 / 9;
+  border: 0;
+  background: #000;
+}
+
+a {
+  display: inline-block;
+  margin: 8px 0;
+}
+
+p {
+  margin: 0;
+  font-size: 12px;
+}
