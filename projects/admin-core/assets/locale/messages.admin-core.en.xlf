@@ -1266,7 +1266,7 @@
         <source>Show button to edit the feature</source>
       </trans-unit>
       <trans-unit id="admin-core.components.feature-info.show-embedded-videos" datatype="html">
-        <source>Show a video player for YouTube embed links in attributes</source>
+        <source>Show a video player for YouTube links in attributes</source>
       </trans-unit>
       <trans-unit id="admin-core.components.geolocation-no-timeout" datatype="html">
         <source>Show location on the map until the button is toggled off.</source>

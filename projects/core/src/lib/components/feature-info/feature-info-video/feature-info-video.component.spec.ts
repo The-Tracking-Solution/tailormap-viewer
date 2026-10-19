@@ -18,7 +18,7 @@ describe('FeatureInfoVideoComponent', () => {
     expect(getByRole('link', { name: 'Open in YouTube' }).getAttribute('href')).toBe('https://www.youtube.com/watch?v=EH6GNSEvmQE');
 
     // Refreshed query parameters for the same source do not reload the player.
-    fixture.componentRef.setInput('source', 'https://www.youtube.com/embed/EH6GNSEvmQE?si=changed');
+    fixture.componentRef.setInput('source', 'https://www.youtube.com/watch?v=EH6GNSEvmQE&si=changed');
     fixture.detectChanges();
     expect(container.querySelector('iframe')).toBe(frame);
     fireEvent.click(getByRole('button', { name: 'Stop video' }));
