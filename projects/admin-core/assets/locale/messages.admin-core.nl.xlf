@@ -1714,8 +1714,8 @@
         <target>Toon knop om het object te bewerken</target>
       </trans-unit>
       <trans-unit id="admin-core.components.feature-info.show-embedded-videos" datatype="html">
-        <source>Show a video player for YouTube embed links in attributes</source>
-        <target>Videospeler tonen voor YouTube-insluitlinks in attributen</target>
+        <source>Show a video player for YouTube links in attributes</source>
+        <target>Videospeler tonen voor YouTube-links in attributen</target>
       </trans-unit>
       <trans-unit id="admin-core.components.geolocation-no-timeout" datatype="html">
         <source>Show location on the map until the button is toggled off.</source>

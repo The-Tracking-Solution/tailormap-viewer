@@ -6,16 +6,18 @@ refresh features. It needs no API, PostGIS, GeoServer or streaming-server change
 ## Enable
 
 In Admin, application components → Feature info, enable **Show a video player for
-YouTube embed links in attributes**. Existing applications default to disabled.
+YouTube links in attributes**. Existing applications default to disabled.
 The API's existing component config stores the optional `showEmbeddedVideos`
 boolean; no schema migration is required.
 
-Only explicit HTTPS `/embed/VIDEO_ID` URLs on youtube.com, www.youtube.com,
-youtube-nocookie.com or www.youtube-nocookie.com are recognized. Watch URLs,
-shortlinks and other providers remain ordinary attribute values. Recognition is
-independent of attribute or layer names; it works for the webcams layer's `url`
-attribute without domain-specific code. Per-layer/attribute configuration and
-other stream types are possible future work, not supported by this version.
+Supported HTTPS links include YouTube `/embed/VIDEO_ID`, `/watch?v=VIDEO_ID`,
+`/live/VIDEO_ID`, `/shorts/VIDEO_ID` and `youtu.be/VIDEO_ID` shortlinks. Only exact
+YouTube hosts and valid 11-character video IDs are accepted. Other providers
+remain ordinary attribute values. Recognition is independent of attribute or
+layer names; it works for the webcams layer's `url` attribute without
+domain-specific code. Per-layer/attribute configuration and other stream types
+are possible future work, not supported by this version. Recognizing a URL does
+not establish that the video exists, is live, or permits embedding.
 
 The original attribute and filtering remain available. A player is loaded only
 when the user clicks **Play video**, using a canonical youtube-nocookie.com URL

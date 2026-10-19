@@ -1715,8 +1715,8 @@
         <target>Schaltfläche zum Bearbeiten des Objekts anzeigen</target>
       </trans-unit>
       <trans-unit id="admin-core.components.feature-info.show-embedded-videos" datatype="html">
-        <source>Show a video player for YouTube embed links in attributes</source>
-        <target>Videoplayer für YouTube-Einbettungslinks in Attributen anzeigen</target>
+        <source>Show a video player for YouTube links in attributes</source>
+        <target>Videoplayer für YouTube-Links in Attributen anzeigen</target>
       </trans-unit>
       <trans-unit id="admin-core.components.geolocation-no-timeout" datatype="html">
         <source>Show location on the map until the button is toggled off.</source>
