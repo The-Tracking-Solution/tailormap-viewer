@@ -11,6 +11,7 @@
                                [isNextButtonDisabled]="(isNextButtonDisabled$ | async) ?? false"
                                [isEditPossible]="isEditPossible() ?? false"
                                [hideEmptyValues]="config()?.hideEmptyValues ?? false"
+                               [showEmbeddedVideos]="config()?.showEmbeddedVideos ?? false"
                                (showNextFeatureInfoFeature)="next()"
                                (showPreviousFeatureInfoFeature)="back()"
                                (editFeature)="editFeature()">
@@ -65,6 +66,8 @@
         [isNextButtonDisabled]="(isNextButtonDisabled$ | async) ?? false"
         [isEditPossible]="isEditPossible() ?? false"
         [hideEmptyValues]="config()?.hideEmptyValues ?? false"
+        [showEmbeddedVideos]="config()?.showEmbeddedVideos ?? false"
+        [mediaVisible]="(dialogOpen$ | async) === true && (dialogCollapsed$ | async) !== true"
         (showNextFeatureInfoFeature)="next()"
         (showPreviousFeatureInfoFeature)="back()"
         (editFeature)="editFeature()">

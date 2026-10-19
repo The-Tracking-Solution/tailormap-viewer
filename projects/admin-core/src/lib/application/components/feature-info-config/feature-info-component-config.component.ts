@@ -46,6 +46,7 @@ export class FeatureInfoComponentConfigComponent implements ConfigurationCompone
     defaultShowDropdown: new FormControl<boolean>(false),
     showEditButton: new FormControl<boolean>(true),
     hideEmptyValues: new FormControl<boolean>(false),
+    showEmbeddedVideos: new FormControl<boolean>(false),
   });
 
   constructor() {
@@ -64,6 +65,7 @@ export class FeatureInfoComponentConfigComponent implements ConfigurationCompone
       defaultShowDropdown: config?.defaultShowDropdown ?? false,
       showEditButton: config?.showEditButton ?? true,
       hideEmptyValues: config?.hideEmptyValues ?? false,
+      showEmbeddedVideos: config?.showEmbeddedVideos ?? false,
     }, { emitEvent: false });
   }
 
@@ -71,6 +73,7 @@ export class FeatureInfoComponentConfigComponent implements ConfigurationCompone
     this.componentConfigService.updateConfigForKey<FeatureInfoConfigModel>(this.type, 'defaultShowDropdown', this.formGroup.value.defaultShowDropdown);
     this.componentConfigService.updateConfigForKey<FeatureInfoConfigModel>(this.type, 'showEditButton', this.formGroup.value.showEditButton);
     this.componentConfigService.updateConfigForKey<FeatureInfoConfigModel>(this.type, 'hideEmptyValues', this.formGroup.value.hideEmptyValues);
+    this.componentConfigService.updateConfigForKey<FeatureInfoConfigModel>(this.type, 'showEmbeddedVideos', this.formGroup.value.showEmbeddedVideos);
   }
 
 }

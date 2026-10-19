@@ -726,6 +726,14 @@
         <source>Object Information</source>
         <target>Objectinformatie</target>
       </trans-unit>
+      <trans-unit id="core.feature-info.open-youtube" datatype="html">
+        <source>Open in YouTube</source>
+        <target>Openen in YouTube</target>
+      </trans-unit>
+      <trans-unit id="core.feature-info.play-video" datatype="html">
+        <source>Play video</source>
+        <target>Video afspelen</target>
+      </trans-unit>
       <trans-unit id="core.feature-info.previous" datatype="html">
         <source>Previous</source>
         <target>Vorige</target>
@@ -745,6 +753,18 @@
       <trans-unit id="core.feature-info.share-feature-not-copied" datatype="html">
         <source>Failed to copy link to clipboard</source>
         <target>Link naar klembord kopiëren mislukt</target>
+      </trans-unit>
+      <trans-unit id="core.feature-info.stop-video" datatype="html">
+        <source>Stop video</source>
+        <target>Video stoppen</target>
+      </trans-unit>
+      <trans-unit id="core.feature-info.video-fallback" datatype="html">
+        <source>If playback is unavailable, open the video in YouTube.</source>
+        <target>Kun je de video niet afspelen? Open deze dan in YouTube.</target>
+      </trans-unit>
+      <trans-unit id="core.feature-info.video-title" datatype="html">
+        <source>YouTube video</source>
+        <target>YouTube-video</target>
       </trans-unit>
       <trans-unit id="core.filter.add-spatial-filter" datatype="html">
         <source>Add spatial filter</source>

@@ -542,6 +542,12 @@
       <trans-unit id="core.feature-info.object-information" datatype="html">
         <source>Object Information</source>
       </trans-unit>
+      <trans-unit id="core.feature-info.open-youtube" datatype="html">
+        <source>Open in YouTube</source>
+      </trans-unit>
+      <trans-unit id="core.feature-info.play-video" datatype="html">
+        <source>Play video</source>
+      </trans-unit>
       <trans-unit id="core.feature-info.previous" datatype="html">
         <source>Previous</source>
       </trans-unit>
@@ -556,6 +562,15 @@
       </trans-unit>
       <trans-unit id="core.feature-info.share-feature-not-copied" datatype="html">
         <source>Failed to copy link to clipboard</source>
+      </trans-unit>
+      <trans-unit id="core.feature-info.stop-video" datatype="html">
+        <source>Stop video</source>
+      </trans-unit>
+      <trans-unit id="core.feature-info.video-fallback" datatype="html">
+        <source>If playback is unavailable, open the video in YouTube.</source>
+      </trans-unit>
+      <trans-unit id="core.feature-info.video-title" datatype="html">
+        <source>YouTube video</source>
       </trans-unit>
       <trans-unit id="core.filter.add-spatial-filter" datatype="html">
         <source>Add spatial filter</source>

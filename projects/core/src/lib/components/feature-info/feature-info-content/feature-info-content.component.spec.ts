@@ -1,5 +1,5 @@
 import { describe, test, expect, vi } from 'vitest';
-import { render, screen } from '@testing-library/angular';
+import { fireEvent, render, screen } from '@testing-library/angular';
 import { FeatureInfoContentComponent } from './feature-info-content.component';
 import { LoadingStateEnum } from '@tailormap-viewer/shared';
 import { FeatureInfoModel } from '../models';
@@ -27,16 +27,14 @@ const getFeatureInfo = (updated?: boolean): FeatureInfoModel => {
   };
 };
 
-describe('FeatureInfoContentComponent', () => {
-
-  test('should render', async () => {
+const setup = async (feature = getFeatureInfo(), showEmbeddedVideos = false) => {
     const mockAttachmentService = {
       getAttachmentUrl: () => '',
       getAttachmentTooltip: () => '',
     };
     const mockFeatureSelectionBookmarkService = { getFidSelectionUrl$: () => of(null) };
     const mockSimpleAttributeFilterService = { setFilter: vi.fn(), removeFilterById: vi.fn() };
-    await render(FeatureInfoContentComponent, {
+    return await render(FeatureInfoContentComponent, {
       imports: [
         ],
       providers: [
@@ -56,14 +54,59 @@ describe('FeatureInfoContentComponent', () => {
       ],
       inputs: {
         selectedLayer: { id: '1', title: 'Layer1', loading: LoadingStateEnum.LOADED },
-        currentFeature: getFeatureInfo(),
+        currentFeature: feature,
+        showEmbeddedVideos,
         isPrevButtonDisabled: false,
         isNextButtonDisabled: false,
         isEditPossible: true,
       },
     });
+};
+
+describe('FeatureInfoContentComponent', () => {
+  test('should render', async () => {
+    await setup();
     expect((await screen.findByText(/fid/)).nextSibling?.textContent?.trim()).toEqual('1');
     expect((await screen.findByText(/Property 2/)).nextSibling?.textContent?.trim()).toEqual('another test');
   });
 
+  test('preserves playback across refreshed attributes and stops when hidden or selecting another feature', async () => {
+    const feature = getFeatureInfo();
+    feature.sortedAttributes[0].attributeValue = 'https://www.youtube.com/embed/EH6GNSEvmQE';
+    const { fixture, container, getByRole } = await setup(feature);
+    expect(container.querySelector('tm-feature-info-video')).toBeNull();
+    fixture.componentRef.setInput('showEmbeddedVideos', true);
+    fixture.detectChanges();
+    fireEvent.click(getByRole('button', { name: 'Play video' }));
+    fixture.detectChanges();
+    const frame = container.querySelector('iframe');
+    expect(frame).not.toBeNull();
+
+    // A refresh creates new attribute objects, but the existing player must survive.
+    const refreshed = { ...feature, sortedAttributes: feature.sortedAttributes.map(att => ({ ...att })) };
+    refreshed.sortedAttributes[1].attributeValue = 'Updated name';
+    fixture.componentRef.setInput('currentFeature', refreshed);
+    fixture.detectChanges();
+    expect(container.querySelector('iframe')).toBe(frame);
+    expect(container.textContent).toContain('Updated name');
+
+    fixture.componentRef.setInput('mediaVisible', false);
+    fixture.detectChanges();
+    expect(container.querySelector('iframe')).toBeNull();
+    expect(frame?.isConnected).toBe(false);
+    fixture.componentRef.setInput('mediaVisible', true);
+    fixture.detectChanges();
+    fireEvent.click(getByRole('button', { name: 'Play video' }));
+    fixture.detectChanges();
+    expect(container.querySelector('iframe')).not.toBeNull();
+    fixture.componentRef.setInput('currentFeature', { ...refreshed, __fid: 'another-feature' });
+    fixture.detectChanges();
+    expect(container.querySelector('iframe')).toBeNull();
+    fireEvent.click(getByRole('button', { name: 'Play video' }));
+    fixture.detectChanges();
+    fixture.componentRef.setInput('showEmbeddedVideos', false);
+    fixture.detectChanges();
+    expect(container.querySelector('iframe')).toBeNull();
+    expect(container.textContent).toContain('https://www.youtube.com/embed/EH6GNSEvmQE');
+  });
 });
