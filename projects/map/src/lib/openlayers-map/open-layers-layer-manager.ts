@@ -1,4 +1,5 @@
 import { Map as OlMap } from 'ol';
+import { getUid } from 'ol/util.js';
 import { Group as LayerGroup, Layer as BaseLayer, Vector as VectorLayer } from 'ol/layer.js';
 import { ImageWMS, TileWMS, Vector as VectorSource, WMTS, XYZ } from 'ol/source.js';
 import { get as getProjection, Projection } from 'ol/proj.js';
@@ -12,8 +13,20 @@ import { ArrayHelper } from '@tailormap-viewer/shared';
 import { NgZone } from '@angular/core';
 import { HttpXsrfTokenExtractor } from '@angular/common/http';
 import { ServerType } from '@tailormap-viewer/api';
+import { BehaviorSubject } from 'rxjs';
+import { unByKey } from 'ol/Observable.js';
+import { EventsKey } from 'ol/events.js';
+import { WmsLoadMonitor } from './wms-load-monitor';
+import { LayerLoadStatusModel } from '../models/layer-load-status.model';
+import CanvasTileLayerRenderer from 'ol/renderer/canvas/TileLayer.js';
 
 export class OpenLayersLayerManager implements LayerManagerModel {
+
+  private observedLayerIds = new Set<string>();
+  private loadMonitors = new Map<string, WmsLoadMonitor>();
+  private loadStatus = new BehaviorSubject<ReadonlyMap<string, LayerLoadStatusModel>>(new Map());
+  private layerRenderListeners = new Map<string, EventsKey>();
+  public readonly layerLoadStatus$ = this.loadStatus.asObservable();
 
   private layers: Map<string, BaseLayer> = new Map<string, BaseLayer>();
   private backgroundLayers: Map<string, BaseLayer> = new Map<string, BaseLayer>();
@@ -41,6 +54,8 @@ export class OpenLayersLayerManager implements LayerManagerModel {
   }
 
   public destroy() {
+    Array.from(this.loadMonitors.keys()).forEach(id => this.stopLoadMonitor(id));
+    this.loadStatus.complete();
     this.layers = new Map();
     this.backgroundLayers = new Map();
     this.vectorLayers = new Map();
@@ -111,6 +126,7 @@ export class OpenLayersLayerManager implements LayerManagerModel {
     const layerGroupProjection = layerGroup === this.backgroundLayerGroup ? this.currentBackgroundLayerProjection : this.currentBaseLayerProjection;
     const layerIdentifiers = this.createLayerIdentifiers(layers);
     if (useProjection && useProjection !== layerGroupProjection.getCode()) {
+      currentLayerMap.forEach((_, id) => this.stopLoadMonitor(id));
       layerGroup.getLayers().clear();
       currentLayerMap.clear();
       if (layerGroup === this.backgroundLayerGroup) {
@@ -151,6 +167,7 @@ export class OpenLayersLayerManager implements LayerManagerModel {
       return null;
     }
     OlLayerHelper.setLayerProps(layer, olLayer);
+    this.observeWmsLoads(layer.id, olLayer);
     this.addLayerToMap(olLayer);
     olLayer.setZIndex(this.getZIndexForLayer(zIndex));
     this.moveDrawingLayersToTop();
@@ -158,6 +175,68 @@ export class OpenLayersLayerManager implements LayerManagerModel {
       this.layers.set(layer.id, olLayer);
     }
     return olLayer as LayerType;
+  }
+
+  public setLayerLoadStatusIds(layerIds: string[]) {
+    this.observedLayerIds = new Set(layerIds);
+    this.loadMonitors.forEach((_, id) => {
+      if (!this.observedLayerIds.has(id)) {
+        this.stopLoadMonitor(id);
+      }
+    });
+    layerIds.forEach(id => {
+      const layer = this.layers.get(id);
+      if (layer && !this.loadMonitors.has(id)) {
+        this.observeWmsLoads(id, layer);
+      }
+    });
+  }
+
+  private observeWmsLoads(id: string, layer: BaseLayer) {
+    this.stopLoadMonitor(id);
+    if (!this.observedLayerIds.has(id)) {
+      return;
+    }
+    if (!isOpenLayersWMSLayer(layer)) {
+      this.ngZone.run(() => {
+        const statuses = new Map(this.loadStatus.value);
+        statuses.delete(id);
+        this.loadStatus.next(statuses);
+      });
+      return;
+    }
+    const source = layer.getSource();
+    if (!source) {
+      return;
+    }
+    const previousSuccess = this.loadStatus.value.get(id)?.lastSuccessfulLoad;
+    const monitor = new WmsLoadMonitor(source, status => {
+      this.ngZone.run(() => {
+        const statuses = new Map(this.loadStatus.value);
+        statuses.set(id, status);
+        this.loadStatus.next(statuses);
+      });
+    }, previousSuccess);
+    this.loadMonitors.set(id, monitor);
+    if (source instanceof TileWMS) {
+      // A busy or failed unrelated layer must not block this layer's confirmation.
+      this.layerRenderListeners.set(id, layer.on('postrender', event => {
+        const renderer = layer.getRenderer();
+        const wanted = event.frameState?.wantedTiles[getUid(source)] ?? {};
+        monitor.observeRender(Object.keys(wanted),
+          renderer instanceof CanvasTileLayerRenderer && renderer.renderComplete);
+      }));
+    }
+  }
+
+  private stopLoadMonitor(id: string) {
+    const listener = this.layerRenderListeners.get(id);
+    if (listener) {
+      unByKey(listener);
+      this.layerRenderListeners.delete(id);
+    }
+    this.loadMonitors.get(id)?.destroy();
+    this.loadMonitors.delete(id);
   }
 
   private getZIndexForLayer(zIndex?: number) {
@@ -214,6 +293,7 @@ export class OpenLayersLayerManager implements LayerManagerModel {
       return;
     }
     olLayer.getSource()?.updateParams(changedParams);
+    this.loadMonitors.get(layer.id)?.reset();
   }
 
   public removeLayer(id: string) {
@@ -275,6 +355,7 @@ export class OpenLayersLayerManager implements LayerManagerModel {
     const source = layer.getSource();
     if (source instanceof ImageWMS || source instanceof TileWMS) {
       source.updateParams({ CACHE: Date.now() });
+      this.loadMonitors.get(layerId)?.beginRefresh();
     }
     if (source instanceof WMTS || source instanceof XYZ) {
       const urls = (source.getUrls() || []).map(url => {
@@ -336,6 +417,7 @@ export class OpenLayersLayerManager implements LayerManagerModel {
       this.removeVectorLayer(layer, layerId);
       return;
     }
+    this.stopLoadMonitor(layerId);
     const layers = layerGroup.getLayers();
     layers.remove(layer);
     layerGroup.setLayers(layers);

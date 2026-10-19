@@ -1242,6 +1242,66 @@
       <trans-unit id="core.toolbar.coordinate-picker-longitude" datatype="html">
         <source>Longitude</source>
       </trans-unit>
+      <trans-unit id="core.refresh.waiting" datatype="html">
+        <source>Waiting for a completed WMS fetch</source>
+        <target>Waiting for a completed WMS fetch</target>
+      </trans-unit>
+      <trans-unit id="core.refresh.hidden" datatype="html">
+        <source>Layer hidden; automatic refresh paused</source>
+        <target>Layer hidden; automatic refresh paused</target>
+      </trans-unit>
+      <trans-unit id="core.refresh.no-3d" datatype="html">
+        <source>Fetch status is not supported in 3D yet</source>
+        <target>Fetch status is not supported in 3D yet</target>
+      </trans-unit>
+      <trans-unit id="core.refresh.out-of-scale" datatype="html">
+        <source>Outside scale range; no image fetch expected</source>
+        <target>Outside scale range; no image fetch expected</target>
+      </trans-unit>
+      <trans-unit id="core.refresh.unavailable" datatype="html">
+        <source>Fetch status unavailable; this preview supports WMS only</source>
+        <target>Fetch status unavailable; this preview supports WMS only</target>
+      </trans-unit>
+      <trans-unit id="core.refresh.error" datatype="html">
+        <source>WMS fetch failed or partially failed</source>
+        <target>WMS fetch failed or partially failed</target>
+      </trans-unit>
+      <trans-unit id="core.refresh.stale" datatype="html">
+        <source>Display may be outdated; no recent successful fetch</source>
+        <target>Display may be outdated; no recent successful fetch</target>
+      </trans-unit>
+      <trans-unit id="core.refresh.loading" datatype="html">
+        <source>Fetching WMS image</source>
+        <target>Fetching WMS image</target>
+      </trans-unit>
+      <trans-unit id="core.refresh.success" datatype="html">
+        <source>WMS fetch completed</source>
+        <target>WMS fetch completed</target>
+      </trans-unit>
+      <trans-unit id="core.refresh.last" datatype="html">
+        <source>Last successful fetch</source>
+        <target>Last successful fetch</target>
+      </trans-unit>
+      <trans-unit id="core.refresh.never" datatype="html">
+        <source>Not yet confirmed</source>
+        <target>Not yet confirmed</target>
+      </trans-unit>
+      <trans-unit id="core.refresh.next" datatype="html">
+        <source>Next scheduled refresh</source>
+        <target>Next scheduled refresh</target>
+      </trans-unit>
+      <trans-unit id="core.refresh.no-schedule" datatype="html">
+        <source>No refresh scheduled</source>
+        <target>No refresh scheduled</target>
+      </trans-unit>
+      <trans-unit id="core.refresh.delayed" datatype="html">
+        <source>Refresh overdue; browser scheduling may be delayed</source>
+        <target>Refresh overdue; browser scheduling may be delayed</target>
+      </trans-unit>
+      <trans-unit id="core.refresh.disclaimer" datatype="html">
+        <source>Fetch status does not confirm the age of the source data</source>
+        <target>Fetch status does not confirm the age of the source data</target>
+      </trans-unit>
     </body>
   </file>
 </xliff>

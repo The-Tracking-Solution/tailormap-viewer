@@ -6,6 +6,7 @@ import { FilterSourceHelper } from '../../../filter';
 import { MatIcon } from '@angular/material/icon';
 import { MatListItemMeta } from '@angular/material/list';
 import { MatRadioGroup, MatRadioButton } from '@angular/material/radio';
+import { LayerRefreshStatusComponent } from '../layer-refresh-status/layer-refresh-status.component';
 import { TocNodeDecorationService } from '../services/toc-node-decoration.service';
 
 @Component({
@@ -14,6 +15,7 @@ import { TocNodeDecorationService } from '../services/toc-node-decoration.servic
     styleUrls: ['./toc-node-layer.component.css'],
     imports: [
         MatIcon,
+        LayerRefreshStatusComponent,
         TooltipDirective,
         MatListItemMeta,
         MatRadioGroup,

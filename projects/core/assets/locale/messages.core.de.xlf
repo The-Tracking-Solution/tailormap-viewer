@@ -1659,6 +1659,66 @@
         <source>Longitude</source>
         <target>Längengrad</target>
       </trans-unit>
+      <trans-unit id="core.refresh.waiting" datatype="html">
+        <source>Waiting for a completed WMS fetch</source>
+        <target>Warten auf einen abgeschlossenen WMS-Abruf</target>
+      </trans-unit>
+      <trans-unit id="core.refresh.hidden" datatype="html">
+        <source>Layer hidden; automatic refresh paused</source>
+        <target>Ebene ausgeblendet; automatische Aktualisierung pausiert</target>
+      </trans-unit>
+      <trans-unit id="core.refresh.no-3d" datatype="html">
+        <source>Fetch status is not supported in 3D yet</source>
+        <target>Abrufstatus wird in 3D noch nicht unterstützt</target>
+      </trans-unit>
+      <trans-unit id="core.refresh.out-of-scale" datatype="html">
+        <source>Outside scale range; no image fetch expected</source>
+        <target>Außerhalb des Maßstabsbereichs; kein Bildabruf erwartet</target>
+      </trans-unit>
+      <trans-unit id="core.refresh.unavailable" datatype="html">
+        <source>Fetch status unavailable; this preview supports WMS only</source>
+        <target>Abrufstatus nicht verfügbar; diese Vorschau unterstützt nur WMS</target>
+      </trans-unit>
+      <trans-unit id="core.refresh.error" datatype="html">
+        <source>WMS fetch failed or partially failed</source>
+        <target>WMS-Abruf ganz oder teilweise fehlgeschlagen</target>
+      </trans-unit>
+      <trans-unit id="core.refresh.stale" datatype="html">
+        <source>Display may be outdated; no recent successful fetch</source>
+        <target>Anzeige möglicherweise veraltet; kein kürzlich erfolgreicher Abruf</target>
+      </trans-unit>
+      <trans-unit id="core.refresh.loading" datatype="html">
+        <source>Fetching WMS image</source>
+        <target>WMS-Bild wird abgerufen</target>
+      </trans-unit>
+      <trans-unit id="core.refresh.success" datatype="html">
+        <source>WMS fetch completed</source>
+        <target>WMS-Abruf abgeschlossen</target>
+      </trans-unit>
+      <trans-unit id="core.refresh.last" datatype="html">
+        <source>Last successful fetch</source>
+        <target>Letzter erfolgreicher Abruf</target>
+      </trans-unit>
+      <trans-unit id="core.refresh.never" datatype="html">
+        <source>Not yet confirmed</source>
+        <target>Noch nicht bestätigt</target>
+      </trans-unit>
+      <trans-unit id="core.refresh.next" datatype="html">
+        <source>Next scheduled refresh</source>
+        <target>Nächste geplante Aktualisierung</target>
+      </trans-unit>
+      <trans-unit id="core.refresh.no-schedule" datatype="html">
+        <source>No refresh scheduled</source>
+        <target>Keine Aktualisierung geplant</target>
+      </trans-unit>
+      <trans-unit id="core.refresh.delayed" datatype="html">
+        <source>Refresh overdue; browser scheduling may be delayed</source>
+        <target>Aktualisierung überfällig; Browser-Zeitplanung kann verzögert sein</target>
+      </trans-unit>
+      <trans-unit id="core.refresh.disclaimer" datatype="html">
+        <source>Fetch status does not confirm the age of the source data</source>
+        <target>Abrufstatus bestätigt nicht die Aktualität der Quelldaten</target>
+      </trans-unit>
     </body>
   </file>
 </xliff>

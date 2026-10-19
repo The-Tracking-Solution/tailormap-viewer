@@ -7,6 +7,12 @@
     <div class="tree-node__label">
       <span class="tree-node__label-content" [class]="decoration().labelCssClasses">{{node.label}}</span>
     </div>
+    @if (!isLevel() && node.metadata && (node.metadata.autoRefreshInSeconds ?? 0) > 0) {
+      <tm-layer-refresh-status [layer]="node.metadata"
+                               [visible]="!!node.checked"
+                               [inScale]="isInScale()"
+                               [in3D]="in3D()" />
+    }
     @for (icon of decoration().icons; track $index) {
       <mat-icon class="icon"
                 [svgIcon]="icon.svgIcon"

@@ -1659,6 +1659,66 @@
         <source>Longitude</source>
         <target>Lengtegraad</target>
       </trans-unit>
+      <trans-unit id="core.refresh.waiting" datatype="html">
+        <source>Waiting for a completed WMS fetch</source>
+        <target>Wachten op een voltooide WMS-ophaalactie</target>
+      </trans-unit>
+      <trans-unit id="core.refresh.hidden" datatype="html">
+        <source>Layer hidden; automatic refresh paused</source>
+        <target>Laag verborgen; automatisch verversen gepauzeerd</target>
+      </trans-unit>
+      <trans-unit id="core.refresh.no-3d" datatype="html">
+        <source>Fetch status is not supported in 3D yet</source>
+        <target>Ophaalstatus wordt nog niet ondersteund in 3D</target>
+      </trans-unit>
+      <trans-unit id="core.refresh.out-of-scale" datatype="html">
+        <source>Outside scale range; no image fetch expected</source>
+        <target>Buiten schaalbereik; geen beeldophaling verwacht</target>
+      </trans-unit>
+      <trans-unit id="core.refresh.unavailable" datatype="html">
+        <source>Fetch status unavailable; this preview supports WMS only</source>
+        <target>Ophaalstatus niet beschikbaar; deze proef ondersteunt alleen WMS</target>
+      </trans-unit>
+      <trans-unit id="core.refresh.error" datatype="html">
+        <source>WMS fetch failed or partially failed</source>
+        <target>WMS-ophaalactie geheel of gedeeltelijk mislukt</target>
+      </trans-unit>
+      <trans-unit id="core.refresh.stale" datatype="html">
+        <source>Display may be outdated; no recent successful fetch</source>
+        <target>Weergave mogelijk verouderd; geen recente geslaagde ophaalactie</target>
+      </trans-unit>
+      <trans-unit id="core.refresh.loading" datatype="html">
+        <source>Fetching WMS image</source>
+        <target>WMS-beeld wordt opgehaald</target>
+      </trans-unit>
+      <trans-unit id="core.refresh.success" datatype="html">
+        <source>WMS fetch completed</source>
+        <target>WMS-ophaalactie voltooid</target>
+      </trans-unit>
+      <trans-unit id="core.refresh.last" datatype="html">
+        <source>Last successful fetch</source>
+        <target>Laatste geslaagde ophaalactie</target>
+      </trans-unit>
+      <trans-unit id="core.refresh.never" datatype="html">
+        <source>Not yet confirmed</source>
+        <target>Nog niet bevestigd</target>
+      </trans-unit>
+      <trans-unit id="core.refresh.next" datatype="html">
+        <source>Next scheduled refresh</source>
+        <target>Volgende geplande verversing</target>
+      </trans-unit>
+      <trans-unit id="core.refresh.no-schedule" datatype="html">
+        <source>No refresh scheduled</source>
+        <target>Geen verversing gepland</target>
+      </trans-unit>
+      <trans-unit id="core.refresh.delayed" datatype="html">
+        <source>Refresh overdue; browser scheduling may be delayed</source>
+        <target>Verversing later dan gepland; browserplanning kan vertraagd zijn</target>
+      </trans-unit>
+      <trans-unit id="core.refresh.disclaimer" datatype="html">
+        <source>Fetch status does not confirm the age of the source data</source>
+        <target>Ophaalstatus bevestigt niet de actualiteit van de brongegevens</target>
+      </trans-unit>
     </body>
   </file>
 </xliff>
