@@ -162,3 +162,26 @@ must not be claimed when no execution environment is available; the LT3 script
 runs those checks before activation. Official provider references:
 https://www.ipcamlive.com/faqs and
 https://www.ipcamlive.com/examples/embed-iframe2.html .
+
+## rtsp.me and StreamPartner providers
+
+Recognize HTTPS `rtsp.me/embed/SOURCE_ID/` (optional trailing slash) and
+`ssl.streampartner.nl/player.php?url=SOURCE_ID`. Hosts and routes are exact;
+credentials and non-default ports are rejected. IDs contain 1–128 ASCII
+letters/digits/underscores/hyphens and start with a letter or digit.
+StreamPartner's `url` parameter must occur exactly once and contain an opaque
+ID, never a media URL. Other query parameters and fragments are discarded.
+Both player and external source links are rebuilt from the validated ID.
+
+The HTTPS rtsp.me service provides the embedded player; this does not add native
+RTSP protocol support. Player identity is provider plus source ID. Loading starts
+on Play, equivalent refreshes preserve playback, and Stop, feature/source/provider
+changes and destruction end playback, as for the existing providers.
+
+Acceptance candidates: Vuurtoren Breskens (feature 21, StreamPartner,
+`rwj3wllrsipkvysnuozz`) and De Zeebries (feature 26, rtsp.me, `tkkGYA72`).
+Browser playback still needs acceptance on LT3; URL recognition alone does not
+prove playback. Repeat YouTube, NetcamViewer and IPCamLive checks. This is a
+viewer-only addition; the API and attachment-storage behavior are unchanged.
+
+Official rtsp.me embed documentation: https://rtsp.me/en/how-to-embed-stream-on-website.html .

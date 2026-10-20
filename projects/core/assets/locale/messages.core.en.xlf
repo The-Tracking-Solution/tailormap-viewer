@@ -1329,6 +1329,12 @@
       <trans-unit id="core.feature-info.open-ipcamlive" datatype="html">
         <source>Open in IPCamLive</source>
       </trans-unit>
+      <trans-unit id="core.feature-info.open-rtspme" datatype="html">
+        <source>Open in rtsp.me</source>
+      </trans-unit>
+      <trans-unit id="core.feature-info.open-streampartner" datatype="html">
+        <source>Open in StreamPartner</source>
+      </trans-unit>
     </body>
   </file>
 </xliff>

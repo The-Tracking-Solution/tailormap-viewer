@@ -17,8 +17,12 @@
     } @else {
       @if (currentVideo.provider === 'netcamviewer') {
         <a [href]="watchUrl" target="_blank" rel="noopener noreferrer" i18n="@@core.feature-info.open-netcamviewer">Open in NetcamViewer</a>
-      } @else {
+      } @else if (currentVideo.provider === 'ipcamlive') {
         <a [href]="watchUrl" target="_blank" rel="noopener noreferrer" i18n="@@core.feature-info.open-ipcamlive">Open in IPCamLive</a>
+      } @else if (currentVideo.provider === 'rtspme') {
+        <a [href]="watchUrl" target="_blank" rel="noopener noreferrer" i18n="@@core.feature-info.open-rtspme">Open in rtsp.me</a>
+      } @else {
+        <a [href]="watchUrl" target="_blank" rel="noopener noreferrer" i18n="@@core.feature-info.open-streampartner">Open in StreamPartner</a>
       }
       <p i18n="@@core.feature-info.video-provider-fallback">If playback is unavailable, open the video at its source.</p>
     }
