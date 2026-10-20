@@ -125,4 +125,40 @@ check NetcamViewer starting, external source link, stop, feature/camera/provider
 switching, closing/collapsing and unchanged automatic refresh. Check fullscreen
 and mobile sizing. A provider snapshot must not be accepted as confirmed live
 video. Domain/referrer restrictions may prevent a camera from playing even
-when the URL is recognized. IPCamLive and Meekijken are separate follow-ups.
+when the URL is recognized. Meekijken remains a separate follow-up.
+
+## IPCamLive provider
+
+IPCamLive public camera links on `ipcamlive.com` and `www.ipcamlive.com` with
+one alias path segment are recognized, together with
+`/player/player.php?alias=CAMERA_ALIAS` on those hosts and `g0.ipcamlive.com`.
+Only HTTPS, exact hosts and no credentials or non-default ports are accepted.
+The alias is limited to 1–100 ASCII letters/digits/underscores/hyphens, starting
+with a letter or digit. Duplicate or empty alias parameters are rejected.
+
+Both forms resolve to a single canonical player:
+`https://g0.ipcamlive.com/player/player.php?alias=CAMERA_ALIAS&autoplay=1`.
+It is loaded only after the user presses Play. Other caller-supplied query options,
+fragments, stream addresses, tokens and domain overrides are not forwarded. In particular,
+`controls=0` from a source link is not retained: the provider's default control settings
+are used. The external link points to the canonical public camera page;
+the original source attribute link also remains available.
+
+Player identity is the validated alias, independently of the supplied supported
+host or public/embed notation. A refresh with the same alias does not restart
+the iframe; camera, feature and provider changes stop the previous player.
+
+The supplied acceptance candidates are De Toko (feature 28, alias
+`detokowebcam`) and Strandhotel Buren aan Zee (feature 78, alias
+`strandhotelburen`). Verify both in the browser after the LT3 build/tests, and
+repeat a YouTube and NetcamViewer check. URL recognition is not confirmation of
+a working stream or embedding permission. Provider domain restrictions, disabled
+public pages and camera availability can still prevent playback; do not bypass
+these restrictions or copy temporary underlying media tokens.
+
+This remains a viewer-only change with the existing video API/settings. The
+attachment-storage candidate remains excluded. Local Angular lint/tests/build
+must not be claimed when no execution environment is available; the LT3 script
+runs those checks before activation. Official provider references:
+https://www.ipcamlive.com/faqs and
+https://www.ipcamlive.com/examples/embed-iframe2.html .
