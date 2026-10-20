@@ -1251,6 +1251,15 @@
       <trans-unit id="core.user-login-check-viewer-message" datatype="html">
         <source>You are logged out and might need to login again</source>
       </trans-unit>
+      <trans-unit id="core.feature-info.player-title" datatype="html">
+        <source>Video player</source>
+      </trans-unit>
+      <trans-unit id="core.feature-info.open-netcamviewer" datatype="html">
+        <source>Open in NetcamViewer</source>
+      </trans-unit>
+      <trans-unit id="core.feature-info.video-provider-fallback" datatype="html">
+        <source>If playback is unavailable, open the video at its source.</source>
+      </trans-unit>
     </body>
   </file>
 </xliff>

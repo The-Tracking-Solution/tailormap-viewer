@@ -1671,6 +1671,18 @@
         <source>You are logged out and might need to login again</source>
         <target>Sie sind abgemeldet und müssen sich möglicherweise erneut anmelden</target>
       </trans-unit>
+      <trans-unit id="core.feature-info.player-title" datatype="html">
+        <source>Video player</source>
+        <target>Videoplayer</target>
+      </trans-unit>
+      <trans-unit id="core.feature-info.open-netcamviewer" datatype="html">
+        <source>Open in NetcamViewer</source>
+        <target>In NetcamViewer öffnen</target>
+      </trans-unit>
+      <trans-unit id="core.feature-info.video-provider-fallback" datatype="html">
+        <source>If playback is unavailable, open the video at its source.</source>
+        <target>Wenn die Wiedergabe nicht verfügbar ist, öffnen Sie das Video bei der Quelle.</target>
+      </trans-unit>
     </body>
   </file>
 </xliff>

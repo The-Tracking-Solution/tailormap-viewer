@@ -1671,6 +1671,18 @@
         <source>You are logged out and might need to login again</source>
         <target>U bent uitgelogd en moet wellicht opnieuw inloggen</target>
       </trans-unit>
+      <trans-unit id="core.feature-info.player-title" datatype="html">
+        <source>Video player</source>
+        <target>Videospeler</target>
+      </trans-unit>
+      <trans-unit id="core.feature-info.open-netcamviewer" datatype="html">
+        <source>Open in NetcamViewer</source>
+        <target>Openen in NetcamViewer</target>
+      </trans-unit>
+      <trans-unit id="core.feature-info.video-provider-fallback" datatype="html">
+        <source>If playback is unavailable, open the video at its source.</source>
+        <target>Kun je de video niet afspelen? Open deze dan bij de bron.</target>
+      </trans-unit>
     </body>
   </file>
 </xliff>

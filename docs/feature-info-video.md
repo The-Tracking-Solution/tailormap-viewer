@@ -26,23 +26,33 @@ attribute aliases. Geometry and numeric attributes cannot become video URLs.
 The first renderer supports HTTPS YouTube `/embed/VIDEO_ID`, `/watch?v=VIDEO_ID`,
 `/live/VIDEO_ID`, `/shorts/VIDEO_ID` and `youtu.be/VIDEO_ID` links. It validates
 exact hosts and 11-character IDs and constructs a canonical youtube-nocookie.com
-player address. Other providers, direct HLS/MP4 and arbitrary website frames are
-not supported. Selecting Video is not permission to embed any URL.
+player address. NetcamViewer Live is also recognized, strictly on the exact host
+`live.netcamviewer.nl` and routes `/CAMERA-SLUG/NUMERIC-ID`, optionally ending
+in `.html` or a trailing slash. Only HTTPS without credentials or a non-default
+port is accepted. The player address is rebuilt from validated path segments;
+source query parameters and fragments are discarded. The existing provider
+page is used as the iframe player, without scraping temporary media URLs.
+The original numeric route style (with or without `.html`) is retained.
+
+Other providers, direct HLS/MP4 and arbitrary website frames are not supported.
+Selecting Video is not permission to embed any URL.
 
 ## Playback
 
 The player loads only after **Play video** is clicked. **Stop video**, selecting
 another feature/video, closing or collapsing the dialog, hiding the attributes
 behind a template, or disabling video presentation destroys the player.
-A refresh of the same feature with the same video ID preserves it, including
-when the URL notation changes. Desktop and mobile share this lifecycle.
+A refresh of the same feature with the same provider/source identity preserves
+it. For YouTube this is the video ID; for NetcamViewer it is the validated
+camera slug and numeric ID, independently of the optional `.html` suffix.
+Changes of feature, camera or provider stop the current player. Desktop and mobile share this lifecycle.
 
 Videos render in the attribute list. This does not permit iframe HTML inside
 Markdown templates or change the template sanitizer. No remote requests are
 made by the API to inspect or proxy a media URL.
 
 The source link remains usable when the URL is unsupported. A recognized video
-may still be unavailable or disallow embedding; YouTube displays its own error.
+may still be unavailable or disallow embedding; the provider may display its own error, an offline snapshot or an access restriction.
 Iframe loading does not prove playback and there is no general automatic
 cross-origin playback health check.
 
@@ -96,3 +106,23 @@ Dev acceptance with the matching API:
 9. Verify the combined candidate still passes the issue #4 acceptance scenarios.
 
 No production deployment or upstream PR is part of this change.
+
+## NetcamViewer dev acceptance
+
+This is a viewer-only addition on top of the configured-video API contract.
+No API rebuild, source-table change or attachment-storage fix is required.
+The standalone branch remains independent of realtime layer status (issue #4).
+
+The supplied inventory contains eight candidate NetcamViewer links: Blanke Top
+(777.html), Cadzand (1069), Timboektoe (1404), Zeesluis (566), Domburg (530),
+Vaarschool Albatros (873), Zeeuwse Riviera (719) and Havenkantoor (480).
+URL recognition is covered by tests; it is not proof of live playback or
+permission to embed. Provider page availability, frame restrictions and actual
+playback must be checked on dev. Do not bypass provider access restrictions.
+
+With the existing video configuration enabled, verify YouTube still works and
+check NetcamViewer starting, external source link, stop, feature/camera/provider
+switching, closing/collapsing and unchanged automatic refresh. Check fullscreen
+and mobile sizing. A provider snapshot must not be accepted as confirmed live
+video. Domain/referrer restrictions may prevent a camera from playing even
+when the URL is recognized. IPCamLive and Meekijken are separate follow-ups.

@@ -1,9 +1,9 @@
-@if (videoId) {
+@if (video; as currentVideo) {
   <div class="video">
     @if (playerUrl(); as url) {
       <iframe #player [src]="url"
-              title="YouTube video"
-              i18n-title="@@core.feature-info.video-title"
+              title="Video player"
+              i18n-title="@@core.feature-info.player-title"
               allow="autoplay; encrypted-media; picture-in-picture; fullscreen"
               referrerpolicy="strict-origin-when-cross-origin"
               allowfullscreen></iframe>
@@ -11,7 +11,12 @@
     } @else {
       <button mat-stroked-button type="button" (click)="playVideo()" i18n="@@core.feature-info.play-video">Play video</button>
     }
-    <a [href]="watchUrl" target="_blank" rel="noopener noreferrer" i18n="@@core.feature-info.open-youtube">Open in YouTube</a>
-    <p i18n="@@core.feature-info.video-fallback">If playback is unavailable, open the video in YouTube.</p>
+    @if (currentVideo.provider === 'youtube') {
+      <a [href]="watchUrl" target="_blank" rel="noopener noreferrer" i18n="@@core.feature-info.open-youtube">Open in YouTube</a>
+      <p i18n="@@core.feature-info.video-fallback">If playback is unavailable, open the video in YouTube.</p>
+    } @else {
+      <a [href]="watchUrl" target="_blank" rel="noopener noreferrer" i18n="@@core.feature-info.open-netcamviewer">Open in NetcamViewer</a>
+      <p i18n="@@core.feature-info.video-provider-fallback">If playback is unavailable, open the video at its source.</p>
+    }
   </div>
 }
