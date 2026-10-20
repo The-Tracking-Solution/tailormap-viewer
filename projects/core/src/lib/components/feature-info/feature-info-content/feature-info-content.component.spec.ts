@@ -73,6 +73,7 @@ describe('FeatureInfoContentComponent', () => {
   test('preserves playback across refreshed attributes and stops when hidden or selecting another feature', async () => {
     const feature = getFeatureInfo();
     feature.sortedAttributes[0].attributeValue = 'https://www.youtube.com/embed/EH6GNSEvmQE';
+    feature.sortedAttributes[0].displayType = 'video';
     const { fixture, container, getByRole } = await setup(feature);
     expect(container.querySelector('tm-feature-info-video')).toBeNull();
     fixture.componentRef.setInput('showEmbeddedVideos', true);
@@ -109,4 +110,24 @@ describe('FeatureInfoContentComponent', () => {
     expect(container.querySelector('iframe')).toBeNull();
     expect(container.textContent).toContain('https://www.youtube.com/embed/EH6GNSEvmQE');
   });
+  test('does not treat unconfigured links as video and responds to presentation changes', async () => {
+    const feature = getFeatureInfo();
+    feature.sortedAttributes[0].attributeValue = 'https://www.youtube.com/watch?v=EH6GNSEvmQE';
+    const { fixture, container, getByRole } = await setup(feature, true);
+    expect(container.querySelector('tm-feature-info-video')).toBeNull();
+    expect(container.textContent).toContain('https://www.youtube.com/watch?v=EH6GNSEvmQE');
+    const configured = { ...feature, sortedAttributes: feature.sortedAttributes.map(att => ({ ...att, displayType: 'video' as const })) };
+    fixture.componentRef.setInput('currentFeature', configured);
+    fixture.detectChanges();
+    fireEvent.click(getByRole('button', { name: 'Play video' }));
+    fixture.detectChanges();
+    const frame = container.querySelector('iframe');
+    expect(frame).not.toBeNull();
+    fixture.componentRef.setInput('currentFeature', { ...feature, sortedAttributes: feature.sortedAttributes.map(att => ({ ...att, displayType: 'text' as const })) });
+    fixture.detectChanges();
+    expect(container.querySelector('iframe')).toBeNull();
+    expect(frame?.isConnected).toBe(false);
+    expect(container.textContent).toContain('https://www.youtube.com/watch?v=EH6GNSEvmQE');
+  });
+
 });

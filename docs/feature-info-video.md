@@ -1,57 +1,98 @@
-# YouTube video in feature info
+# Video presentation in feature info
 
-This feature is independent of the TTS realtime layer status and selected-feature
-refresh features. It needs no API, PostGIS, GeoServer or streaming-server change.
+This optional feature renders supported video links in selected feature-info
+attributes. The data source still supplies an ordinary string attribute; its
+name and layer name have no special meaning. The existing source link and
+filtering remain available.
 
-## Enable
+## Configure
 
-In Admin, application components → Feature info, enable **Show a video player for
-YouTube links in attributes**. Existing applications default to disabled.
-The API's existing component config stores the optional `showEmbeddedVideos`
-boolean; no schema migration is required.
+1. In **Catalog → feature type → Attributes**, set **Feature info display** to
+   **Video** for the string attribute containing the URL. The default is
+   **Text / link**. Read-only data sources/attributes can also display video.
+2. In **Application → Components → Feature info**, enable **Allow video players
+   for configured attributes**. This master switch defaults to disabled.
+3. Optionally open the application's **layer attribute settings** and select
+   **Inherit**, **Text / link** or **Video** for an attribute. Inherit is the
+   default and follows future catalog changes. Text explicitly suppresses a
+   catalog video setting; Video explicitly enables it for this application
+   layer, even if the catalog uses text.
 
-Supported HTTPS links include YouTube `/embed/VIDEO_ID`, `/watch?v=VIDEO_ID`,
-`/live/VIDEO_ID`, `/shorts/VIDEO_ID` and `youtu.be/VIDEO_ID` shortlinks. Only exact
-YouTube hosts and valid 11-character video IDs are accepted. Other providers
-remain ordinary attribute values. Recognition is independent of attribute or
-layer names; it works for the webcams layer's `url` attribute without
-domain-specific code. Per-layer/attribute configuration and other stream types
-are possible future work, not supported by this version. Recognizing a URL does
-not establish that the video exists, is live, or permits embedding.
+The application master switch always wins. Hidden attributes remain hidden;
+only string attributes are eligible for video presentation. The settings do not
+change the source data type, permissions, editing, filtering, attachments or
+attribute aliases. Geometry and numeric attributes cannot become video URLs.
 
-The original attribute and filtering remain available. A player is loaded only
-when the user clicks **Play video**, using a canonical youtube-nocookie.com URL
-constructed from the validated ID. Arbitrary source query parameters are not
-forwarded. YouTube handles playback, audio, fullscreen and source restrictions.
-The **Open in YouTube** link is always available. No load event is treated as proof
-of a healthy/live video; YouTube may display its own error or require another
-play click. This component does not independently verify live status or latency.
+The first renderer supports HTTPS YouTube `/embed/VIDEO_ID`, `/watch?v=VIDEO_ID`,
+`/live/VIDEO_ID`, `/shorts/VIDEO_ID` and `youtu.be/VIDEO_ID` links. It validates
+exact hosts and 11-character IDs and constructs a canonical youtube-nocookie.com
+player address. Other providers, direct HLS/MP4 and arbitrary website frames are
+not supported. Selecting Video is not permission to embed any URL.
 
-Attributes are tracked by key so refreshing the same feature does not replace
-its iframe. Source ID changes and selection changes (layer + feature ID) reset
-the player. Stopping, disabling, closing or collapsing the desktop dialog removes
-the player. Collapsing a template's attribute list also removes its players.
-Reopening requires another play click. On mobile, closing the feature-info panel
-destroys its content. Destroying a video component also navigates its frame to
-about:blank. One player per supported attribute is possible; there is no global
-single-player limit.
+## Playback
 
-## Dev acceptance (not a production deployment)
+The player loads only after **Play video** is clicked. **Stop video**, selecting
+another feature/video, closing or collapsing the dialog, hiding the attributes
+behind a template, or disabling video presentation destroys the player.
+A refresh of the same feature with the same video ID preserves it, including
+when the URL notation changes. Desktop and mobile share this lifecycle.
 
-Test object: Openbare ruimte → webcams → 13 / Zuid-Zuid-West, attribute `url`:
-`https://www.youtube.com/embed/EH6GNSEvmQE?si=kWfiDQFORwpEKjBh`.
+Videos render in the attribute list. This does not permit iframe HTML inside
+Markdown templates or change the template sanitizer. No remote requests are
+made by the API to inspect or proxy a media URL.
 
-1. Disabled: original attributes and links behave as before.
-2. Enable and select the object: Play video / Open in YouTube appear.
-3. Play, audio and fullscreen work in the target browsers; size is at least
-   YouTube's 200 × 200 minimum. Check narrow desktop and mobile layouts.
-4. Refresh attributes/position for the same selected object without iframe
-   recreation or playback interruption.
-5. Select another object/layer, change/clear the URL, stop, collapse or close:
-   previous playback ends. Reopen without automatic playback.
-6. A blocked/unavailable YouTube video retains the external-open fallback.
-7. On the combined TTS build also check #4 status/last successful fetch, selected
-   feature refresh/highlight, coordinate functions and search-result location.
+The source link remains usable when the URL is unsupported. A recognized video
+may still be unavailable or disallow embedding; YouTube displays its own error.
+Iframe loading does not prove playback and there is no general automatic
+cross-origin playback health check.
 
-Browser acceptance is separate from unit tests: jsdom does not play YouTube.
-No PR to Tailormap/B3Partners is part of this implementation.
+## API contract and compatibility
+
+Requires the matching API attribute-presentation extension. The optional
+`AttributeDisplayType` is `text` or `video`:
+
+- Catalog: `FeatureTypeSettings.attributeSettings[attribute].displayType`.
+- Layer: `AppLayerSettings.attributeDisplayOverrides[attribute]`.
+- Feature response: `columnMetadata[].displayType`, resolved by the API after
+  visibility filtering. Missing configuration resolves to `text`.
+- Application: existing `FeatureInfoConfigModel.showEmbeddedVideos` boolean.
+
+Removing an override key restores inheritance; storing `text` is an explicit
+opt-out. The API never mutates catalog settings while resolving a layer.
+Settings live in existing JSONB columns; there is no Flyway schema migration
+and no PostGIS/GeoServer/source-table migration.
+
+This is an intentional change from the earlier TTS POC, which recognized every
+visible YouTube URL when the master switch was enabled. The new viewer requires
+explicit metadata: an older API or missing settings leave links as text. No
+legacy auto-detection fallback is used. Configure the camera URL attribute as
+Video when accepting this version. Build and deploy the matching API and viewer
+as a pair; do not reuse the previous viewer-only activation script that pins
+the old API image. The existing deployed POC remains unaffected until replaced.
+
+## Development and acceptance
+
+The standalone video branch must not depend on realtime refresh status (issue
+#4). Combine it with TTS custom features only on an integration branch. Before
+an upstream proposal, review the API contract and Admin UX with maintainers.
+No upstream acceptance is assumed.
+
+Targeted automated checks cover URL validation, lifecycle, application opt-in,
+explicit attribute selection, refreshed metadata, catalog save/alias preservation,
+layer overrides/inheritance removal, hidden/non-string fields and JSON round trips.
+
+Dev acceptance with the matching API:
+
+1. Verify an unconfigured YouTube link remains an ordinary link.
+2. Configure the catalog URL attribute as Video; save/reload and verify it persists.
+3. Keep the application switch off: no player. Enable it and play a supported URL.
+4. Set this application's layer override to Text; save/reload: no player.
+5. Restore Inherit; save/reload: the catalog setting is followed again.
+6. Change the catalog to Text: inherited layers follow; explicit Video layers do not.
+7. Test two layers/applications sharing one feature type with different overrides.
+8. Verify hidden fields stay hidden, aliases/read-only state persist and normal
+   filtering/attachments still work. Test closing, collapsing, mobile and feature
+   changes, and check that unmodified automatic refresh does not restart playback.
+9. Verify the combined candidate still passes the issue #4 acceptance scenarios.
+
+No production deployment or upstream PR is part of this change.

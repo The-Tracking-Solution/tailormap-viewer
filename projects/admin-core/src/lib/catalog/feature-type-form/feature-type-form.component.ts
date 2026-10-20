@@ -8,7 +8,7 @@ import {
 import { ExtendedFeatureSourceModel } from '../models/extended-feature-source.model';
 import { Store } from '@ngrx/store';
 import { selectFeatureSourceByFeatureTypeOriginalId } from '../state/catalog.selectors';
-import { AttachmentAttributeModel } from '@tailormap-viewer/api';
+import { AttributeDisplayType, AttachmentAttributeModel } from '@tailormap-viewer/api';
 import { MatDialogTitle, MatDialogContent, MatDialogActions } from '@angular/material/dialog';
 import { NgTemplateOutlet, AsyncPipe } from '@angular/common';
 import { FeatureTypeTemplateComponent } from '../feature-type-template/feature-type-template.component';
@@ -164,6 +164,16 @@ export class FeatureTypeFormComponent {
         title: alias.alias,
       };
     });
+    this.updateSettings('attributeSettings', attributeSettings);
+  }
+
+  public attributeDisplayChanged(
+    originalSettings: FeatureTypeSettingsModel,
+    change: { attribute: string; displayType: AttributeDisplayType | undefined },
+  ) {
+    const settings = this.updatedFeatureTypeSubject.value?.settings || {};
+    const attributeSettings = { ...(settings.attributeSettings || originalSettings.attributeSettings || {}) };
+    attributeSettings[change.attribute] = { ...attributeSettings[change.attribute], displayType: change.displayType };
     this.updateSettings('attributeSettings', attributeSettings);
   }
 

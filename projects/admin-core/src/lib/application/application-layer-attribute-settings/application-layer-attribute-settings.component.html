@@ -5,6 +5,8 @@
   <tm-admin-feature-type-attributes [showFullSettings]="false"
                                     [attributes]="attributes"
                                     [primaryKeyAttributeName]="featureType?.primaryKeyAttribute || null"
+                                    [attributeDisplayOverrides]="attributeDisplayOverrides"
+                                    (attributeDisplayChanged)="attributeDisplayChanged($event)"
                                     [catalogFeatureTypeSettings]="catalogFeatureTypeSettings"
                                     (attributeEnabledChanged)="attributesEnabledChanged($event)"
                                     (attributeEditableChanged)="attributesEditableChanged($event)"

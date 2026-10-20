@@ -67,3 +67,4 @@ export * from './layer-extract-response.model';
 export * from './attribute-statistics-response-model';
 export * from './text-filter.model';
 export * from './upload-category.enum';
+export * from './attribute-display-type.model';

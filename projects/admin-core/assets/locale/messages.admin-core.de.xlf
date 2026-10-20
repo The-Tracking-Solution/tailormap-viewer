@@ -1715,8 +1715,8 @@
         <target>Schaltfläche zum Bearbeiten des Objekts anzeigen</target>
       </trans-unit>
       <trans-unit id="admin-core.components.feature-info.show-embedded-videos" datatype="html">
-        <source>Show a video player for YouTube links in attributes</source>
-        <target>Videoplayer für YouTube-Links in Attributen anzeigen</target>
+        <source>Allow video players for configured attributes</source>
+        <target>Videoplayer für konfigurierte Attribute erlauben</target>
       </trans-unit>
       <trans-unit id="admin-core.components.geolocation-no-timeout" datatype="html">
         <source>Show location on the map until the button is toggled off.</source>
@@ -2761,6 +2761,22 @@
       <trans-unit id="admin-core.components.coordinate-picker-help" datatype="html">
         <source>Configure the projection and notation used by the coordinate picker. If no settings are configured, the map projection is used. Decimal degree and degree/minute formats are available for WGS84 (EPSG:4326).</source>
         <target>Konfigurieren Sie die Projektion und Notation für die Koordinatenauswahl. Wenn nichts konfiguriert ist, wird die Kartenprojektion verwendet. Dezimalgrad und Grad/Dezimalminuten sind für WGS84 (EPSG:4326) verfügbar.</target>
+      </trans-unit>
+      <trans-unit id="admin-core.catalog.attribute-display" datatype="html">
+        <source>Feature info display</source>
+        <target>Darstellung in Objektinformationen</target>
+      </trans-unit>
+      <trans-unit id="admin-core.catalog.attribute-display-video" datatype="html">
+        <source>Video</source>
+        <target>Video</target>
+      </trans-unit>
+      <trans-unit id="admin-core.catalog.attribute-display-text" datatype="html">
+        <source>Text / link</source>
+        <target>Text / Link</target>
+      </trans-unit>
+      <trans-unit id="admin-core.catalog.attribute-display-inherit" datatype="html">
+        <source>Inherit (<x id="INTERPOLATION" equiv-text="{{ getCatalogDisplayLabel(att.name) }}"/>)</source>
+        <target>Übernehmen (<x id="INTERPOLATION" equiv-text="{{ getCatalogDisplayLabel(att.name) }}"/>)</target>
       </trans-unit>
     </body>
   </file>

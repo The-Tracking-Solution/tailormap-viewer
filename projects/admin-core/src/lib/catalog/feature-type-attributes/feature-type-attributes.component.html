@@ -61,6 +61,28 @@
               </mat-form-field>
             </mat-cell>
           </ng-container>
+          <ng-container matColumnDef="display">
+            <mat-header-cell *matHeaderCellDef></mat-header-cell>
+            <mat-cell *matCellDef="let att">
+              @if (isVideoAttribute(att)) {
+                <mat-form-field (click)="$event.stopPropagation()">
+                  <mat-select [value]="getAttributeDisplayType(att.name)"
+                              [aria-label]="att.name"
+                              [disabled]="!isAttributeEnabled('hidden', att.name)"
+                              (selectionChange)="changeAttributeDisplayType(att.name, $event.value)">
+                    @if (!showFullSettings) {
+                      <mat-option value="inherit" i18n="@@admin-core.catalog.attribute-display-inherit">Inherit ({{ getCatalogDisplayLabel(att.name) }})</mat-option>
+                    }
+                    <mat-option value="text" i18n="@@admin-core.catalog.attribute-display-text">Text / link</mat-option>
+                    <mat-option value="video" i18n="@@admin-core.catalog.attribute-display-video">Video</mat-option>
+                  </mat-select>
+                </mat-form-field>
+              }
+            </mat-cell>
+          </ng-container>
+          <ng-container matColumnDef="label-display">
+            <mat-header-cell *matHeaderCellDef><div class="wrap-text" i18n="@@admin-core.catalog.attribute-display">Feature info display</div></mat-header-cell>
+          </ng-container>
           <ng-container matColumnDef="sort">
             <mat-header-cell *matHeaderCellDef></mat-header-cell>
             <mat-cell *matCellDef="let att" [class.disabled-cell]="isEditableFieldDisabled(att.name)">

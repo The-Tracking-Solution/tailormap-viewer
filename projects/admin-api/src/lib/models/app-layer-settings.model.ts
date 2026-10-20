@@ -1,7 +1,8 @@
-import { HiddenLayerFunctionality, Tileset3dStyle, WmsStyleModel } from '@tailormap-viewer/api';
+import { AttributeDisplayType, HiddenLayerFunctionality, Tileset3dStyle, WmsStyleModel } from '@tailormap-viewer/api';
 
 export interface AppLayerSettingsModel {
   title?: string;
+  attributeDisplayOverrides?: Record<string, AttributeDisplayType> | null;
   opacity?: number;
   attribution?: string | null;
   description?: string | null;
