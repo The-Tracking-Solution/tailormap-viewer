@@ -1,0 +1,12 @@
+<video #video controls playsinline muted preload="none"
+       aria-label="Live video" i18n-aria-label="@@core.feature-info.hls-video-label"
+       (playing)="onPlaying()" (waiting)="onWaiting()" (error)="onError()"></video>
+@if (status() === 'loading') {
+  <p role="status" i18n="@@core.feature-info.hls-loading">Loading live video…</p>
+} @else if (status() === 'paused') {
+  <p role="status" i18n="@@core.feature-info.hls-paused">Press Play in the video controls to continue.</p>
+} @else if (status() === 'unsupported') {
+  <p role="alert" i18n="@@core.feature-info.hls-unsupported">This browser cannot play this stream. Open the video source.</p>
+} @else if (status() === 'error') {
+  <p role="alert" i18n="@@core.feature-info.hls-error">The stream could not be played. Stop and try again, or open the video source.</p>
+}

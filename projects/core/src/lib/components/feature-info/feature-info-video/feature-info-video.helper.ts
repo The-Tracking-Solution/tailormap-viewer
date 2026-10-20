@@ -1,13 +1,13 @@
 import { YoutubeVideoHelper } from './youtube-video.helper';
 
 export interface FeatureInfoVideoSource {
-  provider: 'youtube' | 'netcamviewer' | 'ipcamlive' | 'rtspme' | 'streampartner';
+  provider: 'youtube' | 'netcamviewer' | 'ipcamlive' | 'rtspme' | 'streampartner' | 'hls';
   key: string;
   playerUrl: string;
   watchUrl: string;
 }
 
-/** Resolve only known HTTPS player routes; never trust arbitrary iframe URLs. */
+/** Resolve supported iframe routes or HTTPS HLS media; never trust arbitrary iframe URLs. */
 export class FeatureInfoVideoHelper {
 
   public static getVideo(value: unknown): FeatureInfoVideoSource | null {
@@ -21,7 +21,7 @@ export class FeatureInfoVideoHelper {
       };
     }
     return this.getNetcamviewerVideo(value) ?? this.getIpcamliveVideo(value)
-      ?? this.getRtspmeVideo(value) ?? this.getStreampartnerVideo(value);
+      ?? this.getRtspmeVideo(value) ?? this.getStreampartnerVideo(value) ?? this.getHlsVideo(value);
   }
 
   private static getNetcamviewerVideo(value: unknown): FeatureInfoVideoSource | null {
@@ -130,6 +130,39 @@ export class FeatureInfoVideoHelper {
       }
       const playerUrl = `https://ssl.streampartner.nl/player.php?url=${id}`;
       return { provider: 'streampartner', key: `streampartner:${id}`, playerUrl, watchUrl: playerUrl };
+    } catch {
+      return null;
+    }
+  }
+
+  private static getHlsVideo(value: unknown): FeatureInfoVideoSource | null {
+    if (typeof value !== 'string' || value.length > 4096) {
+      return null;
+    }
+    try {
+      const url = new URL(value.trim());
+      if (url.protocol !== 'https:' || url.username || url.password || url.port) {
+        return null;
+      }
+      const cameras = [
+        {
+          page: 'https://dehangout.nl/webcam-wijk-aan-zee/',
+          stream: 'https://webcam.dehangout.nl/stream.m3u8',
+        },
+        {
+          page: 'https://webcam-marinaseaport.nl/',
+          stream: 'https://wowza01.crossmediaventures.com/crossmedia/seaport.smil/playlist.m3u8',
+        },
+      ];
+      url.hash = '';
+      const camera = cameras.find(c => c.page === `${url.origin}${url.pathname}` || c.stream === url.href);
+      const playerUrl = camera?.stream ?? url.href;
+      if (!camera && !/\.m3u8$/i.test(url.pathname)) {
+        return null;
+      }
+      // Media URLs are bound to <video>, never trusted as iframe documents.
+      // Preserve signed query parameters: changing one must restart playback.
+      return { provider: 'hls', key: `hls:${playerUrl}`, playerUrl, watchUrl: camera?.page ?? playerUrl };
     } catch {
       return null;
     }

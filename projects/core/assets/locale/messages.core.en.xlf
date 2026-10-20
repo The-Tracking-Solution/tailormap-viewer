@@ -1269,6 +1269,24 @@
       <trans-unit id="core.feature-info.open-streampartner" datatype="html">
         <source>Open in StreamPartner</source>
       </trans-unit>
+      <trans-unit id="core.feature-info.open-video-source" datatype="html">
+        <source>Open video source</source>
+      </trans-unit>
+      <trans-unit id="core.feature-info.hls-video-label" datatype="html">
+        <source>Live video</source>
+      </trans-unit>
+      <trans-unit id="core.feature-info.hls-loading" datatype="html">
+        <source>Loading live video…</source>
+      </trans-unit>
+      <trans-unit id="core.feature-info.hls-paused" datatype="html">
+        <source>Press Play in the video controls to continue.</source>
+      </trans-unit>
+      <trans-unit id="core.feature-info.hls-unsupported" datatype="html">
+        <source>This browser cannot play this stream. Open the video source.</source>
+      </trans-unit>
+      <trans-unit id="core.feature-info.hls-error" datatype="html">
+        <source>The stream could not be played. Stop and try again, or open the video source.</source>
+      </trans-unit>
     </body>
   </file>
 </xliff>

@@ -1,6 +1,9 @@
 @if (video; as currentVideo) {
   <div class="video">
-    @if (playerUrl(); as url) {
+    @if (hlsPlaying()) {
+      <tm-hls-video [source]="currentVideo.playerUrl"></tm-hls-video>
+      <button mat-button type="button" (click)="stopVideo()" i18n="@@core.feature-info.stop-video">Stop video</button>
+    } @else if (playerUrl(); as url) {
       <iframe #player [src]="url"
               title="Video player"
               i18n-title="@@core.feature-info.player-title"
@@ -21,8 +24,10 @@
         <a [href]="watchUrl" target="_blank" rel="noopener noreferrer" i18n="@@core.feature-info.open-ipcamlive">Open in IPCamLive</a>
       } @else if (currentVideo.provider === 'rtspme') {
         <a [href]="watchUrl" target="_blank" rel="noopener noreferrer" i18n="@@core.feature-info.open-rtspme">Open in rtsp.me</a>
-      } @else {
+      } @else if (currentVideo.provider === 'streampartner') {
         <a [href]="watchUrl" target="_blank" rel="noopener noreferrer" i18n="@@core.feature-info.open-streampartner">Open in StreamPartner</a>
+      } @else {
+        <a [href]="watchUrl" target="_blank" rel="noopener noreferrer" i18n="@@core.feature-info.open-video-source">Open video source</a>
       }
       <p i18n="@@core.feature-info.video-provider-fallback">If playback is unavailable, open the video at its source.</p>
     }

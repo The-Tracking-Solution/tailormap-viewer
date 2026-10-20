@@ -34,7 +34,8 @@ source query parameters and fragments are discarded. The existing provider
 page is used as the iframe player, without scraping temporary media URLs.
 The original numeric route style (with or without `.html`) is retained.
 
-Other providers, direct HLS/MP4 and arbitrary website frames are not supported.
+Direct HTTPS HLS playlists are also supported as described below.
+Other providers, direct MP4 and arbitrary website frames are not supported.
 Selecting Video is not permission to embed any URL.
 
 ## Playback
@@ -185,3 +186,52 @@ prove playback. Repeat YouTube, NetcamViewer and IPCamLive checks. This is a
 viewer-only addition; the API and attachment-storage behavior are unchanged.
 
 Official rtsp.me embed documentation: https://rtsp.me/en/how-to-embed-stream-on-website.html .
+
+## Direct HLS video
+
+Configured attributes can contain a direct HTTPS URL whose path ends in `.m3u8`
+(case-insensitive). Credentials, non-default ports and URLs longer than 4096
+characters are rejected. Fragments are removed; query parameters are retained
+because signed HLS URLs may require them. The whole canonical media URL forms
+the playback identity: a changed token restarts playback; an identical feature
+refresh does not. These URLs are media sources, never trusted iframe documents.
+No server-side fetching, proxying, transcoding or access-control bypass is added.
+Only the existing configured, visible string attributes and application opt-in
+can enable the player. Arbitrary HTML pages are not inspected at runtime.
+
+The browser uses native HLS when available (Safari/iOS) or a lazily imported,
+locally bundled HLS.js 1.7.3 player when Media Source Extensions are available.
+HLS.js is MIT-licensed, installed as a pinned root dependency and declared as a
+core peer dependency. No external script/CDN is loaded. Media and the optional
+HLS.js chunk are requested only after Play. Controls include fullscreen where
+supported by the browser; playback starts muted and inline. A denied autoplay
+request leaves the native Play control available.
+
+The pilot includes two exact website aliases, so existing source data needs no
+change: `https://dehangout.nl/webcam-wijk-aan-zee/` resolves to
+`https://webcam.dehangout.nl/stream.m3u8`, and
+`https://webcam-marinaseaport.nl/` resolves to
+`https://wowza01.crossmediaventures.com/crossmedia/seaport.smil/playlist.m3u8`.
+Their direct media URLs resolve to the same identity. Both retain the original
+website as the external viewing link, which opens a full-page player. Other
+direct HLS URLs keep the media URL as their external source link; desktop
+browsers may download that playlist instead of playing it. Use the embedded
+player's fullscreen control for those generic sources.
+
+Every Stop, object/source/provider change or component destruction destroys the
+HLS.js instance, pauses the media element, removes its source, calls load() to
+release connections and cancels pending startup work. Late imports and playback
+promise completions are ignored after cancellation. Fatal player/media errors
+and unsupported browsers show localized fallback text. Initial loading or a
+buffering stall is bounded to 20 seconds; stop/restart permits retry. Browser
+controls, codec support, CORS on playlists/segments/keys, HTTPS and camera
+availability still determine whether a source actually plays. A reachable
+playlist alone is not proof of live video. HLS generally has more latency than
+WebRTC; this does not yet implement Meekijken or alter LT4.
+
+Acceptance on LT3: De HangOut (feature 1) and Marina Seaport (feature 51), plus
+one existing iframe provider. Verify moving video, fullscreen, source link in a
+new tab, stop/restart, feature/provider switches, close/collapse, unchanged
+refresh and mobile sizing. Simulate a failed playlist and a stalled stream;
+verify that error feedback and retry remain usable. Deployment is viewer-only
+with the existing API and existing branding. No database change is required.
