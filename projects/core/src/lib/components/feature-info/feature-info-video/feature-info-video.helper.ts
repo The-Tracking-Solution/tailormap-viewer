@@ -153,6 +153,30 @@ export class FeatureInfoVideoHelper {
           page: 'https://webcam-marinaseaport.nl/',
           stream: 'https://wowza01.crossmediaventures.com/crossmedia/seaport.smil/playlist.m3u8',
         },
+        {
+          page: 'https://webcam-marken.nl/',
+          stream: 'https://565c3c746b763.streamlock.net/live/marken.stream/playlist.m3u8',
+        },
+        {
+          page: 'https://webcams-vlissingen.nl/pages/cameras/strand.php',
+          stream: 'https://565c3c746b763.streamlock.net/live/vlissingen5.stream/playlist.m3u8',
+        },
+        {
+          page: 'https://webcams-ameland.nl/pages/cameras/waddenhaven-nes.php',
+          stream: 'https://5b8d2cbe62ad6.streamlock.net/live/nes-waddenhaven.stream/playlist.m3u8',
+        },
+        {
+          page: 'https://webcam-lauwersoog.nl/',
+          stream: 'https://6162417352ffd.streamlock.net/live/lauwersoog-haven.stream/playlist.m3u8',
+        },
+        {
+          page: 'https://webcam-hindeloopen.nl/',
+          stream: 'https://5b8d2cbe62ad6.streamlock.net/live/hindeloopen.stream/playlist.m3u8',
+        },
+        {
+          page: 'https://www.markermeerzicht.nl/',
+          stream: 'https://www.benlankamp.nl/webcam/index.m3u8',
+        },
       ];
       url.hash = '';
       const camera = cameras.find(c => c.page === `${url.origin}${url.pathname}` || c.stream === url.href);

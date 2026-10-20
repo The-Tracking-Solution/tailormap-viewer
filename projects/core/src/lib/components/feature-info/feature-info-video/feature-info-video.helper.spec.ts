@@ -224,4 +224,22 @@ describe('FeatureInfoVideoHelper', () => {
     expect(FeatureInfoVideoHelper.getVideo(url)).toBeNull();
   });
 
+  test.each([
+    [ 'https://webcam-marken.nl/', 'https://565c3c746b763.streamlock.net/live/marken.stream/playlist.m3u8' ],
+    [ 'https://webcams-vlissingen.nl/pages/cameras/strand.php', 'https://565c3c746b763.streamlock.net/live/vlissingen5.stream/playlist.m3u8' ],
+    [ 'https://webcams-ameland.nl/pages/cameras/waddenhaven-nes.php', 'https://5b8d2cbe62ad6.streamlock.net/live/nes-waddenhaven.stream/playlist.m3u8' ],
+    [ 'https://webcam-lauwersoog.nl/', 'https://6162417352ffd.streamlock.net/live/lauwersoog-haven.stream/playlist.m3u8' ],
+    [ 'https://webcam-hindeloopen.nl/', 'https://5b8d2cbe62ad6.streamlock.net/live/hindeloopen.stream/playlist.m3u8' ],
+    [ 'https://www.markermeerzicht.nl/', 'https://www.benlankamp.nl/webcam/index.m3u8' ],
+  ])('keeps the viewing page and stable HLS identity for the next camera group: %s', (page, stream) => {
+    const expected = { provider: 'hls', key: `hls:${stream}`, playerUrl: stream, watchUrl: page };
+    expect(FeatureInfoVideoHelper.getVideo(page)).toEqual(expected);
+    expect(FeatureInfoVideoHelper.getVideo(page + '?tracking=changed#fragment')).toEqual(expected);
+    expect(FeatureInfoVideoHelper.getVideo(stream)).toEqual(expected);
+    expect(FeatureInfoVideoHelper.getVideo(stream + '?token=signed')?.playerUrl).toBe(stream + '?token=signed');
+    expect(FeatureInfoVideoHelper.getVideo(page.replace('https://', 'http://'))).toBeNull();
+    expect(FeatureInfoVideoHelper.getVideo(page.replace('.nl/', '.nl.evil.example/'))).toBeNull();
+    expect(FeatureInfoVideoHelper.getVideo(page + 'unsupported')).toBeNull();
+  });
+
 });
