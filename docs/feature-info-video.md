@@ -235,3 +235,19 @@ new tab, stop/restart, feature/provider switches, close/collapse, unchanged
 refresh and mobile sizing. Simulate a failed playlist and a stalled stream;
 verify that error feedback and retry remain usable. Deployment is viewer-only
 with the existing API and existing branding. No database change is required.
+
+### Additional HLS viewing-page aliases
+
+The same player also recognizes the existing exact HTTPS source pages for
+Vuurtoren Marken (50), Strand Vlissingen (62), Waddenhaven Nes (80), Jachthaven
+Lauwersoog (82), Jachthaven Hindeloopen (83) and Lelystad/Markermeerzicht (85).
+Each resolves to its checked unsigned master playlist and keeps its original
+page as the external viewing link. No source database change is required.
+Sub-playlists, media segment names and generated session IDs are never stored
+as permanent source URLs. The alias routes are exact; arbitrary websites are
+not scraped or embedded. Direct signed media links retain their query parameters.
+
+Playlist and sample segment availability/CORS were checked during preparation;
+actual browser playback still requires acceptance on LT3. The initial two HLS
+cameras were confirmed working by the user. Hoek van Holland (temporary tokens)
+and Harlingen (camera selection) remain separate follow-ups.
