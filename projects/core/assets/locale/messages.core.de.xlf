@@ -1739,6 +1739,18 @@
         <source>Fetch status does not confirm the age of the source data</source>
         <target>Abrufstatus bestätigt nicht die Aktualität der Quelldaten</target>
       </trans-unit>
+      <trans-unit id="core.feature-info.player-title" datatype="html">
+        <source>Video player</source>
+        <target>Videoplayer</target>
+      </trans-unit>
+      <trans-unit id="core.feature-info.open-netcamviewer" datatype="html">
+        <source>Open in NetcamViewer</source>
+        <target>In NetcamViewer öffnen</target>
+      </trans-unit>
+      <trans-unit id="core.feature-info.video-provider-fallback" datatype="html">
+        <source>If playback is unavailable, open the video at its source.</source>
+        <target>Wenn die Wiedergabe nicht verfügbar ist, öffnen Sie das Video bei der Quelle.</target>
+      </trans-unit>
     </body>
   </file>
 </xliff>

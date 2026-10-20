@@ -1317,6 +1317,15 @@
         <source>Fetch status does not confirm the age of the source data</source>
         <target>Fetch status does not confirm the age of the source data</target>
       </trans-unit>
+      <trans-unit id="core.feature-info.player-title" datatype="html">
+        <source>Video player</source>
+      </trans-unit>
+      <trans-unit id="core.feature-info.open-netcamviewer" datatype="html">
+        <source>Open in NetcamViewer</source>
+      </trans-unit>
+      <trans-unit id="core.feature-info.video-provider-fallback" datatype="html">
+        <source>If playback is unavailable, open the video at its source.</source>
+      </trans-unit>
     </body>
   </file>
 </xliff>

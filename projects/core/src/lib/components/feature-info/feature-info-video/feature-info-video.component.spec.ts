@@ -55,4 +55,76 @@ describe('FeatureInfoVideoComponent', () => {
     fixture.destroy();
     expect(frame?.getAttribute('src')).toBe('about:blank');
   });
+
+  test('loads NetcamViewer only after play and preserves the iframe during an equivalent refresh', async () => {
+    const { container, getByRole, fixture } = await render(FeatureInfoVideoComponent, {
+      inputs: { source: 'https://live.netcamviewer.nl/de-blanke-top/777.html?autoplay=1', featureKey: 'webcams:24' },
+    });
+    expect(container.querySelector('iframe')).toBeNull();
+    expect(getByRole('link', { name: 'Open in NetcamViewer' }).getAttribute('href'))
+      .toBe('https://live.netcamviewer.nl/de-blanke-top/777.html');
+    fireEvent.click(getByRole('button', { name: 'Play video' }));
+    fixture.detectChanges();
+    const frame = container.querySelector('iframe');
+    expect(frame?.getAttribute('src')).toBe('https://live.netcamviewer.nl/de-blanke-top/777.html');
+    expect(frame?.getAttribute('title')).toBe('Video player');
+    expect(frame?.getAttribute('allow')).toContain('fullscreen');
+    expect(frame?.getAttribute('referrerpolicy')).toBe('strict-origin-when-cross-origin');
+    fixture.componentRef.setInput('source', 'https://live.netcamviewer.nl/de-blanke-top/777?tracking=changed');
+    fixture.detectChanges();
+    expect(container.querySelector('iframe')).toBe(frame);
+    expect(frame?.getAttribute('src')).toBe('https://live.netcamviewer.nl/de-blanke-top/777.html');
+    fireEvent.click(getByRole('button', { name: 'Stop video' }));
+    fixture.detectChanges();
+    expect(frame?.getAttribute('src')).toBe('about:blank');
+    expect(container.querySelector('iframe')).toBeNull();
+  });
+
+  test('stops NetcamViewer for another camera, feature or provider, and on destruction', async () => {
+    const { container, getByRole, fixture } = await render(FeatureInfoVideoComponent, {
+      inputs: { source: 'https://live.netcamviewer.nl/beachcam-cadzand/1069', featureKey: 'webcams:25' },
+    });
+    const start = () => {
+      fireEvent.click(getByRole('button', { name: 'Play video' }));
+      fixture.detectChanges();
+      expect(container.querySelector('iframe')).not.toBeNull();
+      return container.querySelector('iframe');
+    };
+    let frame = start();
+    fixture.componentRef.setInput('source', 'https://live.netcamviewer.nl/Camera-Timboektoe/1404');
+    fixture.detectChanges();
+    expect(frame?.getAttribute('src')).toBe('about:blank');
+    expect(container.querySelector('iframe')).toBeNull();
+    frame = start();
+    fixture.componentRef.setInput('featureKey', 'another-layer:25');
+    fixture.detectChanges();
+    expect(frame?.getAttribute('src')).toBe('about:blank');
+    expect(container.querySelector('iframe')).toBeNull();
+    frame = start();
+    fixture.componentRef.setInput('source', source);
+    fixture.detectChanges();
+    expect(frame?.getAttribute('src')).toBe('about:blank');
+    expect(container.querySelector('iframe')).toBeNull();
+    expect(getByRole('link', { name: 'Open in YouTube' })).toBeDefined();
+    start();
+    fixture.componentRef.setInput('source', 'https://live.netcamviewer.nl/beachcam-cadzand/1069');
+    fixture.detectChanges();
+    expect(container.querySelector('iframe')).toBeNull();
+    frame = start();
+    fixture.destroy();
+    expect(frame?.getAttribute('src')).toBe('about:blank');
+  });
+
+  test.each([
+    'https://live.netcamviewer.nl.evil.example/camera/777',
+    'https://live.netcamviewer.nl/camera/777.php',
+    'http://live.netcamviewer.nl/camera/777',
+  ])('does not render playback controls for an unsupported URL: %s', async unsafeSource => {
+    const { container } = await render(FeatureInfoVideoComponent, {
+      inputs: { source: unsafeSource, featureKey: 'webcams:24' },
+    });
+    expect(container.querySelector('iframe')).toBeNull();
+    expect(container.querySelector('button')).toBeNull();
+  });
+
 });

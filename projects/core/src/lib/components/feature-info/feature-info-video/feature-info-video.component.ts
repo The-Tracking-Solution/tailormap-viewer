@@ -1,7 +1,7 @@
 import { ChangeDetectionStrategy, Component, ElementRef, inject, Input, OnChanges, OnDestroy, signal, viewChild } from '@angular/core';
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 import { MatButton } from '@angular/material/button';
-import { YoutubeVideoHelper } from './youtube-video.helper';
+import { FeatureInfoVideoHelper, FeatureInfoVideoSource } from './feature-info-video.helper';
 
 @Component({
   selector: 'tm-feature-info-video',
@@ -21,41 +21,39 @@ export class FeatureInfoVideoComponent implements OnChanges, OnDestroy {
   @Input()
   public featureKey = '';
 
-  public videoId: string | null = null;
+  public video: FeatureInfoVideoSource | null = null;
   public playerUrl = signal<SafeResourceUrl | null>(null);
   public watchUrl = '';
 
   public ngOnChanges() {
-    const videoId = YoutubeVideoHelper.getVideoId(this.source);
-    if (videoId === this.videoId && this.featureKey === this.previousFeatureKey) {
+    const video = FeatureInfoVideoHelper.getVideo(this.source);
+    if (video?.key === this.video?.key && this.featureKey === this.previousFeatureKey) {
       return;
     }
-    this.videoId = videoId;
+    this.video = video;
     this.previousFeatureKey = this.featureKey;
-    this.watchUrl = videoId ? `https://www.youtube.com/watch?v=${videoId}` : '';
+    this.watchUrl = video?.watchUrl ?? '';
     this.stopVideo();
   }
 
   public playVideo() {
-    if (!this.videoId) {
+    if (!this.video) {
       return;
     }
-    // Construct the resource URL from a validated ID, never trust a source URL or its query parameters.
-    this.playerUrl.set(this.sanitizer.bypassSecurityTrustResourceUrl(
-      `https://www.youtube-nocookie.com/embed/${this.videoId}?autoplay=1&playsinline=1`,
-    ));
+    // The resolver constructs a player address only after exact host and route validation.
+    this.playerUrl.set(this.sanitizer.bypassSecurityTrustResourceUrl(this.video.playerUrl));
   }
 
   public stopVideo() {
-    // Removing the iframe ends playback; no player is retained for another feature.
-    this.playerUrl.set(null);
-  }
-
-  public ngOnDestroy() {
     const frame = this.playerFrame()?.nativeElement;
     if (frame) {
       frame.src = 'about:blank';
     }
+    this.playerUrl.set(null);
+  }
+
+  public ngOnDestroy() {
+    this.stopVideo();
   }
 
 }
