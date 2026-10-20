@@ -34,13 +34,13 @@ export const selectFeatureInfoList = createSelector(
       }
       const columnMetadata = metadata.columnMetadata.filter(m => m.layerId === feature.layerId);
       const columnMetadataDict = new Map((columnMetadata || []).map(c => [ c.name, c ]));
-      const attributes: Array<{ label: string; attributeValue: any; key: string }> = [];
+      const attributes: FeatureInfoModel['sortedAttributes'] = [];
       Object.keys(feature.attributes).forEach(key => {
         const attMetadata = columnMetadataDict.get(key);
         if (AttributeTypeHelper.isGeometryType(attMetadata?.type)) {
           return;
         }
-        attributes.push({ label: attMetadata?.alias || key, attributeValue: feature.attributes[key], key });
+        attributes.push({ label: attMetadata?.alias || key, attributeValue: feature.attributes[key], key, displayType: attMetadata?.displayType });
       });
       const attributeOrder = columnMetadata.map(c => c.name);
 

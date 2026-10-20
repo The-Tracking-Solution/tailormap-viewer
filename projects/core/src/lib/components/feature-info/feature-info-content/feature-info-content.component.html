@@ -19,7 +19,7 @@
                 <div class="row-content">
                   <div class="attribute-value">
                     <div [innerHTML]="att.attributeValue | htmlify"></div>
-                    @if (showEmbeddedVideos() && mediaVisible() && !(attributesCollapsed() && layer.template)) {
+                    @if (showEmbeddedVideos() && att.displayType === 'video' && mediaVisible() && !(attributesCollapsed() && layer.template)) {
                       <tm-feature-info-video [source]="att.attributeValue"
                                              [featureKey]="feature.layer.id + ':' + feature.__fid"></tm-feature-info-video>
                     }

@@ -1,6 +1,7 @@
 import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { MAT_DIALOG_DATA, MatDialog, MatDialogRef, MatDialogTitle, MatDialogContent, MatDialogActions } from '@angular/material/dialog';
 import { AppLayerSettingsModel, AttributeDescriptorModel, FeatureTypeModel, FeatureTypeSettingsModel } from '@tailormap-admin/admin-api';
+import { AttributeDisplayType } from '@tailormap-viewer/api';
 import { CdkScrollable } from '@angular/cdk/scrolling';
 import { FeatureTypeAttributesComponent } from '../../catalog/feature-type-attributes/feature-type-attributes.component';
 import { MatButton } from '@angular/material/button';
@@ -12,6 +13,7 @@ interface ApplicationLayerAttributeSettingsData {
 }
 
 interface ApplicationLayerAttributeSettingsResult {
+  attributeDisplayOverrides?: Record<string, AttributeDisplayType>;
   hideAttributes?: string[] | null;
   readOnlyAttributes?: string[] | null;
 }
@@ -39,6 +41,7 @@ export class ApplicationLayerAttributeSettingsComponent {
   private hideAttributes: string[] | null | undefined;
   private appReadOnlyAttributes: string[] | null | undefined;
 
+  public attributeDisplayOverrides: Record<string, AttributeDisplayType> = {};
   public attributes: AttributeDescriptorModel[] = [];
   public settings: FeatureTypeSettingsModel | null = null;
   public catalogFeatureTypeSettings: FeatureTypeSettingsModel;
@@ -52,6 +55,7 @@ export class ApplicationLayerAttributeSettingsComponent {
     this.featureType = this.data.featureType;
     this.hideAttributes = this.data.appLayerSettings.hideAttributes || [];
     this.appReadOnlyAttributes = this.data.appLayerSettings.readOnlyAttributes || [];
+    this.attributeDisplayOverrides = { ...this.data.appLayerSettings.attributeDisplayOverrides };
     this.updateSettings();
   }
 
@@ -72,9 +76,20 @@ export class ApplicationLayerAttributeSettingsComponent {
 
   public save() {
     this.dialogRef.close({
+      attributeDisplayOverrides: { ...this.attributeDisplayOverrides },
       hideAttributes: [...this.hideAttributes || []],
       readOnlyAttributes: [...this.appReadOnlyAttributes || []],
     });
+  }
+
+  public attributeDisplayChanged(change: { attribute: string; displayType: AttributeDisplayType | undefined }) {
+    const overrides = { ...this.attributeDisplayOverrides };
+    if (change.displayType === undefined) {
+      delete overrides[change.attribute];
+    } else {
+      overrides[change.attribute] = change.displayType;
+    }
+    this.attributeDisplayOverrides = overrides;
   }
 
   public attributesEnabledChanged($event: Array<{ attribute: string; checked: boolean }>) {

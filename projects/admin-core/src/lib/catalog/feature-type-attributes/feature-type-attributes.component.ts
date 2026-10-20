@@ -4,19 +4,20 @@ import { CdkDragDrop, CdkDragStart, CdkDropList, CdkDragHandle, CdkDrag } from '
 import { ArrayHelper, TooltipDirective } from '@tailormap-viewer/shared';
 import { FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { AttachmentAttributeModel, AttributeTypeHelper } from "@tailormap-viewer/api";
+import { AttachmentAttributeModel, AttributeDisplayType, AttributeType, AttributeTypeHelper } from "@tailormap-viewer/api";
 import { MatCard, MatCardTitle, MatCardContent } from '@angular/material/card';
 import { MatTable, MatColumnDef, MatHeaderCellDef, MatHeaderCell, MatCellDef, MatCell, MatHeaderRowDef, MatHeaderRow, MatRowDef, MatRow } from '@angular/material/table';
 import { MatCheckbox } from '@angular/material/checkbox';
 import { MatIcon } from '@angular/material/icon';
 import { MatFormField } from '@angular/material/form-field';
+import { MatSelect, MatOption } from '@angular/material/select';
 import { MatInput } from '@angular/material/input';
 import { FeatureTypeAttachmentAttributesComponent } from '../feature-type-attachment-attributes/feature-type-attachment-attributes.component';
 
 type CheckableAttribute = 'hidden' | 'editable';
 
-const baseAttributeColumnLabels = [ 'label-enabled', 'label-name', 'label-type', 'label-alias' ];
-const baseAttributeColumns = [ 'enabled', 'name', 'type', 'alias' ];
+const baseAttributeColumnLabels = [ 'label-enabled', 'label-name', 'label-type', 'label-alias', 'label-display' ];
+const baseAttributeColumns = [ 'enabled', 'name', 'type', 'alias', 'display' ];
 const editableAttributeColumnLabels = ['label-editable'];
 const editableAttributeColumns = ['editable'];
 
@@ -45,6 +46,8 @@ const attributeExtraColumns = ['sort'];
         MatIcon,
         MatFormField,
         MatInput,
+        MatSelect,
+        MatOption,
         CdkDragHandle,
         MatHeaderRowDef,
         MatHeaderRow,
@@ -91,6 +94,32 @@ export class FeatureTypeAttributesComponent implements OnChanges {
     return this._showFullSettings;
   }
   private _showFullSettings = false;
+
+  @Input()
+  public attributeDisplayOverrides: Record<string, AttributeDisplayType> | null = null;
+
+  @Output()
+  public attributeDisplayChanged = new EventEmitter<{ attribute: string; displayType: AttributeDisplayType | undefined }>();
+
+  public isVideoAttribute(attribute: AttributeDescriptorModel) {
+    return attribute.type === AttributeType.STRING;
+  }
+
+  public getAttributeDisplayType(attribute: string): AttributeDisplayType | 'inherit' {
+    return this.showFullSettings
+      ? this.featureTypeSettings?.attributeSettings?.[attribute]?.displayType ?? 'text'
+      : this.attributeDisplayOverrides?.[attribute] ?? 'inherit';
+  }
+
+  public getCatalogDisplayLabel(attribute: string) {
+    return this.catalogFeatureTypeSettings?.attributeSettings?.[attribute]?.displayType === 'video'
+      ? $localize `:@@admin-core.catalog.attribute-display-video:Video`
+      : $localize `:@@admin-core.catalog.attribute-display-text:Text / link`;
+  }
+
+  public changeAttributeDisplayType(attribute: string, value: AttributeDisplayType | 'inherit') {
+    this.attributeDisplayChanged.emit({ attribute, displayType: value === 'inherit' ? undefined : value });
+  }
 
   public primaryKeyText = $localize `:@@admin-core.catalog.primary-key:Primary key`;
 

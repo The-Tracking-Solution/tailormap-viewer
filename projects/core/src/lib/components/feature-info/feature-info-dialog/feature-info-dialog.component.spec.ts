@@ -41,6 +41,7 @@ const setup = async (withState = false, withVideo = false) => {
   const feature = getFeatureInfo();
   if (withVideo) {
     feature.sortedAttributes[0].attributeValue = 'https://www.youtube.com/embed/EH6GNSEvmQE';
+    feature.sortedAttributes[0].displayType = 'video';
   }
   const mockMobileLayoutService = { isMobileLayoutEnabled$: of(false) };
   const mockFeatureSelectionBookmarkService = { getFidSelectionUrl$: () => of(null) };

@@ -1714,8 +1714,8 @@
         <target>Toon knop om het object te bewerken</target>
       </trans-unit>
       <trans-unit id="admin-core.components.feature-info.show-embedded-videos" datatype="html">
-        <source>Show a video player for YouTube links in attributes</source>
-        <target>Videospeler tonen voor YouTube-links in attributen</target>
+        <source>Allow video players for configured attributes</source>
+        <target>Videospelers toestaan voor ingestelde attributen</target>
       </trans-unit>
       <trans-unit id="admin-core.components.geolocation-no-timeout" datatype="html">
         <source>Show location on the map until the button is toggled off.</source>
@@ -2740,6 +2740,22 @@
       <trans-unit id="admin-core.users.valid-until" datatype="html">
         <source>Valid until</source>
         <target>Geldig tot</target>
+      </trans-unit>
+      <trans-unit id="admin-core.catalog.attribute-display" datatype="html">
+        <source>Feature info display</source>
+        <target>Weergave in objectinformatie</target>
+      </trans-unit>
+      <trans-unit id="admin-core.catalog.attribute-display-video" datatype="html">
+        <source>Video</source>
+        <target>Video</target>
+      </trans-unit>
+      <trans-unit id="admin-core.catalog.attribute-display-text" datatype="html">
+        <source>Text / link</source>
+        <target>Tekst / link</target>
+      </trans-unit>
+      <trans-unit id="admin-core.catalog.attribute-display-inherit" datatype="html">
+        <source>Inherit (<x id="INTERPOLATION" equiv-text="{{ getCatalogDisplayLabel(att.name) }}"/>)</source>
+        <target>Overnemen (<x id="INTERPOLATION" equiv-text="{{ getCatalogDisplayLabel(att.name) }}"/>)</target>
       </trans-unit>
     </body>
   </file>
