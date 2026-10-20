@@ -15,7 +15,11 @@
       <a [href]="watchUrl" target="_blank" rel="noopener noreferrer" i18n="@@core.feature-info.open-youtube">Open in YouTube</a>
       <p i18n="@@core.feature-info.video-fallback">If playback is unavailable, open the video in YouTube.</p>
     } @else {
-      <a [href]="watchUrl" target="_blank" rel="noopener noreferrer" i18n="@@core.feature-info.open-netcamviewer">Open in NetcamViewer</a>
+      @if (currentVideo.provider === 'netcamviewer') {
+        <a [href]="watchUrl" target="_blank" rel="noopener noreferrer" i18n="@@core.feature-info.open-netcamviewer">Open in NetcamViewer</a>
+      } @else {
+        <a [href]="watchUrl" target="_blank" rel="noopener noreferrer" i18n="@@core.feature-info.open-ipcamlive">Open in IPCamLive</a>
+      }
       <p i18n="@@core.feature-info.video-provider-fallback">If playback is unavailable, open the video at its source.</p>
     }
   </div>

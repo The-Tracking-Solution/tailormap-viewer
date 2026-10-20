@@ -1260,6 +1260,9 @@
       <trans-unit id="core.feature-info.video-provider-fallback" datatype="html">
         <source>If playback is unavailable, open the video at its source.</source>
       </trans-unit>
+      <trans-unit id="core.feature-info.open-ipcamlive" datatype="html">
+        <source>Open in IPCamLive</source>
+      </trans-unit>
     </body>
   </file>
 </xliff>

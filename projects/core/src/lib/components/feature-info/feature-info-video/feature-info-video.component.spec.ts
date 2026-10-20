@@ -127,4 +127,68 @@ describe('FeatureInfoVideoComponent', () => {
     expect(container.querySelector('button')).toBeNull();
   });
 
+
+  test('plays IPCamLive after a click and preserves the iframe for an equivalent public/player link', async () => {
+    const { container, getByRole, fixture } = await render(FeatureInfoVideoComponent, {
+      inputs: { source: 'https://www.ipcamlive.com/strandhotelburen', featureKey: 'webcams:78' },
+    });
+    expect(container.querySelector('iframe')).toBeNull();
+    expect(getByRole('link', { name: 'Open in IPCamLive' }).getAttribute('href'))
+      .toBe('https://www.ipcamlive.com/strandhotelburen');
+    fireEvent.click(getByRole('button', { name: 'Play video' }));
+    fixture.detectChanges();
+    const frame = container.querySelector('iframe');
+    expect(frame?.getAttribute('src'))
+      .toBe('https://g0.ipcamlive.com/player/player.php?alias=strandhotelburen&autoplay=1');
+    fixture.componentRef.setInput('source', 'https://g0.ipcamlive.com/player/player.php?alias=strandhotelburen&controls=0');
+    fixture.detectChanges();
+    expect(container.querySelector('iframe')).toBe(frame);
+    fireEvent.click(getByRole('button', { name: 'Stop video' }));
+    fixture.detectChanges();
+    expect(frame?.getAttribute('src')).toBe('about:blank');
+    expect(container.querySelector('iframe')).toBeNull();
+  });
+
+  test('stops IPCamLive when changing camera, feature or provider and on destruction', async () => {
+    const { container, getByRole, fixture } = await render(FeatureInfoVideoComponent, {
+      inputs: { source: 'https://www.ipcamlive.com/strandhotelburen', featureKey: 'webcams:78' },
+    });
+    const start = () => {
+      fireEvent.click(getByRole('button', { name: 'Play video' }));
+      fixture.detectChanges();
+      expect(container.querySelector('iframe')).not.toBeNull();
+      return container.querySelector('iframe');
+    };
+    let frame = start();
+    fixture.componentRef.setInput('source', 'https://g0.ipcamlive.com/player/player.php?alias=detokowebcam&controls=0');
+    fixture.detectChanges();
+    expect(frame?.getAttribute('src')).toBe('about:blank');
+    expect(container.querySelector('iframe')).toBeNull();
+    frame = start();
+    fixture.componentRef.setInput('featureKey', 'webcams:28');
+    fixture.detectChanges();
+    expect(frame?.getAttribute('src')).toBe('about:blank');
+    expect(container.querySelector('iframe')).toBeNull();
+    frame = start();
+    fixture.componentRef.setInput('source', source);
+    fixture.detectChanges();
+    expect(frame?.getAttribute('src')).toBe('about:blank');
+    expect(container.querySelector('iframe')).toBeNull();
+    expect(getByRole('link', { name: 'Open in YouTube' })).toBeDefined();
+    frame = start();
+    fixture.componentRef.setInput('source', 'https://live.netcamviewer.nl/de-blanke-top/777.html');
+    fixture.detectChanges();
+    expect(frame?.getAttribute('src')).toBe('about:blank');
+    expect(container.querySelector('iframe')).toBeNull();
+    expect(getByRole('link', { name: 'Open in NetcamViewer' })).toBeDefined();
+    frame = start();
+    fixture.componentRef.setInput('source', 'https://www.ipcamlive.com/strandhotelburen');
+    fixture.detectChanges();
+    expect(frame?.getAttribute('src')).toBe('about:blank');
+    expect(container.querySelector('iframe')).toBeNull();
+    frame = start();
+    fixture.destroy();
+    expect(frame?.getAttribute('src')).toBe('about:blank');
+  });
+
 });

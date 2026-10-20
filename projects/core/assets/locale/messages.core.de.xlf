@@ -1683,6 +1683,10 @@
         <source>If playback is unavailable, open the video at its source.</source>
         <target>Wenn die Wiedergabe nicht verfügbar ist, öffnen Sie das Video bei der Quelle.</target>
       </trans-unit>
+      <trans-unit id="core.feature-info.open-ipcamlive" datatype="html">
+        <source>Open in IPCamLive</source>
+        <target>In IPCamLive öffnen</target>
+      </trans-unit>
     </body>
   </file>
 </xliff>
