@@ -191,4 +191,90 @@ describe('FeatureInfoVideoComponent', () => {
     expect(frame?.getAttribute('src')).toBe('about:blank');
   });
 
+  test('rtsp.me starts on click, preserves refresh and stops on changes and destruction', async () => {
+    const { container, getByRole, fixture } = await render(FeatureInfoVideoComponent, {
+      inputs: { source: 'https://rtsp.me/embed/tkkGYA72/', featureKey: 'webcams:26' },
+    });
+    expect(container.querySelector('iframe')).toBeNull();
+    expect(getByRole('link', { name: 'Open in rtsp.me' }).getAttribute('href')).toBe('https://rtsp.me/embed/tkkGYA72/');
+    const start = () => {
+      fireEvent.click(getByRole('button', { name: 'Play video' }));
+      fixture.detectChanges();
+      const frame = container.querySelector('iframe');
+      expect(frame).not.toBeNull();
+      return frame;
+    };
+    let frame = start();
+    expect(frame?.getAttribute('src')).toBe('https://rtsp.me/embed/tkkGYA72/');
+    fixture.componentRef.setInput('source', 'https://rtsp.me/embed/tkkGYA72/?tracking=changed');
+    fixture.detectChanges();
+    expect(container.querySelector('iframe')).toBe(frame);
+    fireEvent.click(getByRole('button', { name: 'Stop video' }));
+    fixture.detectChanges();
+    expect(frame?.getAttribute('src')).toBe('about:blank');
+    expect(container.querySelector('iframe')).toBeNull();
+    frame = start();
+    fixture.componentRef.setInput('featureKey', 'other-layer:21');
+    fixture.detectChanges();
+    expect(frame?.getAttribute('src')).toBe('about:blank');
+    expect(container.querySelector('iframe')).toBeNull();
+    frame = start();
+    fixture.componentRef.setInput('source', 'https://rtsp.me/embed/474NtQT5/');
+    fixture.detectChanges();
+    expect(frame?.getAttribute('src')).toBe('about:blank');
+    expect(container.querySelector('iframe')).toBeNull();
+    frame = start();
+    fixture.componentRef.setInput('source', source);
+    fixture.detectChanges();
+    expect(frame?.getAttribute('src')).toBe('about:blank');
+    expect(container.querySelector('iframe')).toBeNull();
+    expect(getByRole('link', { name: 'Open in YouTube' })).toBeDefined();
+    frame = start();
+    fixture.destroy();
+    expect(frame?.getAttribute('src')).toBe('about:blank');
+  });
+
+  test('StreamPartner starts on click, preserves refresh and stops on changes and destruction', async () => {
+    const { container, getByRole, fixture } = await render(FeatureInfoVideoComponent, {
+      inputs: { source: 'https://ssl.streampartner.nl/player.php?url=rwj3wllrsipkvysnuozz', featureKey: 'webcams:21' },
+    });
+    expect(container.querySelector('iframe')).toBeNull();
+    expect(getByRole('link', { name: 'Open in StreamPartner' }).getAttribute('href')).toBe('https://ssl.streampartner.nl/player.php?url=rwj3wllrsipkvysnuozz');
+    const start = () => {
+      fireEvent.click(getByRole('button', { name: 'Play video' }));
+      fixture.detectChanges();
+      const frame = container.querySelector('iframe');
+      expect(frame).not.toBeNull();
+      return frame;
+    };
+    let frame = start();
+    expect(frame?.getAttribute('src')).toBe('https://ssl.streampartner.nl/player.php?url=rwj3wllrsipkvysnuozz');
+    fixture.componentRef.setInput('source', 'https://ssl.streampartner.nl/player.php?url=rwj3wllrsipkvysnuozz&tracking=changed');
+    fixture.detectChanges();
+    expect(container.querySelector('iframe')).toBe(frame);
+    fireEvent.click(getByRole('button', { name: 'Stop video' }));
+    fixture.detectChanges();
+    expect(frame?.getAttribute('src')).toBe('about:blank');
+    expect(container.querySelector('iframe')).toBeNull();
+    frame = start();
+    fixture.componentRef.setInput('featureKey', 'other-layer:21');
+    fixture.detectChanges();
+    expect(frame?.getAttribute('src')).toBe('about:blank');
+    expect(container.querySelector('iframe')).toBeNull();
+    frame = start();
+    fixture.componentRef.setInput('source', 'https://ssl.streampartner.nl/player.php?url=9579fb17b6b118ec5063');
+    fixture.detectChanges();
+    expect(frame?.getAttribute('src')).toBe('about:blank');
+    expect(container.querySelector('iframe')).toBeNull();
+    frame = start();
+    fixture.componentRef.setInput('source', source);
+    fixture.detectChanges();
+    expect(frame?.getAttribute('src')).toBe('about:blank');
+    expect(container.querySelector('iframe')).toBeNull();
+    expect(getByRole('link', { name: 'Open in YouTube' })).toBeDefined();
+    frame = start();
+    fixture.destroy();
+    expect(frame?.getAttribute('src')).toBe('about:blank');
+  });
+
 });

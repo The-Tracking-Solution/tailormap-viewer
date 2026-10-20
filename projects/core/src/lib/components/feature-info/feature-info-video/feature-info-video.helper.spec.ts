@@ -126,4 +126,70 @@ describe('FeatureInfoVideoHelper', () => {
     expect(FeatureInfoVideoHelper.getVideo(url)).toBeNull();
   });
 
+  test('recognizes the supplied rtsp.me camera and strips unrelated options', () => {
+    const expected = {
+      provider: 'rtspme',
+      key: 'rtspme:tkkGYA72',
+      playerUrl: 'https://rtsp.me/embed/tkkGYA72/',
+      watchUrl: 'https://rtsp.me/embed/tkkGYA72/',
+    };
+    expect(FeatureInfoVideoHelper.getVideo('https://rtsp.me/embed/tkkGYA72/')).toEqual(expected);
+    expect(FeatureInfoVideoHelper.getVideo('  https://rtsp.me/embed/tkkGYA72/?redirect=https://evil.example&token=discard#fragment  '))
+      .toEqual(expected);
+    expect(FeatureInfoVideoHelper.getVideo('https://rtsp.me/embed/474NtQT5/')?.key).not.toBe(expected.key);
+  });
+
+  test('recognizes the supplied StreamPartner camera and strips unrelated options', () => {
+    const expected = {
+      provider: 'streampartner',
+      key: 'streampartner:rwj3wllrsipkvysnuozz',
+      playerUrl: 'https://ssl.streampartner.nl/player.php?url=rwj3wllrsipkvysnuozz',
+      watchUrl: 'https://ssl.streampartner.nl/player.php?url=rwj3wllrsipkvysnuozz',
+    };
+    expect(FeatureInfoVideoHelper.getVideo('https://ssl.streampartner.nl/player.php?url=rwj3wllrsipkvysnuozz')).toEqual(expected);
+    expect(FeatureInfoVideoHelper.getVideo('  https://ssl.streampartner.nl/player.php?url=rwj3wllrsipkvysnuozz&redirect=https://evil.example&token=discard#fragment  '))
+      .toEqual(expected);
+    expect(FeatureInfoVideoHelper.getVideo('https://ssl.streampartner.nl/player.php?url=9579fb17b6b118ec5063')?.key).not.toBe(expected.key);
+  });
+
+  test('accepts the longer ID format documented by rtsp.me and canonicalizes its trailing slash', () => {
+    expect(FeatureInfoVideoHelper.getVideo('https://rtsp.me/embed/WKZb7jUsUw5T9N4f')?.playerUrl)
+      .toBe('https://rtsp.me/embed/WKZb7jUsUw5T9N4f/');
+  });
+
+  test.each([
+    'http://rtsp.me/embed/tkkGYA72/',
+    '//rtsp.me/embed/tkkGYA72/',
+    'https://rtsp.me.evil.example/embed/tkkGYA72/',
+    'https://rtsp.me@evil.example/embed/tkkGYA72/',
+    'https://user:password@rtsp.me/embed/tkkGYA72/',
+    'https://rtsp.me:8443/embed/tkkGYA72/',
+    'https://www.rtsp.me/embed/tkkGYA72/',
+    'https://rtsp.me/tkkGYA72/',
+    'https://rtsp.me/embed/',
+    'https://rtsp.me/embed/tkkGYA72/extra',
+    'https://rtsp.me/embed/tkkGYA72%2Fextra/',
+    'https://rtsp.me/embed/' + 'a'.repeat(129),
+    'http://ssl.streampartner.nl/player.php?url=abc',
+    '//ssl.streampartner.nl/player.php?url=abc',
+    'https://ssl.streampartner.nl.evil.example/player.php?url=abc',
+    'https://ssl.streampartner.nl@evil.example/player.php?url=abc',
+    'https://user:password@ssl.streampartner.nl/player.php?url=abc',
+    'https://ssl.streampartner.nl:8443/player.php?url=abc',
+    'https://www.streampartner.nl/player.php?url=abc',
+    'https://ssl.streampartner.nl/player.php/extra?url=abc',
+    'https://ssl.streampartner.nl/player.php',
+    'https://ssl.streampartner.nl/player.php?url=',
+    'https://ssl.streampartner.nl/player.php?url=abc&url=abc',
+    'https://ssl.streampartner.nl/player.php?url=abc&url=def',
+    'https://ssl.streampartner.nl/player.php?url=https%3A%2F%2Fevil.example',
+    'https://ssl.streampartner.nl/player.php?url=javascript%3Aalert(1)',
+    'https://ssl.streampartner.nl/player.php?url=abc%2Fdef',
+    'https://ssl.streampartner.nl/player.php?url=abc%26redirect%3Devil',
+    'https://ssl.streampartner.nl/player.php?url=abc%20def',
+    'https://ssl.streampartner.nl/player.php?url=' + 'a'.repeat(129),
+  ])('rejects unsupported or unsafe rtsp.me/StreamPartner routes: %s', url => {
+    expect(FeatureInfoVideoHelper.getVideo(url)).toBeNull();
+  });
+
 });

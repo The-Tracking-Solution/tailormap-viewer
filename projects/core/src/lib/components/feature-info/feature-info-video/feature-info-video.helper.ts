@@ -1,7 +1,7 @@
 import { YoutubeVideoHelper } from './youtube-video.helper';
 
 export interface FeatureInfoVideoSource {
-  provider: 'youtube' | 'netcamviewer' | 'ipcamlive';
+  provider: 'youtube' | 'netcamviewer' | 'ipcamlive' | 'rtspme' | 'streampartner';
   key: string;
   playerUrl: string;
   watchUrl: string;
@@ -20,7 +20,8 @@ export class FeatureInfoVideoHelper {
         watchUrl: `https://www.youtube.com/watch?v=${youtubeId}`,
       };
     }
-    return this.getNetcamviewerVideo(value) ?? this.getIpcamliveVideo(value);
+    return this.getNetcamviewerVideo(value) ?? this.getIpcamliveVideo(value)
+      ?? this.getRtspmeVideo(value) ?? this.getStreampartnerVideo(value);
   }
 
   private static getNetcamviewerVideo(value: unknown): FeatureInfoVideoSource | null {
@@ -85,6 +86,50 @@ export class FeatureInfoVideoHelper {
         playerUrl: `https://g0.ipcamlive.com/player/player.php?alias=${alias}&autoplay=1`,
         watchUrl: `https://www.ipcamlive.com/${alias}`,
       };
+    } catch {
+      return null;
+    }
+  }
+
+  private static getRtspmeVideo(value: unknown): FeatureInfoVideoSource | null {
+    if (typeof value !== 'string') {
+      return null;
+    }
+    try {
+      const url = new URL(value.trim());
+      if (url.protocol !== 'https:' || url.hostname !== 'rtsp.me'
+        || url.username || url.password || url.port) {
+        return null;
+      }
+      const id = /^\/embed\/([a-zA-Z0-9][a-zA-Z0-9_-]{0,127})\/?$/.exec(url.pathname)?.[1];
+      if (!id) {
+        return null;
+      }
+      const playerUrl = `https://rtsp.me/embed/${id}/`;
+      return { provider: 'rtspme', key: `rtspme:${id}`, playerUrl, watchUrl: playerUrl };
+    } catch {
+      return null;
+    }
+  }
+
+  private static getStreampartnerVideo(value: unknown): FeatureInfoVideoSource | null {
+    if (typeof value !== 'string') {
+      return null;
+    }
+    try {
+      const url = new URL(value.trim());
+      if (url.protocol !== 'https:' || url.hostname !== 'ssl.streampartner.nl'
+        || url.username || url.password || url.port || url.pathname !== '/player.php') {
+        return null;
+      }
+      const ids = url.searchParams.getAll('url');
+      const id = ids[0];
+      // The url parameter is an opaque source ID, never an arbitrary media URL.
+      if (ids.length !== 1 || !id || !/^[a-zA-Z0-9][a-zA-Z0-9_-]{0,127}$/.test(id)) {
+        return null;
+      }
+      const playerUrl = `https://ssl.streampartner.nl/player.php?url=${id}`;
+      return { provider: 'streampartner', key: `streampartner:${id}`, playerUrl, watchUrl: playerUrl };
     } catch {
       return null;
     }

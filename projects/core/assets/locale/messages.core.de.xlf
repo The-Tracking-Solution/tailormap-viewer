@@ -1687,6 +1687,14 @@
         <source>Open in IPCamLive</source>
         <target>In IPCamLive öffnen</target>
       </trans-unit>
+      <trans-unit id="core.feature-info.open-rtspme" datatype="html">
+        <source>Open in rtsp.me</source>
+        <target>In rtsp.me öffnen</target>
+      </trans-unit>
+      <trans-unit id="core.feature-info.open-streampartner" datatype="html">
+        <source>Open in StreamPartner</source>
+        <target>In StreamPartner öffnen</target>
+      </trans-unit>
     </body>
   </file>
 </xliff>
