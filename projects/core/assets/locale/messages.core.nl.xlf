@@ -1763,6 +1763,30 @@
         <source>Open in StreamPartner</source>
         <target>Openen in StreamPartner</target>
       </trans-unit>
+      <trans-unit id="core.feature-info.open-video-source" datatype="html">
+        <source>Open video source</source>
+        <target>Videobron openen</target>
+      </trans-unit>
+      <trans-unit id="core.feature-info.hls-video-label" datatype="html">
+        <source>Live video</source>
+        <target>Livevideo</target>
+      </trans-unit>
+      <trans-unit id="core.feature-info.hls-loading" datatype="html">
+        <source>Loading live video…</source>
+        <target>Livevideo laden…</target>
+      </trans-unit>
+      <trans-unit id="core.feature-info.hls-paused" datatype="html">
+        <source>Press Play in the video controls to continue.</source>
+        <target>Druk op Afspelen in de videobediening om verder te gaan.</target>
+      </trans-unit>
+      <trans-unit id="core.feature-info.hls-unsupported" datatype="html">
+        <source>This browser cannot play this stream. Open the video source.</source>
+        <target>Deze browser kan deze stream niet afspelen. Open de videobron.</target>
+      </trans-unit>
+      <trans-unit id="core.feature-info.hls-error" datatype="html">
+        <source>The stream could not be played. Stop and try again, or open the video source.</source>
+        <target>De stream kon niet worden afgespeeld. Stop en probeer opnieuw, of open de videobron.</target>
+      </trans-unit>
     </body>
   </file>
 </xliff>

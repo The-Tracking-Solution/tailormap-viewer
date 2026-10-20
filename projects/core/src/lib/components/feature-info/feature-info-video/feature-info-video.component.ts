@@ -2,13 +2,14 @@ import { ChangeDetectionStrategy, Component, ElementRef, inject, Input, OnChange
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 import { MatButton } from '@angular/material/button';
 import { FeatureInfoVideoHelper, FeatureInfoVideoSource } from './feature-info-video.helper';
+import { HlsVideoComponent } from './hls-video.component';
 
 @Component({
   selector: 'tm-feature-info-video',
   templateUrl: './feature-info-video.component.html',
   styleUrls: ['./feature-info-video.component.css'],
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [MatButton],
+  imports: [ MatButton, HlsVideoComponent ],
 })
 export class FeatureInfoVideoComponent implements OnChanges, OnDestroy {
   private sanitizer = inject(DomSanitizer);
@@ -23,6 +24,7 @@ export class FeatureInfoVideoComponent implements OnChanges, OnDestroy {
 
   public video: FeatureInfoVideoSource | null = null;
   public playerUrl = signal<SafeResourceUrl | null>(null);
+  public hlsPlaying = signal(false);
   public watchUrl = '';
 
   public ngOnChanges() {
@@ -40,6 +42,10 @@ export class FeatureInfoVideoComponent implements OnChanges, OnDestroy {
     if (!this.video) {
       return;
     }
+    if (this.video.provider === 'hls') {
+      this.hlsPlaying.set(true);
+      return;
+    }
     // The resolver constructs a player address only after exact host and route validation.
     this.playerUrl.set(this.sanitizer.bypassSecurityTrustResourceUrl(this.video.playerUrl));
   }
@@ -50,6 +56,7 @@ export class FeatureInfoVideoComponent implements OnChanges, OnDestroy {
       frame.src = 'about:blank';
     }
     this.playerUrl.set(null);
+    this.hlsPlaying.set(false);
   }
 
   public ngOnDestroy() {

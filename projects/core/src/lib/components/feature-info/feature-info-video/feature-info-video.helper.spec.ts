@@ -61,7 +61,7 @@ describe('FeatureInfoVideoHelper', () => {
     'https://live.netcamviewer.nl/camera%2Fother/777',
     'https://live.netcamviewer.nl/camera/777%3Fredirect=other',
     '<iframe src="https://live.netcamviewer.nl/camera/777"></iframe>',
-    'https://camera.example/stream.m3u8',
+    'https://camera.example/stream.mp4',
     'rtsp://camera.example/live',
   ])(
     'does not enable arbitrary or unsafe sources: %s', value => {
@@ -189,6 +189,38 @@ describe('FeatureInfoVideoHelper', () => {
     'https://ssl.streampartner.nl/player.php?url=abc%20def',
     'https://ssl.streampartner.nl/player.php?url=' + 'a'.repeat(129),
   ])('rejects unsupported or unsafe rtsp.me/StreamPartner routes: %s', url => {
+    expect(FeatureInfoVideoHelper.getVideo(url)).toBeNull();
+  });
+
+  test.each([
+    [ 'https://dehangout.nl/webcam-wijk-aan-zee/', 'https://webcam.dehangout.nl/stream.m3u8' ],
+    [ 'https://webcam-marinaseaport.nl/', 'https://wowza01.crossmediaventures.com/crossmedia/seaport.smil/playlist.m3u8' ],
+  ])('resolves the HLS pilot page %s and preserves an external viewing page', (page, stream) => {
+    const video = FeatureInfoVideoHelper.getVideo(page);
+    expect(video).toEqual({ provider: 'hls', key: `hls:${stream}`, playerUrl: stream, watchUrl: page });
+    expect(FeatureInfoVideoHelper.getVideo(stream)).toEqual(video);
+    expect(FeatureInfoVideoHelper.getVideo(page + '?tracking=changed#fragment')).toEqual(video);
+  });
+
+  test('accepts direct HTTPS HLS media without trusting it as an iframe or discarding signed parameters', () => {
+    const url = 'https://camera.example/live/index.m3u8?token=one&expires=123';
+    const video = FeatureInfoVideoHelper.getVideo(url + '#fragment');
+    expect(video).toEqual({ provider: 'hls', key: `hls:${url}`, playerUrl: url, watchUrl: url });
+    expect(FeatureInfoVideoHelper.getVideo(url.replace('one', 'two'))?.key).not.toBe(video?.key);
+  });
+
+  test.each([
+    'http://camera.example/live.m3u8',
+    '//camera.example/live.m3u8',
+    'https://user:password@camera.example/live.m3u8',
+    'https://camera.example:8443/live.m3u8',
+    'https://camera.example/live.m3u8/extra',
+    'https://camera.example/live.m3u8.html',
+    'https://camera.example/?url=live.m3u8',
+    'https://dehangout.nl.evil.example/webcam-wijk-aan-zee/',
+    'https://webcam-marinaseaport.nl/another-page',
+    'https://camera.example/' + 'a'.repeat(4096) + '.m3u8',
+  ])('rejects unsupported or unsafe HLS sources: %s', url => {
     expect(FeatureInfoVideoHelper.getVideo(url)).toBeNull();
   });
 

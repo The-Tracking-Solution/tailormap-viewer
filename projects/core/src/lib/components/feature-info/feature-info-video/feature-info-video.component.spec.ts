@@ -1,4 +1,4 @@
-import { describe, expect, test } from 'vitest';
+import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest';
 import { fireEvent, render } from '@testing-library/angular';
 import { FeatureInfoVideoComponent } from './feature-info-video.component';
 
@@ -277,4 +277,84 @@ describe('FeatureInfoVideoComponent', () => {
     expect(frame?.getAttribute('src')).toBe('about:blank');
   });
 
+});
+
+
+describe('FeatureInfoVideoComponent HLS lifecycle', () => {
+  beforeEach(() => {
+    vi.spyOn(HTMLMediaElement.prototype, 'canPlayType').mockReturnValue('probably');
+    vi.spyOn(HTMLMediaElement.prototype, 'play').mockResolvedValue();
+    vi.spyOn(HTMLMediaElement.prototype, 'pause').mockImplementation(() => undefined);
+    vi.spyOn(HTMLMediaElement.prototype, 'load').mockImplementation(() => undefined);
+  });
+
+  afterEach(() => vi.restoreAllMocks());
+
+  test('does not load HLS before Play, preserves refresh and keeps a full-page source link', async () => {
+    const page = 'https://dehangout.nl/webcam-wijk-aan-zee/';
+    const stream = 'https://webcam.dehangout.nl/stream.m3u8';
+    const { fixture, container, getByRole } = await render(FeatureInfoVideoComponent, {
+      inputs: { source: page, featureKey: 'webcams:1' },
+    });
+    expect(container.querySelector('video')).toBeNull();
+    expect(HTMLMediaElement.prototype.play).not.toHaveBeenCalled();
+    expect(getByRole('link', { name: 'Open video source' }).getAttribute('href')).toBe(page);
+    expect(getByRole('link', { name: 'Open video source' }).getAttribute('target')).toBe('_blank');
+    fireEvent.click(getByRole('button', { name: 'Play video' }));
+    fixture.detectChanges();
+    const video = container.querySelector('video');
+    expect(video?.getAttribute('src')).toBe(stream);
+    expect(container.querySelector('iframe')).toBeNull();
+    fixture.componentRef.setInput('source', stream);
+    fixture.detectChanges();
+    expect(container.querySelector('video')).toBe(video);
+    fireEvent.click(getByRole('button', { name: 'Stop video' }));
+    fixture.detectChanges();
+    expect(container.querySelector('video')).toBeNull();
+    expect(video?.hasAttribute('src')).toBe(false);
+    fixture.destroy();
+  });
+
+  test('releases HLS on feature, source, token and provider changes and destruction', async () => {
+    const { fixture, container, getByRole } = await render(FeatureInfoVideoComponent, {
+      inputs: { source: 'https://camera.example/live.m3u8', featureKey: 'webcams:1' },
+    });
+    const start = () => {
+      fireEvent.click(getByRole('button', { name: 'Play video' }));
+      fixture.detectChanges();
+      const video = container.querySelector('video');
+      expect(video).not.toBeNull();
+      return video;
+    };
+    let video = start();
+    fixture.componentRef.setInput('featureKey', 'other-layer:1');
+    fixture.detectChanges();
+    expect(video?.hasAttribute('src')).toBe(false);
+    expect(container.querySelector('video')).toBeNull();
+    video = start();
+    fixture.componentRef.setInput('source', 'https://camera.example/live.m3u8?token=new');
+    fixture.detectChanges();
+    expect(video?.hasAttribute('src')).toBe(false);
+    expect(container.querySelector('video')).toBeNull();
+    video = start();
+    fixture.componentRef.setInput('source', 'https://webcam-marinaseaport.nl/');
+    fixture.detectChanges();
+    expect(video?.hasAttribute('src')).toBe(false);
+    video = start();
+    fixture.componentRef.setInput('source', source);
+    fixture.detectChanges();
+    expect(video?.hasAttribute('src')).toBe(false);
+    expect(container.querySelector('video')).toBeNull();
+    expect(getByRole('link', { name: 'Open in YouTube' })).toBeDefined();
+    fireEvent.click(getByRole('button', { name: 'Play video' }));
+    fixture.detectChanges();
+    const frame = container.querySelector('iframe');
+    fixture.componentRef.setInput('source', 'https://dehangout.nl/webcam-wijk-aan-zee/');
+    fixture.detectChanges();
+    expect(frame?.getAttribute('src')).toBe('about:blank');
+    expect(container.querySelector('iframe')).toBeNull();
+    video = start();
+    fixture.destroy();
+    expect(video?.hasAttribute('src')).toBe(false);
+  });
 });

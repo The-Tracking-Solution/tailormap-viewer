@@ -1,0 +1,15 @@
+:host {
+  display: block;
+}
+
+video {
+  display: block;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  background: #000;
+}
+
+p {
+  margin: 4px 0;
+  font-size: 12px;
+}
