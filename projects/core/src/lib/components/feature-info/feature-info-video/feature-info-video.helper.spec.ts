@@ -242,4 +242,15 @@ describe('FeatureInfoVideoHelper', () => {
     expect(FeatureInfoVideoHelper.getVideo(page + 'unsupported')).toBeNull();
   });
 
+  test('recognizes Bloemendaal with a stable HLS source and a full-page external viewing link', () => {
+    const page = 'https://reddingsbrigade-bloemendaal.nl/beachcam/';
+    const stream = 'https://wowza01.crossmediaventures.com/beachcam/beachcam.smil/playlist.m3u8';
+    const expected = { provider: 'hls', key: `hls:${stream}`, playerUrl: stream, watchUrl: page };
+    expect(FeatureInfoVideoHelper.getVideo(page)).toEqual(expected);
+    expect(FeatureInfoVideoHelper.getVideo(page + '?tracking=changed#fragment')).toEqual(expected);
+    expect(FeatureInfoVideoHelper.getVideo(stream)).toEqual(expected);
+    expect(FeatureInfoVideoHelper.getVideo('https://reddingsbrigade-bloemendaal.nl.evil.example/beachcam/')).toBeNull();
+    expect(FeatureInfoVideoHelper.getVideo(page + 'other')).toBeNull();
+  });
+
 });

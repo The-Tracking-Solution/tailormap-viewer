@@ -177,6 +177,10 @@ export class FeatureInfoVideoHelper {
           page: 'https://www.markermeerzicht.nl/',
           stream: 'https://www.benlankamp.nl/webcam/index.m3u8',
         },
+        {
+          page: 'https://reddingsbrigade-bloemendaal.nl/beachcam/',
+          stream: 'https://wowza01.crossmediaventures.com/beachcam/beachcam.smil/playlist.m3u8',
+        },
       ];
       url.hash = '';
       const camera = cameras.find(c => c.page === `${url.origin}${url.pathname}` || c.stream === url.href);

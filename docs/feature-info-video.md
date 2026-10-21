@@ -251,3 +251,15 @@ Playlist and sample segment availability/CORS were checked during preparation;
 actual browser playback still requires acceptance on LT3. The initial two HLS
 cameras were confirmed working by the user. Hoek van Holland (temporary tokens)
 and Harlingen (camera selection) remain separate follow-ups.
+
+### Bloemendaal HLS camera
+
+The existing `https://reddingsbrigade-bloemendaal.nl/beachcam/` attribute URL
+(feature 16) resolves to the verified unsigned master playlist
+`https://wowza01.crossmediaventures.com/beachcam/beachcam.smil/playlist.m3u8`.
+The original beachcam page remains the external viewing link in a new tab;
+no source database or schema change is needed. Direct media and page notation
+share one playback identity, so unchanged refreshes preserve the player.
+Recognition and the parent component's opt-in/start/refresh/stop behavior are
+covered by tests. Real moving video, fullscreen and the external viewing page
+still require browser acceptance on LT3. The API and HLS engine are unchanged.

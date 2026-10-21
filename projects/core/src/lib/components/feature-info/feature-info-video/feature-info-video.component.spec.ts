@@ -290,9 +290,11 @@ describe('FeatureInfoVideoComponent HLS lifecycle', () => {
 
   afterEach(() => vi.restoreAllMocks());
 
-  test('does not load HLS before Play, preserves refresh and keeps a full-page source link', async () => {
-    const page = 'https://dehangout.nl/webcam-wijk-aan-zee/';
-    const stream = 'https://webcam.dehangout.nl/stream.m3u8';
+  test.each([
+    [ 'https://dehangout.nl/webcam-wijk-aan-zee/', 'https://webcam.dehangout.nl/stream.m3u8' ],
+    [ 'https://reddingsbrigade-bloemendaal.nl/beachcam/',
+      'https://wowza01.crossmediaventures.com/beachcam/beachcam.smil/playlist.m3u8' ],
+  ])('loads HLS only after Play, preserves refresh and keeps the external viewing page: %s', async (page, stream) => {
     const { fixture, container, getByRole } = await render(FeatureInfoVideoComponent, {
       inputs: { source: page, featureKey: 'webcams:1' },
     });
