@@ -50,6 +50,7 @@ export class OpenLayersMap implements MapViewerModel {
 
   private readonly resizeObserver: ResizeObserver;
   private initialExtent: OpenlayersExtent = [];
+  private homeCenterZoom?: [number[], number];
   private initialCenterZoom?: [ number[], number ] = undefined;
   private mapPadding: number[] | undefined;
 
@@ -74,14 +75,20 @@ export class OpenLayersMap implements MapViewerModel {
 
   public initMap(options: MapViewerOptionsModel, initialOptions?: { initialCenter?: [number, number]; initialZoom?: number }) {
     ProjectionsHelper.initProjection(options.projection, options.projectionDefinition, options.projectionAliases);
+    this.homeCenterZoom = options.initialCenter?.length === 2 && typeof options.initialZoom === 'number'
+      ? [[...options.initialCenter], options.initialZoom ] : undefined;
+    this.initialCenterZoom = this.homeCenterZoom;
     if (typeof initialOptions?.initialCenter !== 'undefined' && typeof initialOptions?.initialZoom !== 'undefined') {
       this.initialCenterZoom = [ initialOptions.initialCenter, initialOptions.initialZoom ];
     }
+    this.initialExtent = options.initialExtent?.length === 4
+      ? options.initialExtent
+      : options.maxExtent;
     const view = new View({
       projection: options.projection,
       extent: options.maxExtent,
-      center: initialOptions?.initialCenter,
-      zoom: initialOptions?.initialZoom,
+      center: this.initialCenterZoom?.[0],
+      zoom: this.initialCenterZoom?.[1],
       showFullExtent: true,
     });
     if (this.map.value && this.map.value.getView().getProjection().getCode() === options.projection) {
@@ -89,8 +96,8 @@ export class OpenLayersMap implements MapViewerModel {
       if (this.initialCenterZoom !== undefined) {
         this.map.value.getView().setCenter(this.initialCenterZoom[0]);
         this.map.value.getView().setZoom(this.initialCenterZoom[1]);
-      } else if (options.initialExtent && options.initialExtent.length > 0) {
-        this.map.value.getView().fit(options.initialExtent);
+      } else if (this.initialExtent && this.initialExtent.length > 0) {
+        this.map.value.getView().fit(this.initialExtent);
       }
       return;
     }
@@ -132,10 +139,6 @@ export class OpenLayersMap implements MapViewerModel {
       collapseLabel: options.controlOptions?.attributionPosition === 'left' ? '‹' : '›',
     });
     olMap.addControl(attributionControl);
-
-    this.initialExtent = options.initialExtent?.length === 4
-      ? options.initialExtent
-      : options.maxExtent;
 
     if (this.toolManager.value) {
       this.toolManager.value.destroy();
@@ -219,9 +222,21 @@ export class OpenLayersMap implements MapViewerModel {
     });
   }
 
+  public setInitialExtent(extent: number[]) {
+    this.homeCenterZoom = undefined;
+    this.initialExtent = [...extent];
+  }
+
+  public setInitialPosition(center: number[], zoom: number) {
+    this.homeCenterZoom = [[...center], zoom ];
+  }
+
   public zoomToInitialExtent() {
     this.executeMapAction(olMap => {
-      if (this.initialExtent && this.initialExtent.length > 0) {
+      if (this.homeCenterZoom) {
+        olMap.getView().setCenter(this.homeCenterZoom[0]);
+        olMap.getView().setZoom(this.homeCenterZoom[1]);
+      } else if (this.initialExtent && this.initialExtent.length > 0) {
         olMap.getView().fit(this.initialExtent);
       }
     });

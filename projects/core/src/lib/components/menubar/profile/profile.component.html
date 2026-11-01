@@ -21,6 +21,16 @@
         <span i18n="@@core.profile.go-to-admin">Go to admin</span>
       </button>
     }
+    @if (userDetails.isAuthenticated && personalStartExtent.available()) {
+      <button mat-menu-item [disabled]="personalStartExtent.busy() || (in3d$ | async)" (click)="saveStartExtent()">
+        <span i18n="@@core.profile.save-start-extent">Use current map as personal start position</span>
+      </button>
+      @if (personalStartExtent.hasPreference()) {
+        <button mat-menu-item [disabled]="personalStartExtent.busy()" (click)="clearStartExtent()">
+          <span i18n="@@core.profile.clear-start-extent">Clear personal start position</span>
+        </button>
+      }
+    }
     @if (userDetails.isAuthenticated && userDetails.username) {
       <button mat-menu-item (click)="logout()">
         <span i18n="@@core.profile.logout">Logout</span>
@@ -51,6 +61,16 @@
     <button mat-menu-item routerLink="/admin">
       <span i18n="@@core.profile.go-to-admin">Go to admin</span>
     </button>
+  }
+  @if (userDetails.isAuthenticated && personalStartExtent.available()) {
+    <button mat-menu-item [disabled]="personalStartExtent.busy() || (in3d$ | async)" (click)="saveStartExtent()">
+      <span i18n="@@core.profile.save-start-extent">Use current map as personal start position</span>
+    </button>
+    @if (personalStartExtent.hasPreference()) {
+      <button mat-menu-item [disabled]="personalStartExtent.busy()" (click)="clearStartExtent()">
+        <span i18n="@@core.profile.clear-start-extent">Clear personal start position</span>
+      </button>
+    }
   }
   @if (userDetails.isAuthenticated && userDetails.username) {
     <button mat-menu-item (click)="logout()">

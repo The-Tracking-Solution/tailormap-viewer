@@ -2761,6 +2761,146 @@
         <source>Inherit (<x id="INTERPOLATION" equiv-text="{{ getCatalogDisplayLabel(att.name) }}"/>)</source>
         <target>Overnemen (<x id="INTERPOLATION" equiv-text="{{ getCatalogDisplayLabel(att.name) }}"/>)</target>
       </trans-unit>
+      <trans-unit id="admin-core.application.personal-start-enabled" datatype="html">
+        <source>Allow personal start positions</source>
+        <target>Persoonlijke startposities toestaan</target>
+      </trans-unit>
+      <trans-unit id="admin-core.personal-start.heading" datatype="html">
+        <source>Start position per local user</source>
+        <target>Startpositie per lokale gebruiker</target>
+      </trans-unit>
+      <trans-unit id="admin-core.personal-start.help" datatype="html">
+        <source>Choose a local user and enter a center in the application projection and a zoom level. Leave all three fields empty to use the application default. Each user's changes are saved separately.</source>
+        <target>Kies een lokale gebruiker en voer een middelpunt in de applicatieprojectie en een zoomniveau in. Laat alle drie velden leeg voor de applicatiestandaard. Wijzigingen worden per gebruiker apart opgeslagen.</target>
+      </trans-unit>
+      <trans-unit id="admin-core.personal-start.disabled" datatype="html">
+        <source>Personal start positions are disabled for this application. You can prepare user settings below; enable the application option and save the application to activate them.</source>
+        <target>Persoonlijke startposities staan uit voor deze applicatie. U kunt hieronder gebruikersinstellingen voorbereiden. Zet de applicatieoptie aan en sla de applicatie op om ze te activeren.</target>
+      </trans-unit>
+      <trans-unit id="admin-core.personal-start.user" datatype="html">
+        <source>Local user</source>
+        <target>Lokale gebruiker</target>
+      </trans-unit>
+      <trans-unit id="admin-core.personal-start.projection" datatype="html">
+        <source>Coordinate reference system: <x id="INTERPOLATION" equiv-text="{{ application?.crs }}"/></source>
+        <target>Coördinatenstelsel: <x id="INTERPOLATION" equiv-text="{{ application?.crs }}"/></target>
+      </trans-unit>
+      <trans-unit id="admin-core.personal-start.x" datatype="html">
+        <source>Center X</source>
+        <target>Middelpunt X</target>
+      </trans-unit>
+      <trans-unit id="admin-core.personal-start.y" datatype="html">
+        <source>Center Y</source>
+        <target>Middelpunt Y</target>
+      </trans-unit>
+      <trans-unit id="admin-core.personal-start.zoom" datatype="html">
+        <source>Start zoom (0–28)</source>
+        <target>Startzoom (0–28)</target>
+      </trans-unit>
+      <trans-unit id="admin-core.personal-start.may-edit" datatype="html">
+        <source>Allow this user to change their own start position</source>
+        <target>Deze gebruiker mag de eigen startpositie aanpassen</target>
+      </trans-unit>
+      <trans-unit id="admin-core.personal-start.save" datatype="html">
+        <source>Save user start position</source>
+        <target>Startpositie gebruiker opslaan</target>
+      </trans-unit>
+      <trans-unit id="admin-core.personal-start.clear" datatype="html">
+        <source>Use application default</source>
+        <target>Applicatiestandaard gebruiken</target>
+      </trans-unit>
+      <trans-unit id="admin-core.personal-start.load-error" datatype="html">
+        <source>Could not load this user's start position.</source>
+        <target>De startpositie van deze gebruiker kon niet worden geladen.</target>
+      </trans-unit>
+      <trans-unit id="admin-core.personal-start.save-error" datatype="html">
+        <source>Could not save this user's start position. Reload if the application projection changed.</source>
+        <target>De startpositie van deze gebruiker kon niet worden opgeslagen. Laad opnieuw als de applicatieprojectie is gewijzigd.</target>
+      </trans-unit>
+      <trans-unit id="admin-core.personal-start.saved" datatype="html">
+        <source>User start position and permission saved.</source>
+        <target>Startpositie en wijzigingsrecht van gebruiker opgeslagen.</target>
+      </trans-unit>
+      <trans-unit id="admin-core.user-start.heading" datatype="html">
+        <source>Personal start position per application</source>
+        <target>Persoonlijke startpositie per applicatie</target>
+      </trans-unit>
+      <trans-unit id="admin-core.user-start.help" datatype="html">
+        <source>Choose an application this user can access. Enter center and zoom, or move the map and use its view, or draw a rectangle. Save this setting with the button below.</source>
+        <target>Kies een applicatie waartoe deze gebruiker toegang heeft. Voer middelpunt en zoom in, verschuif en zoom de kaart en neem het kaartbeeld over, of teken een rechthoek. Sla deze instelling op met de knop hieronder.</target>
+      </trans-unit>
+      <trans-unit id="admin-core.user-start.application" datatype="html">
+        <source>Application</source>
+        <target>Applicatie</target>
+      </trans-unit>
+      <trans-unit id="admin-core.user-start.no-apps" datatype="html">
+        <source>This user has no accessible applications.</source>
+        <target>Deze gebruiker heeft geen toegankelijke applicaties.</target>
+      </trans-unit>
+      <trans-unit id="admin-core.user-start.disabled" datatype="html">
+        <source>Personal start positions are disabled in this application. You can prepare the user's setting here; enable the feature in application settings to use it.</source>
+        <target>Persoonlijke startposities staan uit in deze applicatie. U kunt de gebruikersinstelling hier voorbereiden. Zet de functie bij de applicatie-instellingen aan om deze te gebruiken.</target>
+      </trans-unit>
+      <trans-unit id="admin-core.user-start.rectangle" datatype="html">
+        <source>A rectangle is selected. The viewer will fit this area to the user's screen.</source>
+        <target>Er is een rechthoek geselecteerd. De viewer past dit gebied aan het scherm van de gebruiker aan.</target>
+      </trans-unit>
+      <trans-unit id="admin-core.user-start.manual" datatype="html">
+        <source>Switch to center and zoom</source>
+        <target>Middelpunt en zoom invoeren</target>
+      </trans-unit>
+      <trans-unit id="admin-core.user-start.show" datatype="html">
+        <source>Show coordinates on map</source>
+        <target>Coördinaten op kaart tonen</target>
+      </trans-unit>
+      <trans-unit id="admin-core.user-start.map-error" datatype="html">
+        <source>Map preview unavailable. You can still enter coordinates manually.</source>
+        <target>Kaartvoorbeeld niet beschikbaar. U kunt wel handmatig coördinaten invoeren.</target>
+      </trans-unit>
+      <trans-unit id="admin-core.user-start.unsaved" datatype="html">
+        <source>Start position changes have not been saved.</source>
+        <target>Wijzigingen aan de startpositie zijn nog niet opgeslagen.</target>
+      </trans-unit>
+      <trans-unit id="admin-core.user-start.save" datatype="html">
+        <source>Save start position for this application</source>
+        <target>Startpositie voor deze applicatie opslaan</target>
+      </trans-unit>
+      <trans-unit id="admin-core.user-start.apps-error" datatype="html">
+        <source>Could not load applications for this user.</source>
+        <target>De applicaties voor deze gebruiker konden niet worden geladen.</target>
+      </trans-unit>
+      <trans-unit id="admin-core.user-start.discard-title" datatype="html">
+        <source>Unsaved start position</source>
+        <target>Niet-opgeslagen startpositie</target>
+      </trans-unit>
+      <trans-unit id="admin-core.user-start.discard-message" datatype="html">
+        <source>Discard the unsaved start position and select another application?</source>
+        <target>De niet-opgeslagen startpositie weggooien en een andere applicatie selecteren?</target>
+      </trans-unit>
+      <trans-unit id="map.start-position.label" datatype="html">
+        <source>Start position map</source>
+        <target>Kaart voor startpositie</target>
+      </trans-unit>
+      <trans-unit id="map.start-position.use-view" datatype="html">
+        <source>Use map center and zoom</source>
+        <target>Middelpunt en zoom overnemen</target>
+      </trans-unit>
+      <trans-unit id="map.start-position.draw" datatype="html">
+        <source>Draw rectangle</source>
+        <target>Rechthoek tekenen</target>
+      </trans-unit>
+      <trans-unit id="map.start-position.reset" datatype="html">
+        <source>Show application start</source>
+        <target>Applicatiestart tonen</target>
+      </trans-unit>
+      <trans-unit id="map.start-position.draw-hint" datatype="html">
+        <source>Select two opposite corners of the rectangle. Press Escape to cancel.</source>
+        <target>Kies twee tegenoverliggende hoeken van de rechthoek. Druk op Escape om te annuleren.</target>
+      </trans-unit>
+      <trans-unit id="map.start-position.layer-error" datatype="html">
+        <source>Some map layers could not be loaded.</source>
+        <target>Enkele kaartlagen konden niet worden geladen.</target>
+      </trans-unit>
     </body>
   </file>
 </xliff>

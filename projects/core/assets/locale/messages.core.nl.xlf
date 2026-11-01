@@ -1787,6 +1787,26 @@
         <source>The stream could not be played. Stop and try again, or open the video source.</source>
         <target>De stream kon niet worden afgespeeld. Stop en probeer opnieuw, of open de videobron.</target>
       </trans-unit>
+      <trans-unit id="core.profile.save-start-extent" datatype="html">
+        <source>Use current map as personal start position</source>
+        <target>Huidige kaart als persoonlijke startpositie gebruiken</target>
+      </trans-unit>
+      <trans-unit id="core.profile.clear-start-extent" datatype="html">
+        <source>Clear personal start position</source>
+        <target>Persoonlijke startpositie wissen</target>
+      </trans-unit>
+      <trans-unit id="core.profile.start-extent-saved" datatype="html">
+        <source>Personal start position saved</source>
+        <target>Persoonlijke startpositie opgeslagen</target>
+      </trans-unit>
+      <trans-unit id="core.profile.start-extent-cleared" datatype="html">
+        <source>Application start position restored</source>
+        <target>Startpositie van de applicatie hersteld</target>
+      </trans-unit>
+      <trans-unit id="core.profile.start-extent-error" datatype="html">
+        <source>Could not update personal start position</source>
+        <target>Persoonlijke startpositie kon niet worden bijgewerkt</target>
+      </trans-unit>
     </body>
   </file>
 </xliff>

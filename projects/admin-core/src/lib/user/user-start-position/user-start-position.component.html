@@ -1,0 +1,48 @@
+<h3 i18n="@@admin-core.user-start.heading">Personal start position per application</h3>
+<p i18n="@@admin-core.user-start.help">Choose an application this user can access. Enter center and zoom, or move the map and use its view, or draw a rectangle. Save this setting with the button below.</p>
+<mat-form-field>
+  <mat-label i18n="@@admin-core.user-start.application">Application</mat-label>
+  <mat-select [formControl]="applicationId" [disabled]="busy()">
+    @for (app of applications(); track app.id) {
+      <mat-option [value]="app.id">{{ app.title || app.name }} ({{ app.name }})</mat-option>
+    }
+  </mat-select>
+</mat-form-field>
+@if (!busy() && applications().length === 0) {
+  <p i18n="@@admin-core.user-start.no-apps">This user has no accessible applications.</p>
+}
+@if (loaded()) {
+  @if (!application?.enabled) {
+    <p i18n="@@admin-core.user-start.disabled">Personal start positions are disabled in this application. You can prepare the user's setting here; enable the feature in application settings to use it.</p>
+  }
+  <form [formGroup]="form" (ngSubmit)="save()">
+    <div class="editor">
+      <div class="fields">
+        <p i18n="@@admin-core.personal-start.projection">Coordinate reference system: {{ application?.crs }}</p>
+        @if (rectangle()) {
+          <p i18n="@@admin-core.user-start.rectangle">A rectangle is selected. The viewer will fit this area to the user's screen.</p>
+          <button mat-button type="button" (click)="clearPosition()" [disabled]="busy()" i18n="@@admin-core.user-start.manual">Switch to center and zoom</button>
+        } @else {
+          <mat-form-field><mat-label i18n="@@admin-core.personal-start.x">Center X</mat-label><input matInput type="number" formControlName="x" step="any" [readonly]="busy()" /></mat-form-field>
+          <mat-form-field><mat-label i18n="@@admin-core.personal-start.y">Center Y</mat-label><input matInput type="number" formControlName="y" step="any" [readonly]="busy()" /></mat-form-field>
+          <mat-form-field><mat-label i18n="@@admin-core.personal-start.zoom">Start zoom (0–28)</mat-label><input matInput type="number" formControlName="zoom" min="0" max="28" step="any" [readonly]="busy()" /></mat-form-field>
+          <button mat-button type="button" (click)="showManualPosition()" [disabled]="busy() || !valid" i18n="@@admin-core.user-start.show">Show coordinates on map</button>
+        }
+      </div>
+      <div>
+        @if (mapData(); as data) {
+          <tm-start-position-map [mapData]="data" [position]="previewPosition()" [disabled]="busy()" (positionSelected)="choosePosition($event)"></tm-start-position-map>
+        } @else {
+          <p i18n="@@admin-core.user-start.map-error">Map preview unavailable. You can still enter coordinates manually.</p>
+        }
+      </div>
+    </div>
+    <mat-slide-toggle formControlName="mayEdit" i18n="@@admin-core.personal-start.may-edit">Allow this user to change their own start position</mat-slide-toggle>
+    @if (dirty()) { <p role="status" i18n="@@admin-core.user-start.unsaved">Start position changes have not been saved.</p> }
+    <div class="actions">
+      <button mat-flat-button color="primary" type="submit" [disabled]="busy() || !valid || !dirty()" i18n="@@admin-core.user-start.save">Save start position for this application</button>
+      <button mat-button type="button" [disabled]="busy()" (click)="clearPosition()" i18n="@@admin-core.personal-start.clear">Use application default</button>
+    </div>
+  </form>
+}
+<p role="status">{{ message() }}</p>

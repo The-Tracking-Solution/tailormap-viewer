@@ -5,6 +5,7 @@ import { CoordinateReferenceSystemModel } from './coordinate-reference-system.mo
 import { LayerTreeNodeModel } from './layer-tree-node.model';
 
 export interface MapResponseModel {
+  personalStartPosition?: { center: number[]; zoom: number };
   initialExtent: BoundsModel | null;
   maxExtent: BoundsModel | null;
   services: ServiceModel[];

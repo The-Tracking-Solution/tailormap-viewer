@@ -49,7 +49,9 @@ export class ApplicationMapService implements OnDestroy {
           if (prev === null || curr === null) {
             return false;
           }
-          return prev.projection === curr.projection &&
+          return prev.initialZoom === curr.initialZoom &&
+            ArrayHelper.arrayEquals(prev.initialCenter ?? [], curr.initialCenter ?? []) &&
+            prev.projection === curr.projection &&
             ArrayHelper.arrayEquals(prev.initialExtent, curr.initialExtent) &&
             ArrayHelper.arrayEquals(prev.maxExtent, curr.maxExtent);
         }),
