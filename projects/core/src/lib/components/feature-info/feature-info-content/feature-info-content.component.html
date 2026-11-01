@@ -73,6 +73,17 @@
           </div>
         }
       </div>
+      @if (canFollow()) {
+        <button mat-button
+                [attr.aria-pressed]="isFollowing()"
+                (click)="toggleFollowing.emit()">
+          @if (isFollowing()) {
+            <span i18n="@@core.feature-info.stop-following">Stop following feature</span>
+          } @else {
+            <span i18n="@@core.feature-info.follow-feature">Follow feature</span>
+          }
+        </button>
+      }
       <div class="buttons">
         <button mat-flat-button i18n="@@core.feature-info.previous" (click)="back()" color="primary" [disabled]="isPrevButtonDisabled()">Previous</button>
         <button mat-flat-button i18n="@@core.feature-info.next" (click)="next()" color="primary" [disabled]="isNextButtonDisabled()">Next</button>

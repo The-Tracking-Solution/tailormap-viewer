@@ -1,3 +1,4 @@
+import { FeatureInfoFollowService } from '../feature-info-follow.service';
 import { ChangeDetectionStrategy, Component, computed, DestroyRef, inject, signal } from '@angular/core';
 import { Store } from '@ngrx/store';
 import {
@@ -52,6 +53,7 @@ import { AsyncPipe } from '@angular/common';
 })
 export class FeatureInfoDialogComponent {
   private store$ = inject(Store);
+  public featureFollow = inject(FeatureInfoFollowService);
   public breakpointObserver = inject(BreakpointObserver);
   private destroyRef = inject(DestroyRef);
   private authenticatedUserService = inject(AuthenticatedUserService);

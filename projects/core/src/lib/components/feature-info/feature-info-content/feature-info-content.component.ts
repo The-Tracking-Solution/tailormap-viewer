@@ -53,6 +53,9 @@ export class FeatureInfoContentComponent {
   public hideEmptyValues = input<boolean>(false);
   public showEmbeddedVideos = input<boolean>(false);
   public mediaVisible = input<boolean>(true);
+  public canFollow = input(false);
+  public isFollowing = input(false);
+  public toggleFollowing = output<void>();
 
   public showNextFeatureInfoFeature = output<void>();
   public showPreviousFeatureInfoFeature = output<void>();

@@ -1,3 +1,4 @@
+import { MapFollowHelper } from '../helpers/map-follow.helper';
 import { Map as OlMap } from 'ol';
 import { Projection } from 'ol/proj.js';
 import { View } from 'ol';
@@ -378,6 +379,13 @@ export class OpenLayersMap implements MapViewerModel {
         olMap.getView().animate({ duration: animationDuration, zoom: zoomLevel, center });
       }
     });
+  }
+
+  public panToPointIfOutsideViewport(wkt: string): void {
+    const olMap = this.map.value;
+    if (olMap && !this.in3d.value) {
+      MapFollowHelper.panToPointIfOutsideViewport(olMap, wkt, this.mapPadding);
+    }
   }
 
   public setPadding(padding: number[]) {
