@@ -47,4 +47,42 @@ describe('FeatureInfoReducer', () => {
     expect(updatedState2.dialogCollapsed).toEqual(false);
   });
 
+  test('updates feature only in matching layer when feature IDs are equal', () => {
+    const layerOneFeature = {
+      ...getFeatureModel({
+        __fid: 'same-id',
+        attributes: { prop1: 'layer-one' },
+      }),
+      layerId: 'layer-1',
+    };
+    const layerTwoFeature = {
+      ...getFeatureModel({
+        __fid: 'same-id',
+        attributes: { prop1: 'layer-two' },
+      }),
+      layerId: 'layer-2',
+    };
+    const updatedFeature = {
+      ...getFeatureModel({
+        __fid: 'same-id',
+        attributes: { prop1: 'updated-layer-two' },
+      }),
+      layerId: 'layer-2',
+    };
+
+    const state: FeatureInfoState = {
+      ...initialFeatureInfoState,
+      features: [ layerOneFeature, layerTwoFeature ],
+    };
+
+    const action = FeatureInfoActions.updateFeatureInFeatureInfo({
+      feature: updatedFeature,
+    });
+
+    const updatedState = featureInfoReducer(state, action);
+
+    expect(updatedState.features[0]).toEqual(layerOneFeature);
+    expect(updatedState.features[1]).toEqual(updatedFeature);
+  });
+
 });

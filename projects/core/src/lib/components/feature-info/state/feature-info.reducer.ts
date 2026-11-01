@@ -135,7 +135,9 @@ const onUpdateFeatureInFeatureInfo = (
   state: FeatureInfoState,
   payload: ReturnType<typeof FeatureInfoActions.updateFeatureInFeatureInfo>,
 ): FeatureInfoState => {
-  const featureIdx = state.features.findIndex(f => f.__fid === payload.feature.__fid);
+  const featureIdx = state.features.findIndex(
+    f => f.layerId === payload.feature.layerId && f.__fid === payload.feature.__fid,
+  );
   if (featureIdx === -1) {
     return state;
   }
