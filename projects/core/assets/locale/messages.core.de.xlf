@@ -1711,6 +1711,14 @@
         <source>You are logged out and might need to login again</source>
         <target>Sie sind abgemeldet und müssen sich möglicherweise erneut anmelden</target>
       </trans-unit>
+      <trans-unit id="core.feature-info.follow-feature" datatype="html">
+        <source>Follow feature</source>
+        <target>Objekt verfolgen</target>
+      </trans-unit>
+      <trans-unit id="core.feature-info.stop-following" datatype="html">
+        <source>Stop following feature</source>
+        <target>Objekt nicht mehr verfolgen</target>
+      </trans-unit>
     </body>
   </file>
 </xliff>

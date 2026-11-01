@@ -317,6 +317,11 @@ export class MapService {
     return this.map.getFeatureInfoForLayers$(layerId, coordinates, httpService);
   }
 
+  /** Keep a point in the UI-visible map area, panning only when it enters the outer 20% margin. */
+  public panToPointIfOutsideViewport(wkt: string): void {
+    this.map.panToPointIfOutsideViewport(wkt);
+  }
+
   public setPadding(padding: number[]) {
     this.map.setPadding(padding);
   }

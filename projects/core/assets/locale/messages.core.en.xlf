@@ -1281,6 +1281,14 @@
       <trans-unit id="core.user-login-check-viewer-message" datatype="html">
         <source>You are logged out and might need to login again</source>
       </trans-unit>
+      <trans-unit id="core.feature-info.follow-feature" datatype="html">
+        <source>Follow feature</source>
+        <target>Follow feature</target>
+      </trans-unit>
+      <trans-unit id="core.feature-info.stop-following" datatype="html">
+        <source>Stop following feature</source>
+        <target>Stop following feature</target>
+      </trans-unit>
     </body>
   </file>
 </xliff>
