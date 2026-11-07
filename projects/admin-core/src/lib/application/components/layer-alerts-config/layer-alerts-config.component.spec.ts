@@ -23,24 +23,24 @@ function setup() {
 }
 
 describe('LayerAlertsConfigComponent', () => {
-  test('applies the enabled rule to the application draft', () => {
+  test('applies every change by default without requiring transition values', () => {
     const { component, updateConfig } = setup();
     component.form.setValue({
       enabled: true, layerId: 'layer-1', idAttribute: ' id ', statusAttribute: 'status',
-      labelAttribute: '', from: ' yellow ', to: 'red',
+      labelAttribute: '', mode: component.form.controls.mode.value, from: '', to: '',
     });
     component.apply();
 
     expect(updateConfig).toHaveBeenCalledWith(BaseComponentTypeEnum.LAYER_ALERTS, {
       enabled: true,
-      rule: { layerId: 'layer-1', idAttribute: 'id', statusAttribute: 'status', labelAttribute: undefined, from: 'yellow', to: 'red' },
+      rule: { layerId: 'layer-1', idAttribute: 'id', statusAttribute: 'status', labelAttribute: undefined, mode: 'any-change' },
     });
   });
 
   test('rejects an enabled rule with identical transition values', () => {
     const { component, updateConfig } = setup();
     component.form.patchValue({
-      enabled: true, layerId: 'layer-1', idAttribute: 'id', statusAttribute: 'status', from: 'red', to: ' red ',
+      enabled: true, layerId: 'layer-1', idAttribute: 'id', statusAttribute: 'status', mode: 'transition', from: 'red', to: ' red ',
     });
     component.apply();
 
@@ -52,6 +52,7 @@ describe('LayerAlertsConfigComponent', () => {
     const rule = { layerId: 'layer-1', idAttribute: 'id', statusAttribute: 'status', from: 1, to: 2 };
     fixture.componentRef.setInput('config', { enabled: true, rule });
     fixture.detectChanges();
+    expect(component.form.controls.mode.value).toBe('transition');
     expect(component.form.controls.from.value).toBe('1');
 
     component.form.controls.enabled.setValue(false);

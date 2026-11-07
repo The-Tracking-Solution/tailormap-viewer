@@ -2,14 +2,15 @@ import type { FeatureModel, FeaturesResponseModel } from '@tailormap-viewer/api'
 
 export const LAYER_ALERT_PAGE_SIZE = 500;
 
-export interface LayerAlertRule {
+export type LayerAlertRule = {
   layerId: string;
   idAttribute: string;
   statusAttribute: string;
-  from: string;
-  to: string;
   labelAttribute?: string;
-}
+} & (
+  { mode: 'any-change' }
+  | { mode?: 'transition'; from: string; to: string }
+);
 
 interface LayerAlertObject {
   status: string | undefined;
@@ -39,12 +40,20 @@ export function parseLayerAlertRule(input: unknown): LayerAlertRule | undefined 
   const layerId = asText(fields['layerId']);
   const idAttribute = asText(fields['idAttribute']);
   const statusAttribute = asText(fields['statusAttribute']);
-  const from = asText(fields['from']);
-  const to = asText(fields['to']);
-  if (!layerId || !idAttribute || !statusAttribute || idAttribute === statusAttribute || !from || !to || from === to) {
+  if (!layerId || !idAttribute || !statusAttribute || idAttribute === statusAttribute) {
     return undefined;
   }
-  return { layerId, idAttribute, statusAttribute, from, to, labelAttribute: asText(fields['labelAttribute']) };
+  const baseRule = { layerId, idAttribute, statusAttribute, labelAttribute: asText(fields['labelAttribute']) };
+  const mode = fields['mode'];
+  if (mode === 'any-change') {
+    return { ...baseRule, mode };
+  }
+  const from = asText(fields['from']);
+  const to = asText(fields['to']);
+  if ((mode !== undefined && mode !== 'transition') || !from || !to || from === to) {
+    return undefined;
+  }
+  return { ...baseRule, from, to };
 }
 
 /** A single page is the baseline only when the API confirms it contains the whole layer. */
@@ -59,13 +68,16 @@ export function readLayerAlertSnapshot(response: FeaturesResponseModel, rule: La
   const snapshot = new Map<string, LayerAlertObject>();
   for (const feature of features) {
     const id = asText(feature.attributes?.[rule.idAttribute]);
+    if (!id && rule.mode === 'any-change') {
+      continue;
+    }
     if (!id || snapshot.has(id)) {
       return undefined;
     }
     const label = rule.labelAttribute ? asText(feature.attributes[rule.labelAttribute]) : undefined;
     snapshot.set(id, { feature, label: label ?? id, status: asText(feature.attributes[rule.statusAttribute]) });
   }
-  return snapshot;
+  return snapshot.size ? snapshot : undefined;
 }
 
 export function compareLayerAlertSnapshots(
@@ -75,8 +87,15 @@ export function compareLayerAlertSnapshots(
 ): LayerAlert[] {
   const alerts: LayerAlert[] = [];
   for (const [ id, object ] of current) {
-    if (previous.get(id)?.status === rule.from && object.status === rule.to) {
-      alerts.push({ feature: object.feature, label: object.label, from: rule.from, to: rule.to });
+    const before = previous.get(id);
+    if (!before) {
+      continue;
+    }
+    const matches = rule.mode === 'any-change'
+      ? before.status !== object.status
+      : before.status === rule.from && object.status === rule.to;
+    if (matches) {
+      alerts.push({ feature: object.feature, label: object.label, from: before.status ?? '—', to: object.status ?? '—' });
     }
   }
   return alerts;

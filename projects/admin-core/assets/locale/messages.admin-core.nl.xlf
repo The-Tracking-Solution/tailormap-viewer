@@ -2941,6 +2941,18 @@
         <source>New value</source>
         <target>Nieuwe waarde</target>
       </trans-unit>
+      <trans-unit id="admin-core.layer-alerts.mode" datatype="html">
+        <source>When to notify</source>
+        <target>Wanneer melden</target>
+      </trans-unit>
+      <trans-unit id="admin-core.layer-alerts.any-change" datatype="html">
+        <source>Every change</source>
+        <target>Elke wijziging</target>
+      </trans-unit>
+      <trans-unit id="admin-core.layer-alerts.transition" datatype="html">
+        <source>Specific transition</source>
+        <target>Specifieke overgang</target>
+      </trans-unit>
     </body>
   </file>
 </xliff>
