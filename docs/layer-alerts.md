@@ -4,13 +4,13 @@ The desktop 2D viewer checks one configured layer every 60 seconds while the app
 
 ## Configure in Tailormap Admin
 
-Open **Applications → Components → Map alerts**. Select one application layer and fill in its object ID attribute, status attribute and the values for the transition. The optional label attribute falls back to the object ID. Check **Enabled**, apply the rule and save the application.
+Open **Applications → Components → Map alerts**. Select one application layer and fill in its object ID and status attributes. **Every change** is the default. Existing specific transitions can still be edited and kept. The optional label attribute falls back to the object ID. Check **Enabled**, apply the rule and save the application.
 
-For the strand flags example, choose the warning-flags layer, enter `svid` for the object ID, `svflag` for the status, `svname` for the label and `gele-vlag` → `paarse-vlag` for the transition. Values are case-sensitive and should match the feature API. The rule accepts text and numeric values.
+For the strand flags example, choose the warning-flags layer, enter `svid` for the object ID, `svflag` for the status, `svname` for the label and select **Every change**. Text and numeric values are compared per object, including when the status is set or cleared.
 
 The layer must expose attributes through the existing feature API. Use a small layer with stable, unique object keys and an exact feature count of at most 500. The optional label falls back to the object key. The rule covers the entire application layer, regardless of viewport and temporary viewer filters. It respects the existing application access and layer settings for feature info and the attribute list.
 
-The first complete response establishes the comparison baseline. An incomplete, empty or unsuccessful response produces no alerts. A later complete response compares against the last valid baseline. Newly observed and removed objects do not produce alerts. The last 20 alerts remain in the open viewer session. Selecting **Show on map** zooms to and briefly highlights the geometry from the check.
+The first complete response establishes the comparison baseline. An incomplete, empty or unsuccessful response produces no alerts. A later complete response compares against the last valid baseline. Newly observed and removed objects do not produce alerts. In **Every change** mode, rows without a usable object key are skipped. Duplicate keys prevent the response from becoming a baseline. The last 20 alerts remain in the open viewer session. Selecting **Show on map** zooms to and briefly highlights the geometry from the check.
 
 ## DEV acceptance
 

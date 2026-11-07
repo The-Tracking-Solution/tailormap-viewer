@@ -30,14 +30,25 @@
     </div>
     <div>
       <mat-form-field>
-        <mat-label i18n="@@admin-core.layer-alerts.from">Previous value</mat-label>
-        <input matInput formControlName="from" />
-      </mat-form-field>
-      <mat-form-field>
-        <mat-label i18n="@@admin-core.layer-alerts.to">New value</mat-label>
-        <input matInput formControlName="to" />
+        <mat-label i18n="@@admin-core.layer-alerts.mode">When to notify</mat-label>
+        <mat-select formControlName="mode">
+          <mat-option value="any-change" i18n="@@admin-core.layer-alerts.any-change">Every change</mat-option>
+          <mat-option value="transition" i18n="@@admin-core.layer-alerts.transition">Specific transition</mat-option>
+        </mat-select>
       </mat-form-field>
     </div>
+    @if (form.controls.mode.value === 'transition') {
+      <div>
+        <mat-form-field>
+          <mat-label i18n="@@admin-core.layer-alerts.from">Previous value</mat-label>
+          <input matInput formControlName="from" />
+        </mat-form-field>
+        <mat-form-field>
+          <mat-label i18n="@@admin-core.layer-alerts.to">New value</mat-label>
+          <input matInput formControlName="to" />
+        </mat-form-field>
+      </div>
+    }
     <p i18n="@@admin-core.layer-alerts.help">Use the field names and values returned by the feature source.</p>
   }
   <button mat-button type="submit" [disabled]="!canApply()" i18n="@@admin-core.layer-alerts.apply">Apply rule</button>

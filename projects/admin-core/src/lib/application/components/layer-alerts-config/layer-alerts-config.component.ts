@@ -6,7 +6,7 @@ import { MatFormField, MatLabel } from '@angular/material/form-field';
 import { MatInput } from '@angular/material/input';
 import { MatOption, MatSelect } from '@angular/material/select';
 import { Store } from '@ngrx/store';
-import { BaseComponentTypeEnum, LayerAlertsConfigModel } from '@tailormap-viewer/api';
+import { BaseComponentTypeEnum, LayerAlertMatchMode, LayerAlertsConfigModel } from '@tailormap-viewer/api';
 import { ComponentConfigurationService } from '../../services/component-configuration.service';
 import { selectExtendedAppLayerNodesForSelectedApplication } from '../../state/application.selectors';
 
@@ -29,6 +29,7 @@ export class LayerAlertsConfigComponent {
     idAttribute: '',
     statusAttribute: '',
     labelAttribute: '',
+    mode: 'any-change' as LayerAlertMatchMode,
     from: '',
     to: '',
   });
@@ -43,18 +44,19 @@ export class LayerAlertsConfigComponent {
         idAttribute: rule?.idAttribute ?? '',
         statusAttribute: rule?.statusAttribute ?? '',
         labelAttribute: rule?.labelAttribute ?? '',
-        from: String(rule?.from ?? ''),
-        to: String(rule?.to ?? ''),
+        mode: !rule || rule.mode === 'any-change' ? 'any-change' : 'transition',
+        from: rule?.mode === 'any-change' ? '' : String(rule?.from ?? ''),
+        to: rule?.mode === 'any-change' ? '' : String(rule?.to ?? ''),
       });
     });
   }
 
   public canApply(): boolean {
-    const { enabled, layerId, idAttribute, statusAttribute, from, to } = this.form.getRawValue();
+    const { enabled, layerId, idAttribute, statusAttribute, mode, from, to } = this.form.getRawValue();
     return !enabled || (
       this.layers().some(layer => layer.id === layerId)
       && !!idAttribute.trim() && !!statusAttribute.trim() && idAttribute.trim() !== statusAttribute.trim()
-      && !!from.trim() && !!to.trim() && from.trim() !== to.trim()
+      && (mode === 'any-change' || (!!from.trim() && !!to.trim() && from.trim() !== to.trim()))
     );
   }
 
@@ -62,19 +64,19 @@ export class LayerAlertsConfigComponent {
     if (!this.canApply()) {
       return;
     }
-    const { enabled, layerId, idAttribute, statusAttribute, labelAttribute, from, to } = this.form.getRawValue();
+    const { enabled, layerId, idAttribute, statusAttribute, labelAttribute, mode, from, to } = this.form.getRawValue();
+    const fields = {
+      layerId,
+      idAttribute: idAttribute.trim(),
+      statusAttribute: statusAttribute.trim(),
+      labelAttribute: labelAttribute.trim() || undefined,
+    };
+    const rule: LayerAlertsConfigModel['rule'] = mode === 'any-change'
+      ? { ...fields, mode }
+      : { ...fields, mode, from: from.trim(), to: to.trim() };
     this.componentConfiguration.updateConfig<LayerAlertsConfigModel>(this.type(), {
       enabled,
-      rule: enabled
-        ? {
-          layerId,
-          idAttribute: idAttribute.trim(),
-          statusAttribute: statusAttribute.trim(),
-          labelAttribute: labelAttribute.trim() || undefined,
-          from: from.trim(),
-          to: to.trim(),
-        }
-        : this.config()?.rule,
+      rule: enabled ? rule : this.config()?.rule,
     });
   }
 }
