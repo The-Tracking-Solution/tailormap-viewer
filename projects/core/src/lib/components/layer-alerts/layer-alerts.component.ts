@@ -110,7 +110,7 @@ export class LayerAlertsComponent {
       if (alerts.length) {
         const observedAt = Date.now();
         const newest = alerts.map(alert => ({ ...alert, observedAt, sequence: ++this.sequence }));
-        this.alerts.update(history => [...newest, ...history].slice(0, MAX_ALERTS));
+        this.alerts.update(history => [ ...newest, ...history ].slice(0, MAX_ALERTS));
       }
     });
 

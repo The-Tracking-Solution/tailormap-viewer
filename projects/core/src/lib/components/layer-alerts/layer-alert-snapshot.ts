@@ -74,7 +74,7 @@ export function compareLayerAlertSnapshots(
   rule: LayerAlertRule,
 ): LayerAlert[] {
   const alerts: LayerAlert[] = [];
-  for (const [id, object] of current) {
+  for (const [ id, object ] of current) {
     if (previous.get(id)?.status === rule.from && object.status === rule.to) {
       alerts.push({ feature: object.feature, label: object.label, from: rule.from, to: rule.to });
     }
