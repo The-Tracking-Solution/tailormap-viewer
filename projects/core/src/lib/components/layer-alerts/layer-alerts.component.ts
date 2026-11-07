@@ -20,6 +20,7 @@ const selectLayerAlertsConfig = selectComponentsConfigForType<LayerAlertsConfigM
 const POLL_INTERVAL_MS = 60_000;
 const REQUEST_TIMEOUT_MS = 15_000;
 const MAX_ALERTS = 20;
+const ALERT_LIFETIME_MS = 60 * 60 * 1000;
 const HIGHLIGHT_DURATION_MS = 5_000;
 
 @Component({
@@ -108,6 +109,20 @@ export class LayerAlertsComponent {
         const newest = alerts.map(alert => ({ ...alert, observedAt, sequence: ++this.sequence }));
         this.alerts.update(history => [ ...newest, ...history ].slice(0, MAX_ALERTS));
       }
+    });
+
+    toObservable(this.alerts).pipe(
+      switchMap(alerts => {
+        if (!alerts.length) {
+          return EMPTY;
+        }
+        const oldest = Math.min(...alerts.map(alert => alert.observedAt));
+        return timer(Math.max(0, oldest + ALERT_LIFETIME_MS - Date.now()));
+      }),
+      takeUntilDestroyed(this.destroyRef),
+    ).subscribe(() => {
+      const cutoff = Date.now() - ALERT_LIFETIME_MS;
+      this.alerts.update(alerts => alerts.filter(alert => alert.observedAt > cutoff));
     });
 
     const highlightId = 'layer-alert-highlight';
