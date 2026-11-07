@@ -36,15 +36,15 @@ export function parseLayerAlertRule(input: unknown): LayerAlertRule | undefined 
     return undefined;
   }
   const fields = input as Record<string, unknown>;
-  const layerId = asText(fields.layerId);
-  const idAttribute = asText(fields.idAttribute);
-  const statusAttribute = asText(fields.statusAttribute);
-  const from = asText(fields.from);
-  const to = asText(fields.to);
+  const layerId = asText(fields['layerId']);
+  const idAttribute = asText(fields['idAttribute']);
+  const statusAttribute = asText(fields['statusAttribute']);
+  const from = asText(fields['from']);
+  const to = asText(fields['to']);
   if (!layerId || !idAttribute || !statusAttribute || idAttribute === statusAttribute || !from || !to || from === to) {
     return undefined;
   }
-  return { layerId, idAttribute, statusAttribute, from, to, labelAttribute: asText(fields.labelAttribute) };
+  return { layerId, idAttribute, statusAttribute, from, to, labelAttribute: asText(fields['labelAttribute']) };
 }
 
 /** A single page is the baseline only when the API confirms it contains the whole layer. */
