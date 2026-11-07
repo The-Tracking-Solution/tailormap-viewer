@@ -2758,6 +2758,146 @@
         <source>Configure the projection and notation used by the coordinate picker. If no settings are configured, the map projection is used. Decimal degree and degree/minute formats are available for WGS84 (EPSG:4326).</source>
         <target>Konfigurieren Sie die Projektion und Notation für die Koordinatenauswahl. Wenn nichts konfiguriert ist, wird die Kartenprojektion verwendet. Dezimalgrad und Grad/Dezimalminuten sind für WGS84 (EPSG:4326) verfügbar.</target>
       </trans-unit>
+      <trans-unit id="admin-core.application.personal-start-enabled" datatype="html">
+        <source>Allow personal start positions</source>
+        <target>Persönliche Startpositionen erlauben</target>
+      </trans-unit>
+      <trans-unit id="admin-core.personal-start.heading" datatype="html">
+        <source>Start position per local user</source>
+        <target>Startposition pro lokalem Benutzer</target>
+      </trans-unit>
+      <trans-unit id="admin-core.personal-start.help" datatype="html">
+        <source>Choose a local user and enter a center in the application projection and a zoom level. Leave all three fields empty to use the application default. Each user's changes are saved separately.</source>
+        <target>Wählen Sie einen lokalen Benutzer und geben Sie einen Mittelpunkt in der Anwendungsprojektion und eine Zoomstufe ein. Lassen Sie alle drei Felder für den Anwendungsstandard leer. Änderungen werden pro Benutzer separat gespeichert.</target>
+      </trans-unit>
+      <trans-unit id="admin-core.personal-start.disabled" datatype="html">
+        <source>Personal start positions are disabled for this application. You can prepare user settings below; enable the application option and save the application to activate them.</source>
+        <target>Persönliche Startpositionen sind für diese Anwendung deaktiviert. Sie können Benutzereinstellungen vorbereiten. Aktivieren Sie die Anwendungsoption und speichern Sie die Anwendung, um sie zu verwenden.</target>
+      </trans-unit>
+      <trans-unit id="admin-core.personal-start.user" datatype="html">
+        <source>Local user</source>
+        <target>Lokaler Benutzer</target>
+      </trans-unit>
+      <trans-unit id="admin-core.personal-start.projection" datatype="html">
+        <source>Coordinate reference system: <x id="INTERPOLATION" equiv-text="{{ application?.crs }}"/></source>
+        <target>Koordinatenreferenzsystem: <x id="INTERPOLATION" equiv-text="{{ application?.crs }}"/></target>
+      </trans-unit>
+      <trans-unit id="admin-core.personal-start.x" datatype="html">
+        <source>Center X</source>
+        <target>Mittelpunkt X</target>
+      </trans-unit>
+      <trans-unit id="admin-core.personal-start.y" datatype="html">
+        <source>Center Y</source>
+        <target>Mittelpunkt Y</target>
+      </trans-unit>
+      <trans-unit id="admin-core.personal-start.zoom" datatype="html">
+        <source>Start zoom (0–28)</source>
+        <target>Startzoom (0–28)</target>
+      </trans-unit>
+      <trans-unit id="admin-core.personal-start.may-edit" datatype="html">
+        <source>Allow this user to change their own start position</source>
+        <target>Dieser Benutzer darf seine eigene Startposition ändern</target>
+      </trans-unit>
+      <trans-unit id="admin-core.personal-start.save" datatype="html">
+        <source>Save user start position</source>
+        <target>Benutzerstartposition speichern</target>
+      </trans-unit>
+      <trans-unit id="admin-core.personal-start.clear" datatype="html">
+        <source>Use application default</source>
+        <target>Anwendungsstandard verwenden</target>
+      </trans-unit>
+      <trans-unit id="admin-core.personal-start.load-error" datatype="html">
+        <source>Could not load this user's start position.</source>
+        <target>Die Startposition dieses Benutzers konnte nicht geladen werden.</target>
+      </trans-unit>
+      <trans-unit id="admin-core.personal-start.save-error" datatype="html">
+        <source>Could not save this user's start position. Reload if the application projection changed.</source>
+        <target>Die Startposition dieses Benutzers konnte nicht gespeichert werden. Laden Sie neu, wenn sich die Anwendungsprojektion geändert hat.</target>
+      </trans-unit>
+      <trans-unit id="admin-core.personal-start.saved" datatype="html">
+        <source>User start position and permission saved.</source>
+        <target>Benutzerstartposition und Berechtigung gespeichert.</target>
+      </trans-unit>
+      <trans-unit id="admin-core.user-start.heading" datatype="html">
+        <source>Personal start position per application</source>
+        <target>Persönliche Startposition pro Anwendung</target>
+      </trans-unit>
+      <trans-unit id="admin-core.user-start.help" datatype="html">
+        <source>Choose an application this user can access. Enter center and zoom, or move the map and use its view, or draw a rectangle. Save this setting with the button below.</source>
+        <target>Wählen Sie eine Anwendung, auf die dieser Benutzer Zugriff hat. Geben Sie Mittelpunkt und Zoom ein, übernehmen Sie die verschobene und gezoomte Karte oder zeichnen Sie ein Rechteck. Speichern Sie mit der Schaltfläche unten.</target>
+      </trans-unit>
+      <trans-unit id="admin-core.user-start.application" datatype="html">
+        <source>Application</source>
+        <target>Anwendung</target>
+      </trans-unit>
+      <trans-unit id="admin-core.user-start.no-apps" datatype="html">
+        <source>This user has no accessible applications.</source>
+        <target>Dieser Benutzer hat keinen Zugriff auf Anwendungen.</target>
+      </trans-unit>
+      <trans-unit id="admin-core.user-start.disabled" datatype="html">
+        <source>Personal start positions are disabled in this application. You can prepare the user's setting here; enable the feature in application settings to use it.</source>
+        <target>Persönliche Startpositionen sind in dieser Anwendung deaktiviert. Sie können die Benutzereinstellung hier vorbereiten. Aktivieren Sie die Funktion in den Anwendungseinstellungen, um sie zu verwenden.</target>
+      </trans-unit>
+      <trans-unit id="admin-core.user-start.rectangle" datatype="html">
+        <source>A rectangle is selected. The viewer will fit this area to the user's screen.</source>
+        <target>Ein Rechteck ist ausgewählt. Die Kartenansicht passt diesen Bereich an den Bildschirm des Benutzers an.</target>
+      </trans-unit>
+      <trans-unit id="admin-core.user-start.manual" datatype="html">
+        <source>Switch to center and zoom</source>
+        <target>Mittelpunkt und Zoom eingeben</target>
+      </trans-unit>
+      <trans-unit id="admin-core.user-start.show" datatype="html">
+        <source>Show coordinates on map</source>
+        <target>Koordinaten auf Karte anzeigen</target>
+      </trans-unit>
+      <trans-unit id="admin-core.user-start.map-error" datatype="html">
+        <source>Map preview unavailable. You can still enter coordinates manually.</source>
+        <target>Kartenvorschau nicht verfügbar. Koordinaten können weiterhin manuell eingegeben werden.</target>
+      </trans-unit>
+      <trans-unit id="admin-core.user-start.unsaved" datatype="html">
+        <source>Start position changes have not been saved.</source>
+        <target>Änderungen an der Startposition wurden noch nicht gespeichert.</target>
+      </trans-unit>
+      <trans-unit id="admin-core.user-start.save" datatype="html">
+        <source>Save start position for this application</source>
+        <target>Startposition für diese Anwendung speichern</target>
+      </trans-unit>
+      <trans-unit id="admin-core.user-start.apps-error" datatype="html">
+        <source>Could not load applications for this user.</source>
+        <target>Die Anwendungen dieses Benutzers konnten nicht geladen werden.</target>
+      </trans-unit>
+      <trans-unit id="admin-core.user-start.discard-title" datatype="html">
+        <source>Unsaved start position</source>
+        <target>Ungespeicherte Startposition</target>
+      </trans-unit>
+      <trans-unit id="admin-core.user-start.discard-message" datatype="html">
+        <source>Discard the unsaved start position and select another application?</source>
+        <target>Ungespeicherte Startposition verwerfen und eine andere Anwendung auswählen?</target>
+      </trans-unit>
+      <trans-unit id="map.start-position.label" datatype="html">
+        <source>Start position map</source>
+        <target>Karte für Startposition</target>
+      </trans-unit>
+      <trans-unit id="map.start-position.use-view" datatype="html">
+        <source>Use map center and zoom</source>
+        <target>Mittelpunkt und Zoom übernehmen</target>
+      </trans-unit>
+      <trans-unit id="map.start-position.draw" datatype="html">
+        <source>Draw rectangle</source>
+        <target>Rechteck zeichnen</target>
+      </trans-unit>
+      <trans-unit id="map.start-position.reset" datatype="html">
+        <source>Show application start</source>
+        <target>Anwendungsstart anzeigen</target>
+      </trans-unit>
+      <trans-unit id="map.start-position.draw-hint" datatype="html">
+        <source>Select two opposite corners of the rectangle. Press Escape to cancel.</source>
+        <target>Wählen Sie zwei gegenüberliegende Ecken des Rechtecks. Mit Escape abbrechen.</target>
+      </trans-unit>
+      <trans-unit id="map.start-position.layer-error" datatype="html">
+        <source>Some map layers could not be loaded.</source>
+        <target>Einige Kartenebenen konnten nicht geladen werden.</target>
+      </trans-unit>
     </body>
   </file>
 </xliff>

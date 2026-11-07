@@ -29,6 +29,8 @@ export const selectMapOptions = createSelector(
       return null;
     }
     return {
+      initialCenter: mapSettings.personalStartPosition?.center,
+      initialZoom: mapSettings.personalStartPosition?.zoom,
       projection: mapSettings.crs.code,
       projectionDefinition: mapSettings.crs.definition,
       maxExtent: mapSettings?.maxExtent ? [

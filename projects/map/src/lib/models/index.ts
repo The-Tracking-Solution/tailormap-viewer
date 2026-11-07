@@ -1,5 +1,6 @@
 export * from './extent.type';
 export * from './layer-manager.model';
+export * from './layer-load-status.model';
 export * from './layer.model';
 export * from './map-viewer.model';
 export * from './vector-layer.model';

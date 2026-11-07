@@ -266,6 +266,14 @@ export class MapService {
     this.map.zoomOut();
   }
 
+  public setInitialPosition(center: number[], zoom: number) {
+    this.map.setInitialPosition(center, zoom);
+  }
+
+  public setInitialExtent(extent: number[]) {
+    this.map.setInitialExtent(extent);
+  }
+
   public zoomToInitialExtent() {
     this.map.zoomToInitialExtent();
   }

@@ -5,6 +5,7 @@ import { AppLayerStateModel, ExtendedLayerTreeNodeModel } from '../models';
 export const mapStateKey = 'map';
 
 export interface MapSettingsModel {
+  personalStartPosition?: { center: number[]; zoom: number };
   initialExtent?: BoundsModel;
   maxExtent?: BoundsModel;
   crs?: CoordinateReferenceSystemModel;

@@ -1,3 +1,5 @@
+import { Observable } from 'rxjs';
+import { LayerLoadStatusModel } from './layer-load-status.model';
 import { LayerModel } from './layer.model';
 import { Vector as VectorLayer, Image as ImageLayer, Tile as TileLayer } from 'ol/layer.js';
 import { ImageWMS, WMTS, XYZ, TileWMS } from 'ol/source.js';
@@ -5,6 +7,8 @@ import { ImageWMS, WMTS, XYZ, TileWMS } from 'ol/source.js';
 export type LayerTypes = VectorLayer | TileLayer<TileWMS> | ImageLayer<ImageWMS> | TileLayer<XYZ> | TileLayer<WMTS> | null;
 
 export interface LayerManagerModel {
+  setLayerLoadStatusIds?(layerIds: string[]): void;
+  readonly layerLoadStatus$?: Observable<ReadonlyMap<string, LayerLoadStatusModel>>;
   setBackgroundLayers(layers: LayerModel[], useProjection?: string): void;
   setLayers(layers: LayerModel[], useProjection?: string): void;
   addLayer<LayerType extends LayerTypes>(layer: LayerModel): LayerType | null;
