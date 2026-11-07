@@ -17,8 +17,8 @@ import tempfile
 import time
 import urllib.request
 
-SOURCE_COMMIT = 'dbfa3780931a4d0124a989b73ab65eff6afd37c7'
-SOURCE_TREE = '56f99af40aefb2d661ea2a8a24fd3d9fec539340'
+SOURCE_COMMIT = 'dd27a0b9b149ca9b07f0ea1f9fbd3ed82bf9a783'
+SOURCE_TREE = '5e6302f77256df3c8a146b862c1ea9373a2ed6f1'
 ROOT = Path('/srv/tailormap-releases/dev-layer-alerts-20261107')
 STATIC = Path('/var/tailormap/dev/static')
 CANDIDATES = Path('/var/tailormap/candidates')
