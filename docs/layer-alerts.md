@@ -10,7 +10,7 @@ For the strand flags example, choose the warning-flags layer, enter `svid` for t
 
 The layer must expose attributes through the existing feature API. Use a small layer with stable, unique object keys and an exact feature count of at most 500. The optional label falls back to the object key. The rule covers the entire application layer, regardless of viewport and temporary viewer filters. It respects the existing application access and layer settings for feature info and the attribute list.
 
-The first complete response establishes the comparison baseline. An incomplete, empty or unsuccessful response produces no alerts. A later complete response compares against the last valid baseline. Newly observed and removed objects do not produce alerts. In **Every change** mode, rows without a usable object key are skipped. Duplicate keys prevent the response from becoming a baseline. The last 20 alerts remain in the open viewer session. Selecting **Show on map** zooms to and briefly highlights the geometry from the check.
+The first complete response establishes the comparison baseline. An incomplete, empty or unsuccessful response produces no alerts. A later complete response compares against the last valid baseline. Newly observed and removed objects do not produce alerts. In **Every change** mode, rows without a usable object key are skipped. Duplicate keys prevent the response from becoming a baseline. The open viewer shows up to 20 alerts. Each expires one hour after it was observed, even if subsequent source requests fail. Selecting **Show on map** zooms to and briefly highlights the geometry from the check.
 
 ## DEV acceptance
 
