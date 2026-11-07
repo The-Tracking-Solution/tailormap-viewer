@@ -1,0 +1,45 @@
+<strong>{{ label() }}</strong>
+<form [formGroup]="form" (ngSubmit)="apply()">
+  <div>
+    <mat-checkbox formControlName="enabled" i18n="@@admin-core.common.enabled">Enabled</mat-checkbox>
+  </div>
+  @if (form.controls.enabled.value) {
+    <div>
+      <mat-form-field>
+        <mat-label i18n="@@admin-core.layer-alerts.layer">Application layer</mat-label>
+        <mat-select formControlName="layerId">
+          @for (layer of layers(); track layer.id) {
+            <mat-option [value]="layer.id">{{ layer.label }}</mat-option>
+          }
+        </mat-select>
+      </mat-form-field>
+    </div>
+    <div>
+      <mat-form-field>
+        <mat-label i18n="@@admin-core.layer-alerts.id-attribute">Object ID attribute</mat-label>
+        <input matInput formControlName="idAttribute" />
+      </mat-form-field>
+      <mat-form-field>
+        <mat-label i18n="@@admin-core.layer-alerts.status-attribute">Status attribute</mat-label>
+        <input matInput formControlName="statusAttribute" />
+      </mat-form-field>
+      <mat-form-field>
+        <mat-label i18n="@@admin-core.layer-alerts.label-attribute">Label attribute (optional)</mat-label>
+        <input matInput formControlName="labelAttribute" />
+      </mat-form-field>
+    </div>
+    <div>
+      <mat-form-field>
+        <mat-label i18n="@@admin-core.layer-alerts.from">Previous value</mat-label>
+        <input matInput formControlName="from" />
+      </mat-form-field>
+      <mat-form-field>
+        <mat-label i18n="@@admin-core.layer-alerts.to">New value</mat-label>
+        <input matInput formControlName="to" />
+      </mat-form-field>
+    </div>
+    <p i18n="@@admin-core.layer-alerts.help">Use the field names and values returned by the feature source.</p>
+  }
+  <button mat-button type="submit" [disabled]="!canApply()" i18n="@@admin-core.layer-alerts.apply">Apply rule</button>
+  <p i18n="@@admin-core.layer-alerts.save">Save the application to publish the rule.</p>
+</form>

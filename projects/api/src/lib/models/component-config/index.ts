@@ -11,3 +11,4 @@ export * from './toc-config.model';
 export * from './snapping-component-config.model';
 export * from './mouse-coordinates-config.model';
 export * from './coordinate-picker-config.model';
+export * from './layer-alerts-config.model';

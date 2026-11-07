@@ -14,12 +14,14 @@ import { DrawingConfigComponent } from './drawing-config/drawing-config.componen
 import { SnappingComponentConfigComponent } from './snapping-config/snapping-component-config.component';
 import { MouseCoordinatesConfigComponent } from './mouse-coordinates-config/mouse-coordinates-config.component';
 import { CoordinatePickerConfigComponent } from './coordinate-picker-config/coordinate-picker-config.component';
+import { LayerAlertsConfigComponent } from './layer-alerts-config/layer-alerts-config.component';
 
 export function provideConfigurationComponents(): Array<Provider | EnvironmentProviders> {
   return [
     provideEnvironmentInitializer(() => {
       const configurationComponentService = inject(ConfigurationComponentRegistryService);
       /* eslint-disable max-len */
+      configurationComponentService.registerConfigurationComponents(BaseComponentTypeEnum.LAYER_ALERTS, $localize `:@@admin-core.application.component-layer-alerts:Map alerts`, LayerAlertsConfigComponent);
       configurationComponentService.registerConfigurationComponents(BaseComponentTypeEnum.TOC, $localize `:@@admin-core.application.component-table-of-contents:Table of contents`, BaseComponentConfigComponent);
       configurationComponentService.registerConfigurationComponents(BaseComponentTypeEnum.LEGEND, $localize `:@@admin-core.application.component-legend:Legend`, BaseComponentConfigComponent);
       configurationComponentService.registerConfigurationComponents(BaseComponentTypeEnum.DRAWING, $localize `:@@admin-core.application.component-drawing:Drawing`, DrawingConfigComponent);

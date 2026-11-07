@@ -8,6 +8,7 @@ export class BaseComponentConfigHelper {
     BaseComponentTypeEnum.HEADER,
     BaseComponentTypeEnum.INFO,
     BaseComponentTypeEnum.SNAPPING,
+    BaseComponentTypeEnum.LAYER_ALERTS,
   ]);
 
   public static addDefaultDisabledComponent(component: string) {

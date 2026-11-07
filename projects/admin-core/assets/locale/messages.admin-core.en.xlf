@@ -2188,6 +2188,36 @@
         <source>Some map layers could not be loaded.</source>
         <target>Some map layers could not be loaded.</target>
       </trans-unit>
+      <trans-unit id="admin-core.application.component-layer-alerts" datatype="html">
+        <source>Map alerts</source>
+      </trans-unit>
+      <trans-unit id="admin-core.layer-alerts.apply" datatype="html">
+        <source>Apply rule</source>
+      </trans-unit>
+      <trans-unit id="admin-core.layer-alerts.from" datatype="html">
+        <source>Previous value</source>
+      </trans-unit>
+      <trans-unit id="admin-core.layer-alerts.help" datatype="html">
+        <source>Use the field names and values returned by the feature source.</source>
+      </trans-unit>
+      <trans-unit id="admin-core.layer-alerts.id-attribute" datatype="html">
+        <source>Object ID attribute</source>
+      </trans-unit>
+      <trans-unit id="admin-core.layer-alerts.label-attribute" datatype="html">
+        <source>Label attribute (optional)</source>
+      </trans-unit>
+      <trans-unit id="admin-core.layer-alerts.layer" datatype="html">
+        <source>Application layer</source>
+      </trans-unit>
+      <trans-unit id="admin-core.layer-alerts.save" datatype="html">
+        <source>Save the application to publish the rule.</source>
+      </trans-unit>
+      <trans-unit id="admin-core.layer-alerts.status-attribute" datatype="html">
+        <source>Status attribute</source>
+      </trans-unit>
+      <trans-unit id="admin-core.layer-alerts.to" datatype="html">
+        <source>New value</source>
+      </trans-unit>
     </body>
   </file>
 </xliff>

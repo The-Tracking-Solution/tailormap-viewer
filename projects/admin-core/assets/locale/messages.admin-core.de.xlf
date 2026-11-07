@@ -2918,6 +2918,46 @@
         <source>Some map layers could not be loaded.</source>
         <target>Einige Kartenebenen konnten nicht geladen werden.</target>
       </trans-unit>
+      <trans-unit id="admin-core.application.component-layer-alerts" datatype="html">
+        <source>Map alerts</source>
+        <target>Kartenmeldungen</target>
+      </trans-unit>
+      <trans-unit id="admin-core.layer-alerts.apply" datatype="html">
+        <source>Apply rule</source>
+        <target>Regel anwenden</target>
+      </trans-unit>
+      <trans-unit id="admin-core.layer-alerts.from" datatype="html">
+        <source>Previous value</source>
+        <target>Vorheriger Wert</target>
+      </trans-unit>
+      <trans-unit id="admin-core.layer-alerts.help" datatype="html">
+        <source>Use the field names and values returned by the feature source.</source>
+        <target>Verwenden Sie die Feldnamen und Werte aus der Objektquelle.</target>
+      </trans-unit>
+      <trans-unit id="admin-core.layer-alerts.id-attribute" datatype="html">
+        <source>Object ID attribute</source>
+        <target>Objekt-ID-Attribut</target>
+      </trans-unit>
+      <trans-unit id="admin-core.layer-alerts.label-attribute" datatype="html">
+        <source>Label attribute (optional)</source>
+        <target>Beschriftungsattribut (optional)</target>
+      </trans-unit>
+      <trans-unit id="admin-core.layer-alerts.layer" datatype="html">
+        <source>Application layer</source>
+        <target>Anwendungsebene</target>
+      </trans-unit>
+      <trans-unit id="admin-core.layer-alerts.save" datatype="html">
+        <source>Save the application to publish the rule.</source>
+        <target>Speichern Sie die Anwendung, um die Regel zu veröffentlichen.</target>
+      </trans-unit>
+      <trans-unit id="admin-core.layer-alerts.status-attribute" datatype="html">
+        <source>Status attribute</source>
+        <target>Statusattribut</target>
+      </trans-unit>
+      <trans-unit id="admin-core.layer-alerts.to" datatype="html">
+        <source>New value</source>
+        <target>Neuer Wert</target>
+      </trans-unit>
     </body>
   </file>
 </xliff>
