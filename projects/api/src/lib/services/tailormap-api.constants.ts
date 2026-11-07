@@ -1,4 +1,7 @@
+import { HttpContextToken } from '@angular/common/http';
+
 export class TailormapApiConstants {
+  public static readonly SUPPRESS_LOGIN_REDIRECT = new HttpContextToken(() => false);
   public static BASE_URL = '/api';
   public static LOGIN_URL = `${TailormapApiConstants.BASE_URL}/login`;
   public static LOGOUT_URL = `${TailormapApiConstants.BASE_URL}/logout`;

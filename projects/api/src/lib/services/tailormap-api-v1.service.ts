@@ -1,5 +1,5 @@
 import { inject, Injectable } from '@angular/core';
-import { HttpClient, HttpHeaders, HttpParams, HttpResponse, HttpStatusCode } from '@angular/common/http';
+import { HttpClient, HttpContext, HttpHeaders, HttpParams, HttpResponse, HttpStatusCode } from '@angular/common/http';
 import {
   ViewerResponseModel, FeaturesResponseModel, LayerDetailsModel, MapResponseModel, Sortorder, VersionResponseModel,
   FeatureModel, ConfigResponseModel, SearchResponseModel, AttachmentMetadataModel, BoundsModel,
@@ -61,6 +61,7 @@ export class TailormapApiV1Service implements TailormapApiV1ServiceModel {
     onlyGeometries?: boolean;
     geometryInAttributes?: boolean;
     withAttachments?: boolean;
+    background?: boolean;
   }): Observable<FeaturesResponseModel> {
     const queryParams = ApiHelper.getQueryParams({
       x: params.x,
@@ -83,6 +84,7 @@ export class TailormapApiV1Service implements TailormapApiV1ServiceModel {
       {
         headers: new HttpHeaders('Content-Type: application/x-www-form-urlencoded'),
         params: queryParams,
+        context: new HttpContext().set(TailormapApiConstants.SUPPRESS_LOGIN_REDIRECT, params.background === true),
       });
   }
 

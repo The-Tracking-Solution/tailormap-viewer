@@ -82,6 +82,7 @@ export class AuthenticatedUserService {
           catchError(error => {
             if (
               error instanceof HttpErrorResponse
+              && !req.context.get(TailormapApiConstants.SUPPRESS_LOGIN_REDIRECT)
               && (req.url.startsWith(TailormapApiConstants.BASE_URL) && req.url !== TailormapApiConstants.LOGIN_URL)
               && (error.status === 401 || error.status === 403 || AuthenticatedUserService.isUnauthorizedMethod(error))
             ) {

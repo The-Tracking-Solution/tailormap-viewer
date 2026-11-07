@@ -38,6 +38,7 @@ export interface TailormapApiV1ServiceModel {
     onlyGeometries?: boolean;
     geometryInAttributes?: boolean;
     withAttachments?: boolean;
+    background?: boolean;
   }): Observable<FeaturesResponseModel>;
 
   deleteFeature$(params: {

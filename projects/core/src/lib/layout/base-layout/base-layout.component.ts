@@ -31,6 +31,7 @@ import { GeolocationComponent } from '../../components/toolbar/geolocation/geolo
 import { ScaleBarComponent } from '../../components/toolbar/scale-bar/scale-bar.component';
 import { MouseCoordinatesComponent } from '../../components/toolbar/mouse-coordinates/mouse-coordinates.component';
 import { AsyncPipe } from '@angular/common';
+import { LayerAlertsComponent } from '../../components/layer-alerts/layer-alerts.component';
 
 @Component({
     selector: 'tm-base-layout',
@@ -68,6 +69,7 @@ import { AsyncPipe } from '@angular/common';
         ScaleBarComponent,
         MouseCoordinatesComponent,
         AsyncPipe,
+        LayerAlertsComponent,
     ],
 })
 export class BaseLayoutComponent {
