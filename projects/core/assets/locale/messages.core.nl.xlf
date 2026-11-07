@@ -1739,6 +1739,14 @@
         <source>Could not update personal start position</source>
         <target>Persoonlijke startpositie kon niet worden bijgewerkt</target>
       </trans-unit>
+      <trans-unit id="core.feature-info.follow-feature" datatype="html">
+        <source>Follow feature</source>
+        <target>Object volgen</target>
+      </trans-unit>
+      <trans-unit id="core.feature-info.stop-following" datatype="html">
+        <source>Stop following feature</source>
+        <target>Object niet meer volgen</target>
+      </trans-unit>
     </body>
   </file>
 </xliff>

@@ -55,6 +55,7 @@ export const getMapServiceMock = (
     })),
     getUnitsOfMeasure$: vi.fn(() => of('degrees')),
     zoomTo: vi.fn(),
+    panToPointIfOutsideViewport: vi.fn(),
     zoomIn: vi.fn(),
     zoomOut: vi.fn(),
     zoomToInitialExtent: vi.fn(),

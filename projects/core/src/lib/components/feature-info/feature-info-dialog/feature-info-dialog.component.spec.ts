@@ -1,3 +1,5 @@
+import userEvent from '@testing-library/user-event';
+import { getMapServiceMock } from '../../../test-helpers/map-service.mock';
 import { describe, test, expect, vi } from 'vitest';
 import { render, screen } from '@testing-library/angular';
 import { FeatureInfoDialogComponent } from './feature-info-dialog.component';
@@ -44,6 +46,7 @@ const setup = async (withState = false) => {
     imports: [
       ],
     providers: [
+      getMapServiceMock().provider,
       { provide: ViewerLayoutService, useValue: { setLeftPadding: vi.fn(), setRightPadding: vi.fn() } },
       provideMockStore({
         initialState: { [featureInfoStateKey]: { ...initialFeatureInfoState } },
@@ -104,6 +107,22 @@ describe('FeatureInfoDialogComponent', () => {
     expect(store.dispatch).toHaveBeenCalledWith({ type: showNextFeatureInfoFeature.type });
     (await screen.findByText(/Previous/)).click();
     expect(store.dispatch).toHaveBeenCalledWith({ type: showPreviousFeatureInfoFeature.type });
+  });
+
+  test('offers an accessible following toggle for a stable point feature', async () => {
+    const { fixture } = await setup(true);
+    const store = TestBed.inject(MockStore);
+    store.overrideSelector(selectCurrentlySelectedFeature, {
+      ...getFeatureInfo(), geometry: 'POINT (1 2)', layer: { ...getAppLayerModel(), hasAttributes: true },
+    });
+    store.refreshState();
+    fixture.detectChanges();
+    const button = await screen.findByRole('button', { name: 'Follow feature' });
+    expect(button).toHaveAttribute('aria-pressed', 'false');
+    await userEvent.click(button);
+    expect(await screen.findByRole('button', { name: 'Stop following feature' })).toHaveAttribute('aria-pressed', 'true');
+    await userEvent.click(screen.getByRole('button', { name: 'Stop following feature' }));
+    expect(await screen.findByRole('button', { name: 'Follow feature' })).toHaveAttribute('aria-pressed', 'false');
   });
 
   test('updates feature info when state changes', async () => {
