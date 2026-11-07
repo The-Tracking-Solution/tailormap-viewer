@@ -3,8 +3,11 @@ import { BehaviorSubject, catchError, filter, map, Observable, switchMap, take, 
 import { tap } from 'rxjs/operators';
 import { TAILORMAP_SECURITY_API_V1_SERVICE } from './tailormap-security-api-v1.service.injection-token';
 import { SecurityModel, SecurityPropertyModel } from '../models';
-import { HttpErrorResponse, HttpEvent, HttpHandler, HttpRequest } from '@angular/common/http';
+import { HttpContextToken, HttpErrorResponse, HttpEvent, HttpHandler, HttpRequest } from '@angular/common/http';
 import { TailormapApiConstants } from './tailormap-api.constants';
+
+// Optional feature permission errors are handled locally; expired sessions still require login.
+export const SKIP_FORBIDDEN_LOGIN_REDIRECT = new HttpContextToken<boolean>(() => false);
 
 @Injectable({
   providedIn: 'root',
@@ -83,7 +86,8 @@ export class AuthenticatedUserService {
             if (
               error instanceof HttpErrorResponse
               && (req.url.startsWith(TailormapApiConstants.BASE_URL) && req.url !== TailormapApiConstants.LOGIN_URL)
-              && (error.status === 401 || error.status === 403 || AuthenticatedUserService.isUnauthorizedMethod(error))
+              && (error.status === 401 || (error.status === 403 && !req.context.get(SKIP_FORBIDDEN_LOGIN_REDIRECT))
+                || AuthenticatedUserService.isUnauthorizedMethod(error))
             ) {
               this.getUserDetails$()
                 .pipe(take(1))

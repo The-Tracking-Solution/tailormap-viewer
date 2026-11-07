@@ -41,7 +41,7 @@ const setup = async (hasApplication: boolean, isDefaultApplication?: boolean) =>
       provideHttpClientTesting(),
       { provide: Store, useValue: store },
       { provide: ConfigService, useValue: configService },
-      { provide: TailormapAdminApiV1Service, useValue: { getGroups$: vi.fn(() => of([])) } },
+      { provide: TailormapAdminApiV1Service, useValue: { getGroups$: vi.fn(() => of([])), getUsers$: vi.fn(() => of([])) } },
       AuthenticatedUserTestHelper.provideAuthenticatedUserServiceWithAdminUser(),
     ],
   });

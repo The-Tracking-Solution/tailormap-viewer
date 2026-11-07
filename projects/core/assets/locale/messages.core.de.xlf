@@ -1659,6 +1659,26 @@
         <source>Longitude</source>
         <target>Längengrad</target>
       </trans-unit>
+      <trans-unit id="core.profile.save-start-extent" datatype="html">
+        <source>Use current map as personal start position</source>
+        <target>Aktuelle Karte als persönliche Startposition verwenden</target>
+      </trans-unit>
+      <trans-unit id="core.profile.clear-start-extent" datatype="html">
+        <source>Clear personal start position</source>
+        <target>Persönliche Startposition löschen</target>
+      </trans-unit>
+      <trans-unit id="core.profile.start-extent-saved" datatype="html">
+        <source>Personal start position saved</source>
+        <target>Persönliche Startposition gespeichert</target>
+      </trans-unit>
+      <trans-unit id="core.profile.start-extent-cleared" datatype="html">
+        <source>Application start position restored</source>
+        <target>Startposition der Anwendung wiederhergestellt</target>
+      </trans-unit>
+      <trans-unit id="core.profile.start-extent-error" datatype="html">
+        <source>Could not update personal start position</source>
+        <target>Persönliche Startposition konnte nicht aktualisiert werden</target>
+      </trans-unit>
     </body>
   </file>
 </xliff>

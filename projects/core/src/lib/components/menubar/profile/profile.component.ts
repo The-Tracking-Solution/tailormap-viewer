@@ -1,4 +1,4 @@
-import { Component, ChangeDetectionStrategy, OnDestroy, inject, OnInit, input, DestroyRef } from '@angular/core';
+import { Component, ChangeDetectionStrategy, OnDestroy, inject, OnInit, input, DestroyRef, effect } from '@angular/core';
 import { Store } from '@ngrx/store';
 import { selectShowLanguageSwitcher, selectShowLoginButton } from '../../../state/core.selectors';
 import { combineLatest, distinctUntilChanged, map, Observable, Subject } from 'rxjs';
@@ -9,12 +9,16 @@ import { MatDialog } from '@angular/material/dialog';
 import { AuthenticatedUserService } from '@tailormap-viewer/api';
 import { ProfileMenuButtonComponent } from './profile-menu-button/profile-menu-button.component';
 import { ComponentRegistrationService } from '../../../services';
-import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { SnackBarMessageComponent } from '@tailormap-viewer/shared';
+import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
 import { MenubarService } from '../menubar.service';
 import { MobileLayoutService } from '../../../services/viewer-layout/mobile-layout.service';
 import { MenubarButtonComponent } from '../menubar-button/menubar-button.component';
 import { MatMenu, MatMenuItem } from '@angular/material/menu';
 import { AsyncPipe } from '@angular/common';
+import { MatSnackBar } from '@angular/material/snack-bar';
+import { PersonalStartExtentService } from '../../../map/services/personal-start-extent.service';
+import { selectIn3dView } from '../../../map/state/map.selectors';
 
 @Component({
     selector: 'tm-profile',
@@ -31,6 +35,8 @@ import { AsyncPipe } from '@angular/common';
     ],
 })
 export class ProfileComponent implements OnInit, OnDestroy {
+  public readonly personalStartExtent = inject(PersonalStartExtentService);
+  private snackBar = inject(MatSnackBar);
   private store$ = inject(Store);
   private router = inject(Router);
   private dialog = inject(MatDialog);
@@ -41,6 +47,8 @@ export class ProfileComponent implements OnInit, OnDestroy {
   private destroyRef = inject(DestroyRef);
 
   public inMobilePanel = input<boolean>(false);
+  public readonly in3d$ = this.store$.select(selectIn3dView);
+  private profileVisible = toSignal(this.menubarService.isComponentVisible$(BaseComponentTypeEnum.PROFILE), { initialValue: false });
 
   public showLanguageToggle$: Observable<boolean>;
   public userDetails$: Observable<SecurityModel | null>;
@@ -75,13 +83,14 @@ export class ProfileComponent implements OnInit, OnDestroy {
       return showLoginButton ? 'login' : 'settings';
     }));
 
-    this.menubarService.isComponentVisible$(BaseComponentTypeEnum.PROFILE)
-      .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe(visible => {
-        if (visible) {
-          this.menubarService.setMobilePanelHeight(255);
-        }
-      });
+    effect(() => {
+      if (this.profileVisible()) {
+        const extraHeight = this.personalStartExtent.available()
+          ? 48 + (this.personalStartExtent.hasPreference() ? 48 : 0)
+          : 0;
+        this.menubarService.setMobilePanelHeight(255 + extraHeight);
+      }
+    });
   }
 
   public ngOnInit(): void {
@@ -92,6 +101,22 @@ export class ProfileComponent implements OnInit, OnDestroy {
     this.componentRegistrationService.deregisterComponent('mobile-menu-home', BaseComponentTypeEnum.PROFILE);
     this.destroyed.next(null);
     this.destroyed.complete();
+  }
+
+  public saveStartExtent() {
+    this.personalStartExtent.save$().subscribe(saved => {
+      SnackBarMessageComponent.open$(this.snackBar, { message: saved
+        ? $localize `:@@core.profile.start-extent-saved:Personal start position saved`
+        : $localize `:@@core.profile.start-extent-error:Could not update personal start position`, duration: 4000 }).subscribe();
+    });
+  }
+
+  public clearStartExtent() {
+    this.personalStartExtent.clear$().subscribe(cleared => {
+      SnackBarMessageComponent.open$(this.snackBar, { message: cleared
+        ? $localize `:@@core.profile.start-extent-cleared:Application start position restored`
+        : $localize `:@@core.profile.start-extent-error:Could not update personal start position`, duration: 4000 }).subscribe();
+    });
   }
 
   public logout() {

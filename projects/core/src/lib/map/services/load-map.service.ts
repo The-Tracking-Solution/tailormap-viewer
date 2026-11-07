@@ -1,5 +1,5 @@
 import { inject, Injectable } from '@angular/core';
-import { catchError, combineLatest, concatMap, map, of, take } from 'rxjs';
+import { catchError, combineLatest, concatMap, filter, map, of, switchMap, take } from 'rxjs';
 import {
   ApplicationBookmarkFragments, LayerSettingsBookmarkFragment, LayerTreeOrderBookmarkFragment,
 } from '../../services/application-bookmark/application-bookmark-fragments';
@@ -8,6 +8,7 @@ import { TAILORMAP_API_V1_SERVICE } from '@tailormap-viewer/api';
 import { BookmarkService } from '../../services/bookmark/bookmark.service';
 import { Store } from '@ngrx/store';
 import { loadMap, loadMapFailed, loadMapSuccess } from '../state/map.actions';
+import { PersonalStartExtentService } from './personal-start-extent.service';
 
 @Injectable({
   providedIn: 'root',
@@ -17,13 +18,17 @@ export class LoadMapService {
   private apiService = inject(TAILORMAP_API_V1_SERVICE);
   private bookmarkService = inject(BookmarkService);
   private store$ = inject(Store);
+  private personalStartExtent = inject(PersonalStartExtentService);
+  private loadGeneration = 0;
 
   private static LOAD_MAP_ERROR = $localize `:@@core.common.error-loading-map:Could not load map settings`;
 
   public loadMap(id: string) {
+    const generation = ++this.loadGeneration;
     this.store$.dispatch(loadMap({ id }));
     this.apiService.getMap$(id)
       .pipe(
+        switchMap(response => this.personalStartExtent.load$(id, response)),
         catchError(() => of(LoadMapService.LOAD_MAP_ERROR)),
         concatMap(response => {
           if (typeof response === 'string') {
@@ -40,6 +45,7 @@ export class LoadMapService {
               }),
             );
         }),
+        filter(() => generation === this.loadGeneration),
       )
       .subscribe(response => {
         if (typeof response === 'string') {

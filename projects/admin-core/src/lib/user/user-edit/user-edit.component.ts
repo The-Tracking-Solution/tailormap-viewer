@@ -9,6 +9,7 @@ import { UserAddUpdateModel } from '../models/user-add-update.model';
 import { UserFormComponent } from '../user-form/user-form.component';
 import { SaveButtonComponent } from '../../shared/components/save-button/save-button.component';
 import { MatButton } from '@angular/material/button';
+import { UserStartPositionComponent } from '../user-start-position/user-start-position.component';
 import { AsyncPipe } from '@angular/common';
 
 @Component({
@@ -18,6 +19,7 @@ import { AsyncPipe } from '@angular/common';
     changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
         UserFormComponent,
+        UserStartPositionComponent,
         SaveButtonComponent,
         MatButton,
         RouterLink,

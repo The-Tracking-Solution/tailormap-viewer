@@ -64,6 +64,7 @@ describe('ApplicationFormComponent', () => {
           hideLanguageSwitcher: false,
         },
         uiSettings: {
+          personalStartPositionEnabled: false,
           enable3D: false,
           hideLoginButton: false,
         },
@@ -93,6 +94,7 @@ describe('ApplicationFormComponent', () => {
           hideLanguageSwitcher: false,
         },
         uiSettings: {
+          personalStartPositionEnabled: false,
           enable3D: false,
           hideLoginButton: false,
         },
@@ -107,4 +109,16 @@ describe('ApplicationFormComponent', () => {
     expect(await screen.findByText('Name should be unique.')).toBeInTheDocument();
   });
 
+});
+
+describe('Personal start position application permission', () => {
+  test('an administrator can explicitly enable the application switch', async () => {
+    const { onUpdate } = await setup(true);
+    await userEvent.click(await screen.findByPlaceholderText('Projection'));
+    await userEvent.click(await screen.findByText('EPSG:3857 (WGS 84 / Pseudo-Mercator)', { exact: false }));
+    await userEvent.click(await screen.findByRole('switch', { name: 'Allow personal start positions' }));
+    await vi.waitFor(() => expect(onUpdate).toHaveBeenCalledWith(expect.objectContaining({
+      uiSettings: expect.objectContaining({ personalStartPositionEnabled: true }),
+    })));
+  });
 });

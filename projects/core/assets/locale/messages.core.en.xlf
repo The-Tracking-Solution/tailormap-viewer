@@ -1242,6 +1242,26 @@
       <trans-unit id="core.toolbar.coordinate-picker-longitude" datatype="html">
         <source>Longitude</source>
       </trans-unit>
+      <trans-unit id="core.profile.save-start-extent" datatype="html">
+        <source>Use current map as personal start position</source>
+        <target>Use current map as personal start position</target>
+      </trans-unit>
+      <trans-unit id="core.profile.clear-start-extent" datatype="html">
+        <source>Clear personal start position</source>
+        <target>Clear personal start position</target>
+      </trans-unit>
+      <trans-unit id="core.profile.start-extent-saved" datatype="html">
+        <source>Personal start position saved</source>
+        <target>Personal start position saved</target>
+      </trans-unit>
+      <trans-unit id="core.profile.start-extent-cleared" datatype="html">
+        <source>Application start position restored</source>
+        <target>Application start position restored</target>
+      </trans-unit>
+      <trans-unit id="core.profile.start-extent-error" datatype="html">
+        <source>Could not update personal start position</source>
+        <target>Could not update personal start position</target>
+      </trans-unit>
     </body>
   </file>
 </xliff>

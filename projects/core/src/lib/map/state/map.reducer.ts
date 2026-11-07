@@ -84,6 +84,7 @@ const onLoadMapSuccess = (
   ...state,
   loadStatus: LoadingStateEnum.LOADED,
   mapSettings: {
+    personalStartPosition: payload.personalStartPosition,
     initialExtent: payload.initialExtent || undefined,
     maxExtent: payload.maxExtent || undefined,
     crs: payload.crs,

@@ -5,6 +5,8 @@ export interface MapViewerControlOptionsModel {
 }
 
 export interface MapViewerOptionsModel {
+  initialCenter?: number[];
+  initialZoom?: number;
   projection: string;
   projectionAliases?: string[];
   projectionDefinition: string;

@@ -89,6 +89,7 @@ export class ApplicationFormComponent implements OnInit, OnDestroy {
     }),
     defaultLanguage: new FormControl<string | null>(null),
     hideLoginButton: new FormControl<boolean | null>(null),
+    personalStartPositionEnabled: new FormControl(false, { nonNullable: true }),
     enable3d: new FormControl<boolean | null>(null),
     hideLanguageSwitcher: new FormControl<boolean | null>(null),
     initialExtent: new FormControl<BoundsModel | null>(null),
@@ -147,6 +148,7 @@ export class ApplicationFormComponent implements OnInit, OnDestroy {
         };
         const uiSettings: UiSettingsModel = {
           hideLoginButton: typeof value.hideLoginButton === 'boolean' ? value.hideLoginButton : false,
+          personalStartPositionEnabled: value.personalStartPositionEnabled === true,
           enable3D: typeof value.enable3d === 'boolean' ? value.enable3d : false,
         };
         this.updateApplication.emit({ application, i18nSettings, uiSettings });
@@ -186,6 +188,7 @@ export class ApplicationFormComponent implements OnInit, OnDestroy {
       hideLoginButton: typeof application?.settings?.uiSettings?.hideLoginButton === "boolean"
         ? application.settings.uiSettings.hideLoginButton
         : null,
+      personalStartPositionEnabled: application?.settings?.uiSettings?.personalStartPositionEnabled === true,
       enable3d: typeof application?.settings?.uiSettings?.enable3D === "boolean"
         ? application.settings.uiSettings.enable3D
         : null,
