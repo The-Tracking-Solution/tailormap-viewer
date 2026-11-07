@@ -49,6 +49,9 @@ export class FeatureInfoContentComponent {
   public isNextButtonDisabled = input<boolean>(false);
   public isEditPossible = input<boolean>(false);
   public hideEmptyValues = input<boolean>(false);
+  public canFollow = input(false);
+  public isFollowing = input(false);
+  public toggleFollowing = output<void>();
 
   public showNextFeatureInfoFeature = output<void>();
   public showPreviousFeatureInfoFeature = output<void>();

@@ -1,3 +1,4 @@
+import { MapFollowService } from '../../../services/map-follow.service';
 import { ChangeDetectionStrategy, Component, OnInit, inject, signal, DestroyRef } from '@angular/core';
 import { CoordinateHelper, MapService } from '@tailormap-viewer/map';
 import { Subject, take } from 'rxjs';
@@ -24,6 +25,7 @@ import { MatIcon } from '@angular/material/icon';
 })
 export class GeolocationComponent implements OnInit {
   private store$ = inject(Store);
+  private mapFollow = inject(MapFollowService);
   private mapService = inject(MapService);
   private snackBar = inject(MatSnackBar);
 
@@ -45,6 +47,7 @@ export class GeolocationComponent implements OnInit {
 
   constructor() {
     const store$ = this.store$;
+    this.destroyRef.onDestroy(() => this.cancelGeolocation());
 
     ComponentConfigHelper.useInitialConfigForComponent<GeolocationConfigModel>(
       store$,
@@ -81,8 +84,8 @@ export class GeolocationComponent implements OnInit {
       }
      }).pipe(takeUntilDestroyed(this.destroyRef)).subscribe();
 
-    this.mapService.getPointerDrag$().pipe(takeUntilDestroyed(this.destroyRef)).subscribe(() => {
-      if (this.isFollowing()) {
+    this.mapFollow.owner$.pipe(takeUntilDestroyed(this.destroyRef)).subscribe(owner => {
+      if (owner !== 'geolocation' && this.isFollowing()) {
         this.isFollowing.set(false);
         this.showSnackbarMessage($localize `:@@core.toolbar.zoom-following-canceled:Stopped following location`, 2000);
       }
@@ -91,7 +94,7 @@ export class GeolocationComponent implements OnInit {
 
   private positionSuccess(pos: GeolocationPosition) {
     this.mapService.getProjectionCode$()
-      .pipe(take(1))
+      .pipe(take(1), takeUntilDestroyed(this.destroyRef))
       .subscribe(projectionCode => {
           const location = CoordinateHelper.projectCoordinates([ pos.coords.longitude, pos.coords.latitude ], 'EPSG:4326', projectionCode);
 
@@ -103,8 +106,12 @@ export class GeolocationComponent implements OnInit {
             { __fid: 'geolocation-shadow', geometry: circleWkt, attributes: {} },
           ]);
 
-          if (!this.hasFix() || this.isFollowing()) {
-            this.hasFix.set(true);
+          const firstFix = !this.hasFix();
+          this.hasFix.set(true);
+          if (firstFix && !this.isFollowing() && !this.noTimeout()) {
+            this.activeWatchTimeout = window.setTimeout(() => this.cancelGeolocation(), GeolocationComponent.GEOLOCATION_TIMEOUT_MS);
+          }
+          if ((firstFix || this.isFollowing()) && this.mapFollow.owner() === 'geolocation') {
             const maxZoom = projectionCode === 'EPSG:28992'
               ? GeolocationComponent.MAX_ZOOM_EPSG_28992
               : GeolocationComponent.MAX_ZOOM_DEFAULT;
@@ -115,9 +122,6 @@ export class GeolocationComponent implements OnInit {
               this.mapService.zoomTo(circleWkt, projectionCode, maxZoom);
             }
 
-            if (!this.isFollowing() && !this.noTimeout()) {
-              this.activeWatchTimeout = window.setTimeout(() => this.cancelGeolocation(), GeolocationComponent.GEOLOCATION_TIMEOUT_MS);
-            }
           }
       });
   }
@@ -130,6 +134,7 @@ export class GeolocationComponent implements OnInit {
         clearTimeout(this.activeWatchTimeout);
       }
 
+      this.mapFollow.stop('geolocation');
       this.featureGeom.next([]);
       this.isWatching.set(false);
       this.isFollowing.set(false);
@@ -163,10 +168,12 @@ export class GeolocationComponent implements OnInit {
 
   public onClick(): void {
     if (this.activeWatch === undefined) {
+      this.mapFollow.start('geolocation');
       this.activeWatch = navigator.geolocation.watchPosition(this.positionSuccess.bind(this), this.positionError.bind(this), { enableHighAccuracy: true });
       this.isWatching.set(true);
     } else {
       if (!this.isFollowing()) {
+        this.mapFollow.start('geolocation');
         this.isFollowing.set(true);
         clearTimeout(this.activeWatchTimeout);
       } else {

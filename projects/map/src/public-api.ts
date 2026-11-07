@@ -18,3 +18,4 @@ export * from './lib/helpers/map-cursor.helper';
 export * from './lib/helpers/geometry.helper';
 
 export * from './lib/start-position-map/start-position-map.component';
+export * from './lib/helpers/map-follow.helper';
