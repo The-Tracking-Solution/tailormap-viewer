@@ -1,0 +1,19 @@
+details {
+  padding: 0.375rem 0.75rem;
+}
+
+summary {
+  cursor: pointer;
+  min-height: 24px;
+  line-height: 24px;
+  width: fit-content;
+}
+
+.alert-list {
+  max-height: 24vh;
+  overflow: auto;
+}
+
+li > * + * {
+  margin-inline-start: 0.5rem;
+}

@@ -887,6 +887,24 @@
       <trans-unit id="core.info.info" datatype="html">
         <source>Info</source>
       </trans-unit>
+      <trans-unit id="core.layer-alerts.empty" datatype="html">
+        <source>No matching changes detected.</source>
+      </trans-unit>
+      <trans-unit id="core.layer-alerts.show-on-map" datatype="html">
+        <source>Show on map</source>
+      </trans-unit>
+      <trans-unit id="core.layer-alerts.title" datatype="html">
+        <source>Map alerts (<x id="INTERPOLATION" equiv-text="{{ alerts().length }}"/>)</source>
+      </trans-unit>
+      <trans-unit id="core.layer-alerts.transition" datatype="html">
+        <source><x id="INTERPOLATION" equiv-text="{{ alert.label }}"/>: <x id="INTERPOLATION_1" equiv-text="{{ alert.from }}"/> → <x id="INTERPOLATION_2" equiv-text="{{ alert.to }}"/></source>
+      </trans-unit>
+      <trans-unit id="core.layer-alerts.unavailable" datatype="html">
+        <source>No complete layer data available. Checking again shortly.</source>
+      </trans-unit>
+      <trans-unit id="core.layer-alerts.waiting" datatype="html">
+        <source>Waiting for the first complete layer check.</source>
+      </trans-unit>
       <trans-unit id="core.legend.legend" datatype="html">
         <source>Legend</source>
       </trans-unit>

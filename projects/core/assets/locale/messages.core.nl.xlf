@@ -1186,6 +1186,30 @@
         <source>Info</source>
         <target>Info</target>
       </trans-unit>
+      <trans-unit id="core.layer-alerts.empty" datatype="html">
+        <source>No matching changes detected.</source>
+        <target>Geen passende statuswijzigingen gevonden.</target>
+      </trans-unit>
+      <trans-unit id="core.layer-alerts.show-on-map" datatype="html">
+        <source>Show on map</source>
+        <target>Toon op de kaart</target>
+      </trans-unit>
+      <trans-unit id="core.layer-alerts.title" datatype="html">
+        <source>Map alerts (<x id="INTERPOLATION" equiv-text="{{ alerts().length }}"/>)</source>
+        <target>Kaartmeldingen (<x id="INTERPOLATION" equiv-text="{{ alerts().length }}"/>)</target>
+      </trans-unit>
+      <trans-unit id="core.layer-alerts.transition" datatype="html">
+        <source><x id="INTERPOLATION" equiv-text="{{ alert.label }}"/>: <x id="INTERPOLATION_1" equiv-text="{{ alert.from }}"/> → <x id="INTERPOLATION_2" equiv-text="{{ alert.to }}"/></source>
+        <target><x id="INTERPOLATION" equiv-text="{{ alert.label }}"/>: <x id="INTERPOLATION_1" equiv-text="{{ alert.from }}"/> → <x id="INTERPOLATION_2" equiv-text="{{ alert.to }}"/></target>
+      </trans-unit>
+      <trans-unit id="core.layer-alerts.unavailable" datatype="html">
+        <source>No complete layer data available. Checking again shortly.</source>
+        <target>Geen volledige laaggegevens beschikbaar. De laag wordt zo opnieuw gecontroleerd.</target>
+      </trans-unit>
+      <trans-unit id="core.layer-alerts.waiting" datatype="html">
+        <source>Waiting for the first complete layer check.</source>
+        <target>Wachten op de eerste volledige laagcontrole.</target>
+      </trans-unit>
       <trans-unit id="core.legend.legend" datatype="html">
         <source>Legend</source>
         <target>Legenda</target>

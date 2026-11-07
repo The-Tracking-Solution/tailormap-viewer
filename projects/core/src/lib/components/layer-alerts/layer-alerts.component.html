@@ -1,0 +1,35 @@
+@if (configured()) {
+  <details>
+    <summary>
+      <span role="status" i18n="@@core.layer-alerts.title">Map alerts ({{ alerts().length }})</span>
+    </summary>
+    <div class="alert-list">
+      @switch (sourceState()) {
+        @case ('waiting') {
+          <p i18n="@@core.layer-alerts.waiting">Waiting for the first complete layer check.</p>
+        }
+        @case ('unavailable') {
+          <p i18n="@@core.layer-alerts.unavailable">No complete layer data available. Checking again shortly.</p>
+        }
+        @case ('ready') {
+          @if (!alerts().length) {
+            <p i18n="@@core.layer-alerts.empty">No matching changes detected.</p>
+          }
+        }
+      }
+      @if (alerts().length) {
+        <ul>
+          @for (alert of alerts(); track alert.sequence) {
+            <li>
+              <span i18n="@@core.layer-alerts.transition">{{ alert.label }}: {{ alert.from }} → {{ alert.to }}</span>
+              <time>{{ alert.observedAt | date:'mediumTime' }}</time>
+              @if (alert.feature.geometry) {
+                <button type="button" (click)="showOnMap(alert.feature)" i18n="@@core.layer-alerts.show-on-map">Show on map</button>
+              }
+            </li>
+          }
+        </ul>
+      }
+    </div>
+  </details>
+}

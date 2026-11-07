@@ -6,6 +6,9 @@
       <tm-menubar [config]="layoutConfig.config"></tm-menubar>
     </nav>
     <main class="content">
+      @if (!layoutConfig.in3d) {
+        <tm-layer-alerts></tm-layer-alerts>
+      }
       <div class="center">
         <div class="left">
           <tm-menubar-panel>
