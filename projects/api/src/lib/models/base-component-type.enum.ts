@@ -26,4 +26,5 @@ export enum BaseComponentTypeEnum {
   TERRAIN_CONTROLS = 'TERRAIN_CONTROLS',
   PROFILE = 'PROFILE',
   SNAPPING = 'SNAPPING',
+  LAYER_ALERTS = 'layer-alerts',
 }

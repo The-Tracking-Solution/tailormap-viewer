@@ -3,7 +3,7 @@ import { DatePipe } from '@angular/common';
 import { takeUntilDestroyed, toObservable, toSignal } from '@angular/core/rxjs-interop';
 import { HttpErrorResponse } from '@angular/common/http';
 import { Store } from '@ngrx/store';
-import { ComponentBaseConfigModel, FeatureModel, HiddenLayerFunctionality, TAILORMAP_API_V1_SERVICE } from '@tailormap-viewer/api';
+import { BaseComponentTypeEnum, FeatureModel, HiddenLayerFunctionality, LayerAlertsConfigModel, TAILORMAP_API_V1_SERVICE } from '@tailormap-viewer/api';
 import { FeatureHelper, MapService } from '@tailormap-viewer/map';
 import { catchError, EMPTY, exhaustMap, map, of, Subject, switchMap, take, takeUntil, timeout, timer } from 'rxjs';
 import { selectComponentsConfigForType, selectViewerId } from '../../state/core.selectors';
@@ -11,16 +11,12 @@ import { selectLayers } from '../../map/state/map.selectors';
 import { FeatureStylingHelper } from '../../shared/helpers/feature-styling.helper';
 import { compareLayerAlertSnapshots, LAYER_ALERT_PAGE_SIZE, LayerAlert, parseLayerAlertRule, readLayerAlertSnapshot } from './layer-alert-snapshot';
 
-interface LayerAlertsConfig extends ComponentBaseConfigModel {
-  rule?: unknown;
-}
-
 interface TimedLayerAlert extends LayerAlert {
   sequence: number;
   observedAt: number;
 }
 
-const selectLayerAlertsConfig = selectComponentsConfigForType<LayerAlertsConfig>('layer-alerts');
+const selectLayerAlertsConfig = selectComponentsConfigForType<LayerAlertsConfigModel>(BaseComponentTypeEnum.LAYER_ALERTS);
 const POLL_INTERVAL_MS = 60_000;
 const REQUEST_TIMEOUT_MS = 15_000;
 const MAX_ALERTS = 20;

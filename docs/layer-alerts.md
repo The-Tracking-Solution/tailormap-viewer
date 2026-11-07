@@ -2,26 +2,11 @@
 
 The desktop 2D viewer checks one configured layer every 60 seconds while the application is open. Each open viewer makes its own requests. There is no background service or saved alert history.
 
-## Enable in a DEV application
+## Configure in Tailormap Admin
 
-Append this entry to the existing application `components` array. Use the application layer ID from the viewer's map response. Match `from` and `to` to the actual values returned by the feature API, including case. The rule accepts text and numeric values.
+Open **Applications → Components → Map alerts**. Select one application layer and fill in its object ID attribute, status attribute and the values for the transition. The optional label attribute falls back to the object ID. Check **Enabled**, apply the rule and save the application.
 
-```json
-{
-  "type": "layer-alerts",
-  "config": {
-    "enabled": true,
-    "rule": {
-      "layerId": "<DEV application layer ID>",
-      "idAttribute": "svid",
-      "statusAttribute": "svflag",
-      "labelAttribute": "<optional name attribute>",
-      "from": "yellow",
-      "to": "red"
-    }
-  }
-}
-```
+For the strand flags example, choose the warning-flags layer, enter `svid` for the object ID, `svflag` for the status, `svname` for the label and `gele-vlag` → `paarse-vlag` for the transition. Values are case-sensitive and should match the feature API. The rule accepts text and numeric values.
 
 The layer must expose attributes through the existing feature API. Use a small layer with stable, unique object keys and an exact feature count of at most 500. The optional label falls back to the object key. The rule covers the entire application layer, regardless of viewport and temporary viewer filters. It respects the existing application access and layer settings for feature info and the attribute list.
 
