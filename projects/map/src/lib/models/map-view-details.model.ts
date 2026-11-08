@@ -11,4 +11,5 @@ export interface MapViewDetailsModel {
   size: number[] | undefined;
   center: number[] | undefined;
   extent: OpenlayersExtent | null;
+  viewport?: number[][];
 }

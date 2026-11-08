@@ -430,6 +430,10 @@ export class OpenLayersMap implements MapViewerModel {
         map(olMap => {
           const view = olMap.getView();
           const { scale, resolution } = OlMapScaleHelper.getResolutionAndScale(view);
+          const size = olMap.getSize();
+          const viewport = size?.every(dimension => dimension > 0)
+            ? [[ 0, 0 ], [ size[0], 0 ], size, [ 0, size[1] ]].map(pixel => olMap.getCoordinateFromPixel(pixel))
+            : undefined;
           return {
             zoomLevel: view.getZoom() || 0,
             minZoomLevel: view.getMinZoom() || 0,
@@ -438,9 +442,10 @@ export class OpenLayersMap implements MapViewerModel {
             minResolution: view.getMinResolution() || 0,
             maxResolution: view.getMaxResolution() || 0,
             scale,
-            size: olMap.getSize(),
-            center: olMap.getView().getCenter() != null ? olMap.getView().getCenter() : undefined,
-            extent: olMap.getView().getCenter() != null ? olMap.getView().calculateExtent(olMap.getSize()) : null,
+            size,
+            center: view.getCenter() ?? undefined,
+            extent: view.getCenter() != null ? view.calculateExtent(size) : null,
+            viewport: viewport?.every(coordinate => coordinate?.every(Number.isFinite)) ? viewport : undefined,
           };
         }),
       );

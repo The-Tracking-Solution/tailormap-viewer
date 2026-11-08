@@ -1,7 +1,7 @@
-import { describe, expect, test } from 'vitest';
+import { assert, describe, expect, test } from 'vitest';
 import { AttributeType } from '@tailormap-viewer/api';
 import type { FeatureModel, FeaturesResponseModel } from '@tailormap-viewer/api';
-import { compareLayerAlertSnapshots, parseLayerAlertRule, readLayerAlertSnapshot } from './layer-alert-snapshot';
+import { compareLayerAlertSnapshots, detectNewLayerAlerts, parseLayerAlertRule, readLayerAlertSnapshot } from './layer-alert-snapshot';
 
 const rule = {
   layerId: 'strand-flags',
@@ -31,6 +31,28 @@ function response(...features: FeatureModel[]): FeaturesResponseModel {
 }
 
 describe('layer alert snapshots', () => {
+  test('accepts a complete empty baseline and reports a new ID only once per session', () => {
+    const newRule = parseLayerAlertRule({ layerId: 'warnings', idAttribute: 'svid', mode: 'new-object', bufferKm: 10 })!;
+    const seen = new Set<string>();
+    const empty = readLayerAlertSnapshot(response(), newRule)!;
+    const warning = feature('a', null);
+    const populated = readLayerAlertSnapshot(response(warning), newRule)!;
+
+    expect(detectNewLayerAlerts(empty, seen, false)).toEqual([]);
+    expect(detectNewLayerAlerts(populated, seen, true)).toEqual([{ objectId: 'a', label: 'a', feature: warning }]);
+    expect(detectNewLayerAlerts(empty, seen, true)).toEqual([]);
+    expect(detectNewLayerAlerts(populated, seen, true)).toEqual([]);
+    expect(readLayerAlertSnapshot({ ...response(), total: 1 }, newRule)).toBeUndefined();
+  });
+
+  test('uses existing warnings as baseline without emitting new alerts', () => {
+    const newRule = parseLayerAlertRule({ layerId: 'warnings', idAttribute: 'svid', mode: 'new-object', bufferKm: 0 })!;
+    const seen = new Set<string>();
+    const snapshot = readLayerAlertSnapshot(response(feature('existing', null)), newRule)!;
+    expect(detectNewLayerAlerts(snapshot, seen, false)).toEqual([]);
+    expect(detectNewLayerAlerts(snapshot, seen, true)).toEqual([]);
+  });
+
   test('emits one alert for the configured transition on the same object', () => {
     const red = feature('a', 'red');
     const previous = readLayerAlertSnapshot(response(feature('a', 'yellow'), feature('b', 'green')), rule)!;
@@ -44,6 +66,7 @@ describe('layer alert snapshots', () => {
 
   test('emits one alert for each observed value change and ignores unchanged or newly seen objects', () => {
     const anyRule = parseLayerAlertRule({ ...rule, mode: 'any-change', from: undefined, to: undefined })!;
+    assert(anyRule.mode !== 'new-object');
     const purple = feature('a', 'purple');
     const cleared = feature('b', null);
     const raised = feature('c', 'yellow');
@@ -64,6 +87,7 @@ describe('layer alert snapshots', () => {
 
   test('skips unidentifiable objects in any-change mode and still rejects duplicate IDs', () => {
     const anyRule = parseLayerAlertRule({ ...rule, mode: 'any-change' })!;
+    assert(anyRule.mode !== 'new-object');
     const before = readLayerAlertSnapshot(response(feature('', 'red'), feature('a', 'yellow')), anyRule)!;
     const after = readLayerAlertSnapshot(response(feature('', 'yellow'), feature('a', 'red')), anyRule)!;
     expect(compareLayerAlertSnapshots(before, after, anyRule)).toHaveLength(1);
@@ -94,6 +118,7 @@ describe('layer alert snapshots', () => {
 
   test('normalizes numeric flag values and rejects rules without a distinct transition', () => {
     const numericRule = parseLayerAlertRule({ ...rule, from: 1, to: 2 })!;
+    assert(numericRule.mode !== 'new-object');
     const previous = readLayerAlertSnapshot(response(feature('a', 1)), numericRule)!;
     const current = readLayerAlertSnapshot(response(feature('a', 2)), numericRule)!;
 

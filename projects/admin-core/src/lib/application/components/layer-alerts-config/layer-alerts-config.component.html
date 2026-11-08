@@ -19,10 +19,12 @@
         <mat-label i18n="@@admin-core.layer-alerts.id-attribute">Object ID attribute</mat-label>
         <input matInput formControlName="idAttribute" />
       </mat-form-field>
-      <mat-form-field>
-        <mat-label i18n="@@admin-core.layer-alerts.status-attribute">Status attribute</mat-label>
-        <input matInput formControlName="statusAttribute" />
-      </mat-form-field>
+      @if (form.controls.mode.value !== 'new-object') {
+        <mat-form-field>
+          <mat-label i18n="@@admin-core.layer-alerts.status-attribute">Status attribute</mat-label>
+          <input matInput formControlName="statusAttribute" />
+        </mat-form-field>
+      }
       <mat-form-field>
         <mat-label i18n="@@admin-core.layer-alerts.label-attribute">Label attribute (optional)</mat-label>
         <input matInput formControlName="labelAttribute" />
@@ -33,10 +35,19 @@
         <mat-label i18n="@@admin-core.layer-alerts.mode">When to notify</mat-label>
         <mat-select formControlName="mode">
           <mat-option value="any-change" i18n="@@admin-core.layer-alerts.any-change">Every change</mat-option>
+          <mat-option value="new-object" i18n="@@admin-core.layer-alerts.new-object">New object</mat-option>
           <mat-option value="transition" i18n="@@admin-core.layer-alerts.transition">Specific transition</mat-option>
         </mat-select>
       </mat-form-field>
     </div>
+    @if (form.controls.mode.value === 'new-object') {
+      <div>
+        <mat-form-field>
+          <mat-label i18n="@@admin-core.layer-alerts.buffer">Distance outside the map (km)</mat-label>
+          <input matInput type="number" min="0" step="any" formControlName="bufferKm" />
+        </mat-form-field>
+      </div>
+    }
     @if (form.controls.mode.value === 'transition') {
       <div>
         <mat-form-field>

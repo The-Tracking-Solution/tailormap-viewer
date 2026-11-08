@@ -2970,6 +2970,14 @@
         <source>Specific transition</source>
         <target>Bestimmter Übergang</target>
       </trans-unit>
+      <trans-unit id="admin-core.layer-alerts.new-object" datatype="html">
+        <source>New object</source>
+        <target>Neues Objekt</target>
+      </trans-unit>
+      <trans-unit id="admin-core.layer-alerts.buffer" datatype="html">
+        <source>Distance outside the map (km)</source>
+        <target>Abstand außerhalb der Karte (km)</target>
+      </trans-unit>
     </body>
   </file>
 </xliff>

@@ -1195,8 +1195,8 @@
         <target>Auf der Karte anzeigen</target>
       </trans-unit>
       <trans-unit id="core.layer-alerts.title" datatype="html">
-        <source>Map alerts (<x id="INTERPOLATION" equiv-text="{{ alerts().length }}"/>)</source>
-        <target>Kartenmeldungen (<x id="INTERPOLATION" equiv-text="{{ alerts().length }}"/>)</target>
+        <source>Map alerts (<x id="INTERPOLATION" equiv-text="{{ visibleAlerts().length }}"/>)</source>
+        <target>Kartenmeldungen (<x id="INTERPOLATION" equiv-text="{{ visibleAlerts().length }}"/>)</target>
       </trans-unit>
       <trans-unit id="core.layer-alerts.transition" datatype="html">
         <source><x id="INTERPOLATION" equiv-text="{{ alert.label }}"/>: <x id="INTERPOLATION_1" equiv-text="{{ alert.from }}"/> → <x id="INTERPOLATION_2" equiv-text="{{ alert.to }}"/></source>
@@ -1838,6 +1838,10 @@
       <trans-unit id="core.feature-info.stop-following" datatype="html">
         <source>Stop following feature</source>
         <target>Objekt nicht mehr verfolgen</target>
+      </trans-unit>
+      <trans-unit id="core.layer-alerts.outside-view" datatype="html">
+        <source>Outside the map</source>
+        <target>Außerhalb der Karte</target>
       </trans-unit>
     </body>
   </file>

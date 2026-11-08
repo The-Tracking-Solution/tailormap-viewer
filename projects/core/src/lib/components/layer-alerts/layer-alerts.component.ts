@@ -4,17 +4,19 @@ import { takeUntilDestroyed, toObservable, toSignal } from '@angular/core/rxjs-i
 import { HttpErrorResponse } from '@angular/common/http';
 import { Store } from '@ngrx/store';
 import { BaseComponentTypeEnum, FeatureModel, HiddenLayerFunctionality, LayerAlertsConfigModel, TAILORMAP_API_V1_SERVICE } from '@tailormap-viewer/api';
-import { FeatureHelper, MapService } from '@tailormap-viewer/map';
-import { catchError, EMPTY, exhaustMap, map, of, Subject, switchMap, take, takeUntil, timeout, timer } from 'rxjs';
+import { FeatureHelper, GeometryHelper, MapService } from '@tailormap-viewer/map';
+import { catchError, combineLatest, EMPTY, exhaustMap, map, of, Subject, switchMap, take, takeUntil, timeout, timer } from 'rxjs';
 import { selectComponentsConfigForType, selectViewerId } from '../../state/core.selectors';
 import { selectLayers } from '../../map/state/map.selectors';
 import { FeatureStylingHelper } from '../../shared/helpers/feature-styling.helper';
-import { compareLayerAlertSnapshots, LAYER_ALERT_PAGE_SIZE, LayerAlert, parseLayerAlertRule, readLayerAlertSnapshot } from './layer-alert-snapshot';
+import {
+  compareLayerAlertSnapshots, detectNewLayerAlerts, LAYER_ALERT_PAGE_SIZE, LayerAlert, parseLayerAlertRule, readLayerAlertSnapshot,
+} from './layer-alert-snapshot';
 
-interface TimedLayerAlert extends LayerAlert {
+type TimedLayerAlert = LayerAlert & {
   sequence: number;
   observedAt: number;
-}
+};
 
 const selectLayerAlertsConfig = selectComponentsConfigForType<LayerAlertsConfigModel>(BaseComponentTypeEnum.LAYER_ALERTS);
 const POLL_INTERVAL_MS = 60_000;
@@ -58,6 +60,23 @@ export class LayerAlertsComponent {
 
   public readonly configured = computed(() => this.configuration()?.config?.enabled === true);
   public readonly alerts = signal<TimedLayerAlert[]>([]);
+  private readonly classifyViewport = toSignal(toObservable(this.rule).pipe(
+    switchMap(rule => rule?.mode === 'new-object'
+      ? combineLatest([ this.mapService.getMapViewDetails$(), this.mapService.getProjectionCode$() ]).pipe(
+        map(([ view, projection ]) => GeometryHelper.createViewportClassifier(view, projection, rule.bufferKm * 1000)),
+      )
+      : of(undefined)),
+  ));
+  public readonly visibleAlerts = computed(() => {
+    const classify = this.classifyViewport();
+    return this.alerts().flatMap<TimedLayerAlert & { outsideView: boolean }>(alert => {
+      if (alert.objectId === undefined) {
+        return [{ ...alert, outsideView: false }];
+      }
+      const relation = alert.feature.geometry && classify?.(alert.feature.geometry, alert.feature.crs);
+      return relation ? [{ ...alert, outsideView: relation === 'nearby' }] : [];
+    }).slice(0, MAX_ALERTS);
+  });
   public readonly sourceState = signal<'waiting' | 'ready' | 'unavailable'>('waiting');
   private sequence = 0;
 
@@ -72,6 +91,7 @@ export class LayerAlertsComponent {
 
         const { rule, applicationId } = target;
         let previous: ReturnType<typeof readLayerAlertSnapshot>;
+        const seen = new Set<string>();
         return timer(0, POLL_INTERVAL_MS).pipe(
           exhaustMap(() => this.api.getFeatures$({
             applicationId,
@@ -86,6 +106,7 @@ export class LayerAlertsComponent {
             catchError((error: unknown) => {
               if (error instanceof HttpErrorResponse && [ 401, 403, 404, 405 ].includes(error.status)) {
                 previous = undefined;
+                seen.clear();
                 this.reset();
               }
               return of(undefined);
@@ -95,6 +116,15 @@ export class LayerAlertsComponent {
             this.sourceState.set(current ? 'ready' : 'unavailable');
             if (!current) {
               return [];
+            }
+            if (rule.mode === 'new-object') {
+              this.alerts.update(history => history.flatMap(alert => {
+                const active = alert.objectId === undefined ? undefined : current.get(alert.objectId);
+                return active ? [{ ...alert, label: active.label, feature: active.feature }] : [];
+              }));
+              const alerts = detectNewLayerAlerts(current, seen, previous !== undefined);
+              previous = current;
+              return alerts;
             }
             const alerts = previous ? compareLayerAlertSnapshots(previous, current, rule) : [];
             previous = current;
@@ -107,7 +137,10 @@ export class LayerAlertsComponent {
       if (alerts.length) {
         const observedAt = Date.now();
         const newest = alerts.map(alert => ({ ...alert, observedAt, sequence: ++this.sequence }));
-        this.alerts.update(history => [ ...newest, ...history ].slice(0, MAX_ALERTS));
+        this.alerts.update(history => {
+          const updated = [ ...newest, ...history ];
+          return this.rule()?.mode === 'new-object' ? updated : updated.slice(0, MAX_ALERTS);
+        });
       }
     });
 
