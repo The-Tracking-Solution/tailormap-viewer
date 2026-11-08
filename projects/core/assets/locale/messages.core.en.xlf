@@ -915,7 +915,7 @@
         <source>Show on map</source>
       </trans-unit>
       <trans-unit id="core.layer-alerts.title" datatype="html">
-        <source>Map alerts (<x id="INTERPOLATION" equiv-text="{{ alerts().length }}"/>)</source>
+        <source>Map alerts (<x id="INTERPOLATION" equiv-text="{{ visibleAlerts().length }}"/>)</source>
       </trans-unit>
       <trans-unit id="core.layer-alerts.transition" datatype="html">
         <source><x id="INTERPOLATION" equiv-text="{{ alert.label }}"/>: <x id="INTERPOLATION_1" equiv-text="{{ alert.from }}"/> → <x id="INTERPOLATION_2" equiv-text="{{ alert.to }}"/></source>
@@ -1298,6 +1298,9 @@
       </trans-unit>
       <trans-unit id="core.user-login-check-viewer-message" datatype="html">
         <source>You are logged out and might need to login again</source>
+      </trans-unit>
+      <trans-unit id="core.layer-alerts.outside-view" datatype="html">
+        <source>Outside the map</source>
       </trans-unit>
     </body>
   </file>

@@ -16,6 +16,12 @@ declare module 'jsts/org/locationtech/jts/io.js' {
   }
 }
 
+declare module 'jsts/org/locationtech/jts/operation/distance.js' {
+  export class DistanceOp {
+    public static distance(first: unknown, second: unknown): number;
+  }
+}
+
 declare module 'jsts/org/locationtech/jts/operation/buffer.js' {
   export class BufferOp {
     public static bufferOp(geom: any, distance: number): any;

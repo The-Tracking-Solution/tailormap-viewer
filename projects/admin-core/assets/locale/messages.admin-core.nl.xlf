@@ -2793,6 +2793,14 @@
         <source>Specific transition</source>
         <target>Specifieke overgang</target>
       </trans-unit>
+      <trans-unit id="admin-core.layer-alerts.new-object" datatype="html">
+        <source>New object</source>
+        <target>Nieuw object</target>
+      </trans-unit>
+      <trans-unit id="admin-core.layer-alerts.buffer" datatype="html">
+        <source>Distance outside the map (km)</source>
+        <target>Afstand buiten beeld (km)</target>
+      </trans-unit>
     </body>
   </file>
 </xliff>

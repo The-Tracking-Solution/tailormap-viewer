@@ -23,11 +23,25 @@ function setup() {
 }
 
 describe('LayerAlertsConfigComponent', () => {
+  test('saves a new-object rule with the default buffer and without a status field', () => {
+    const { component, updateConfig } = setup();
+    component.form.patchValue({ enabled: true, layerId: 'layer-1', idAttribute: 'message-id', mode: 'new-object' });
+    component.apply();
+    expect(updateConfig).toHaveBeenCalledWith(BaseComponentTypeEnum.LAYER_ALERTS, {
+      enabled: true,
+      rule: { layerId: 'layer-1', idAttribute: 'message-id', labelAttribute: undefined, mode: 'new-object', bufferKm: 10 },
+    });
+
+    component.form.controls.bufferKm.setValue(null);
+    component.apply();
+    expect(updateConfig).toHaveBeenCalledTimes(1);
+  });
+
   test('applies every change by default without requiring transition values', () => {
     const { component, updateConfig } = setup();
     component.form.setValue({
       enabled: true, layerId: 'layer-1', idAttribute: ' id ', statusAttribute: 'status',
-      labelAttribute: '', mode: component.form.controls.mode.value, from: '', to: '',
+      labelAttribute: '', mode: component.form.controls.mode.value, bufferKm: 10, from: '', to: '',
     });
     component.apply();
 
