@@ -1216,7 +1216,7 @@
       </trans-unit>
       <trans-unit id="core.layer-alerts.empty" datatype="html">
         <source>No matching changes detected.</source>
-        <target>Geen passende statuswijzigingen gevonden.</target>
+        <target>Geen passende wijzigingen of nieuwe objecten gevonden.</target>
       </trans-unit>
       <trans-unit id="core.layer-alerts.show-on-map" datatype="html">
         <source>Show on map</source>
@@ -1738,6 +1738,10 @@
       <trans-unit id="core.layer-alerts.outside-view" datatype="html">
         <source>Outside the map</source>
         <target>Buiten beeld</target>
+      </trans-unit>
+      <trans-unit id="core.layer-alerts.rule-unavailable" datatype="html">
+        <source>Waiting for complete data for this rule. Retrying shortly.</source>
+        <target>Wachten op volledige gegevens voor deze regel. Binnenkort opnieuw proberen.</target>
       </trans-unit>
     </body>
   </file>

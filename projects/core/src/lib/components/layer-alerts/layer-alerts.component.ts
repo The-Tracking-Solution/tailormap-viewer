@@ -5,18 +5,31 @@ import { HttpErrorResponse } from '@angular/common/http';
 import { Store } from '@ngrx/store';
 import { BaseComponentTypeEnum, FeatureModel, HiddenLayerFunctionality, LayerAlertsConfigModel, TAILORMAP_API_V1_SERVICE } from '@tailormap-viewer/api';
 import { FeatureHelper, GeometryHelper, MapService } from '@tailormap-viewer/map';
-import { catchError, combineLatest, EMPTY, exhaustMap, map, of, Subject, switchMap, take, takeUntil, timeout, timer } from 'rxjs';
+import { catchError, combineLatest, EMPTY, exhaustMap, map, merge, Observable, of, Subject, switchMap, take, takeUntil, timeout, timer } from 'rxjs';
 import { selectComponentsConfigForType, selectViewerId } from '../../state/core.selectors';
 import { selectLayers } from '../../map/state/map.selectors';
 import { FeatureStylingHelper } from '../../shared/helpers/feature-styling.helper';
 import {
-  compareLayerAlertSnapshots, detectNewLayerAlerts, LAYER_ALERT_PAGE_SIZE, LayerAlert, parseLayerAlertRule, readLayerAlertSnapshot,
+  compareLayerAlertSnapshots, detectNewLayerAlerts, LAYER_ALERT_PAGE_SIZE, LayerAlert, parseLayerAlertRule, readLayerAlertSnapshot, LayerAlertRule,
 } from './layer-alert-snapshot';
 
 type TimedLayerAlert = LayerAlert & {
+  ruleId: string;
+  ruleLabel: string;
   sequence: number;
   observedAt: number;
 };
+
+type ViewportClassifier = ReturnType<typeof GeometryHelper.createViewportClassifier>;
+
+type SourceState = 'waiting' | 'ready' | 'unavailable';
+type RuleTarget = {
+  id: string;
+  label: string;
+  rule: LayerAlertRule | undefined;
+  available: boolean;
+};
+type RuleAlert = LayerAlert & { ruleId: string; ruleLabel: string };
 
 const selectLayerAlertsConfig = selectComponentsConfigForType<LayerAlertsConfigModel>(BaseComponentTypeEnum.LAYER_ALERTS);
 const POLL_INTERVAL_MS = 60_000;
@@ -41,97 +54,68 @@ export class LayerAlertsComponent {
   private readonly configuration = toSignal(this.store.select(selectLayerAlertsConfig));
   private readonly applicationId = toSignal(this.store.select(selectViewerId));
   private readonly layers = toSignal(this.store.select(selectLayers), { initialValue: [] });
-  private readonly rule = computed(() => {
+  private readonly targets = computed<RuleTarget[]>(() => {
     const config = this.configuration()?.config;
-    return config?.enabled === true ? parseLayerAlertRule(config.rule) : undefined;
-  });
-  private readonly sourceAvailable = computed(() => {
-    const rule = this.rule();
-    const layer = this.layers().find(candidate => candidate.id === rule?.layerId);
-    return !!layer?.hasAttributes
-      && !layer.hiddenFunctionality?.includes(HiddenLayerFunctionality.featureInfo)
-      && !layer.hiddenFunctionality?.includes(HiddenLayerFunctionality.attributeList);
-  });
-  private readonly target = computed(() => {
-    const applicationId = this.applicationId();
-    const rule = this.rule();
-    return applicationId && rule && this.sourceAvailable() ? { applicationId, rule } : undefined;
-  });
+    if (!config?.enabled) {
+      return [];
+    }
+    const rules = config.rules ?? (config.rule ? [{ ...config.rule, id: 'legacy-rule' }] : []);
+    return rules.flatMap((input, index) => {
+      if (input?.enabled === false) {
+        return [];
+      }
+      const rule = parseLayerAlertRule(input);
+      const layer = this.layers().find(candidate => candidate.id === rule?.layerId);
+      return [{
+        id: `${index}:${input?.id ?? ''}`,
+        label: input?.name || layer?.title || rule?.layerId || String(index + 1),
+        rule,
+        available: !!layer?.hasAttributes
+          && !layer.hiddenFunctionality?.includes(HiddenLayerFunctionality.featureInfo)
+          && !layer.hiddenFunctionality?.includes(HiddenLayerFunctionality.attributeList),
+      }];
+    });
+  }, { equal: (previous, next) => JSON.stringify(previous) === JSON.stringify(next) });
 
   public readonly configured = computed(() => this.configuration()?.config?.enabled === true);
   public readonly alerts = signal<TimedLayerAlert[]>([]);
-  private readonly classifyViewport = toSignal(toObservable(this.rule).pipe(
-    switchMap(rule => rule?.mode === 'new-object'
+  private readonly sourceStates = signal<Record<string, SourceState>>({});
+  public readonly sourceState = computed<SourceState>(() => {
+    const states = Object.values(this.sourceStates());
+    if (!states.length || states.includes('ready')) {
+      return 'ready';
+    }
+    return states.includes('waiting') ? 'waiting' : 'unavailable';
+  });
+  public readonly sourceProblems = computed(() => this.targets().filter(target => this.sourceStates()[target.id] !== 'ready'));
+  private readonly classifyViewport = toSignal(toObservable(this.targets).pipe(
+    switchMap(targets => targets.some(target => target.rule?.mode === 'new-object')
       ? combineLatest([ this.mapService.getMapViewDetails$(), this.mapService.getProjectionCode$() ]).pipe(
-        map(([ view, projection ]) => GeometryHelper.createViewportClassifier(view, projection, rule.bufferKm * 1000)),
+        map(([ view, projection ]) => new Map(targets.map(target => [ target.id, target.rule?.mode === 'new-object'
+          ? GeometryHelper.createViewportClassifier(view, projection, target.rule.bufferKm * 1000)
+          : undefined ] as const))),
       )
-      : of(undefined)),
+      : of(new Map<string, ViewportClassifier>())),
   ));
   public readonly visibleAlerts = computed(() => {
-    const classify = this.classifyViewport();
+    const classifiers = this.classifyViewport();
     return this.alerts().flatMap<TimedLayerAlert & { outsideView: boolean }>(alert => {
       if (alert.objectId === undefined) {
         return [{ ...alert, outsideView: false }];
       }
+      const classify = classifiers?.get(alert.ruleId);
       const relation = alert.feature.geometry && classify?.(alert.feature.geometry, alert.feature.crs);
       return relation ? [{ ...alert, outsideView: relation === 'nearby' }] : [];
     }).slice(0, MAX_ALERTS);
   });
-  public readonly sourceState = signal<'waiting' | 'ready' | 'unavailable'>('waiting');
   private sequence = 0;
 
   constructor() {
-    toObservable(this.target).pipe(
-      switchMap(target => {
+    combineLatest([ toObservable(this.targets), toObservable(this.applicationId) ]).pipe(
+      switchMap(([ targets, applicationId ]) => {
         this.reset();
-        this.sourceState.set(target ? 'waiting' : 'unavailable');
-        if (!target) {
-          return EMPTY;
-        }
-
-        const { rule, applicationId } = target;
-        let previous: ReturnType<typeof readLayerAlertSnapshot>;
-        const seen = new Set<string>();
-        return timer(0, POLL_INTERVAL_MS).pipe(
-          exhaustMap(() => this.api.getFeatures$({
-            applicationId,
-            layerId: rule.layerId,
-            page: 1,
-            pageSize: LAYER_ALERT_PAGE_SIZE,
-            geometryInAttributes: rule.mode === 'new-object',
-            withAttachments: false,
-            background: true,
-          }).pipe(
-            timeout({ first: REQUEST_TIMEOUT_MS }),
-            map(response => readLayerAlertSnapshot(response, rule)),
-            catchError((error: unknown) => {
-              if (error instanceof HttpErrorResponse && [ 401, 403, 404, 405 ].includes(error.status)) {
-                previous = undefined;
-                seen.clear();
-                this.reset();
-              }
-              return of(undefined);
-            }),
-          )),
-          map(current => {
-            this.sourceState.set(current ? 'ready' : 'unavailable');
-            if (!current) {
-              return [];
-            }
-            if (rule.mode === 'new-object') {
-              this.alerts.update(history => history.flatMap(alert => {
-                const active = alert.objectId === undefined ? undefined : current.get(alert.objectId);
-                return active ? [{ ...alert, label: active.label, feature: active.feature }] : [];
-              }));
-              const alerts = detectNewLayerAlerts(current, seen, previous !== undefined);
-              previous = current;
-              return alerts;
-            }
-            const alerts = previous ? compareLayerAlertSnapshots(previous, current, rule) : [];
-            previous = current;
-            return alerts;
-          }),
-        );
+        this.sourceStates.set(Object.fromEntries(targets.map(target => [ target.id, 'waiting' ])));
+        return merge(...targets.map(target => this.pollRule(target, applicationId)));
       }),
       takeUntilDestroyed(this.destroyRef),
     ).subscribe(alerts => {
@@ -139,8 +123,15 @@ export class LayerAlertsComponent {
         const observedAt = Date.now();
         const newest = alerts.map(alert => ({ ...alert, observedAt, sequence: ++this.sequence }));
         this.alerts.update(history => {
-          const updated = [ ...newest, ...history ];
-          return this.rule()?.mode === 'new-object' ? updated : updated.slice(0, MAX_ALERTS);
+          const counts = new Map<string, number>();
+          return [ ...newest, ...history ].filter(alert => {
+            if (alert.objectId !== undefined) {
+              return true;
+            }
+            const count = counts.get(alert.ruleId) ?? 0;
+            counts.set(alert.ruleId, count + 1);
+            return count < MAX_ALERTS;
+          });
         });
       }
     });
@@ -187,6 +178,59 @@ export class LayerAlertsComponent {
     if (feature.geometry) {
       this.highlight.next(feature);
     }
+  }
+
+  private pollRule(target: RuleTarget, applicationId: string | null | undefined): Observable<RuleAlert[]> {
+    const { id, label, rule } = target;
+    if (!applicationId || !rule || !target.available) {
+      this.sourceStates.update(states => ({ ...states, [id]: 'unavailable' }));
+      return EMPTY;
+    }
+    let previous: ReturnType<typeof readLayerAlertSnapshot>;
+    const seen = new Set<string>();
+    return timer(0, POLL_INTERVAL_MS).pipe(
+      exhaustMap(() => this.api.getFeatures$({
+        applicationId,
+        layerId: rule.layerId,
+        page: 1,
+        pageSize: LAYER_ALERT_PAGE_SIZE,
+        geometryInAttributes: rule.mode === 'new-object',
+        withAttachments: false,
+        background: true,
+      }).pipe(
+        timeout({ first: REQUEST_TIMEOUT_MS }),
+        map(response => readLayerAlertSnapshot(response, rule)),
+        catchError((error: unknown) => {
+          if (error instanceof HttpErrorResponse && [ 401, 403, 404, 405 ].includes(error.status)) {
+            previous = undefined;
+            seen.clear();
+            this.alerts.update(history => history.filter(alert => alert.ruleId !== id));
+          }
+          return of(undefined);
+        }),
+      )),
+      map(current => {
+        this.sourceStates.update(states => ({ ...states, [id]: current ? 'ready' : 'unavailable' }));
+        if (!current) {
+          return [];
+        }
+        let alerts: LayerAlert[];
+        if (rule.mode === 'new-object') {
+          this.alerts.update(history => history.flatMap(alert => {
+            if (alert.ruleId !== id) {
+              return [alert];
+            }
+            const active = alert.objectId === undefined ? undefined : current.get(alert.objectId);
+            return active ? [{ ...alert, label: active.label, feature: active.feature }] : [];
+          }));
+          alerts = detectNewLayerAlerts(current, seen, previous !== undefined);
+        } else {
+          alerts = previous ? compareLayerAlertSnapshots(previous, current, rule) : [];
+        }
+        previous = current;
+        return alerts.map(alert => ({ ...alert, ruleId: id, ruleLabel: label }));
+      }),
+    );
   }
 
   private reset(): void {

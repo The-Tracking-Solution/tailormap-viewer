@@ -1739,6 +1739,10 @@
         <source>Outside the map</source>
         <target>Außerhalb der Karte</target>
       </trans-unit>
+      <trans-unit id="core.layer-alerts.rule-unavailable" datatype="html">
+        <source>Waiting for complete data for this rule. Retrying shortly.</source>
+        <target>Warten auf vollständige Daten für diese Regel. Ein neuer Versuch folgt.</target>
+      </trans-unit>
     </body>
   </file>
 </xliff>
