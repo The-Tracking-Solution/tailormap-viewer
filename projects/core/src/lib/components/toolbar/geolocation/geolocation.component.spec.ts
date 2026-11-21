@@ -33,6 +33,7 @@ describe('GeolocationComponent', () => {
 
     Object.defineProperty(global.navigator, 'geolocation', { value: { watchPosition, clearWatch: vi.fn() }, configurable: true });
 
+
     await render(GeolocationComponent, {
       providers: [
         mapService.provider,

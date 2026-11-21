@@ -7,13 +7,44 @@ import { HtmlifyHelper } from './htmlify.helper';
 export class MarkdownHelper {
 
   private static ESCAPE_REGEX = /[\\`*_{}[\]<>()#+\-.!|]/g;
+  private static UNESCAPE_REGEX = /\\([!-/:-@[-`{-~])/g;
 
-  public static getSafeHtmlForMarkdown$(md: string, sanitizer: DomSanitizer): Observable<SafeHtml> {
+  /**
+   * Converts Markdown to sanitized HTML. Bare URLs are rendered as links opening in a new window, or as images when the
+   * URL points to an image. When `resolveImageUrl` is given, the src of each Markdown image is replaced by the URL it
+   * returns, for example to display images with an `upload://` URL in the admin.
+   */
+  public static getSafeHtmlForMarkdown$(
+    md: string,
+    sanitizer: DomSanitizer,
+    resolveImageUrl?: (url: string) => string,
+  ): Observable<SafeHtml> {
     return from(import('marked'))
       .pipe(
         take(1),
         map(markedLib => {
-          const html = sanitizer.sanitize(SecurityContext.HTML, markedLib.marked.parse(md ?? "", { async: false }));
+          const markedInstance = new markedLib.Marked({
+            breaks: true,
+            walkTokens: token => {
+              if (resolveImageUrl && token.type === 'image') {
+                token.href = resolveImageUrl(token.href);
+              }
+            },
+            renderer: {
+              link(token) {
+                if (!token.autolink) {
+                  return markedLib.Renderer.prototype.link.call(this, token);
+                }
+                const label = HtmlifyHelper.escapeHTML(MarkdownHelper.markdownUnescape(token.text));
+                const href = HtmlifyHelper.escapeHTML(MarkdownHelper.markdownUnescape(token.href));
+                const content = HtmlifyHelper.isImageUrl(token.href)
+                  ? `<img src="${href}" alt="${label}">`
+                  : label;
+                return `<a href="${href}" target="_blank" rel="noopener noreferrer">${content}</a>`;
+              },
+            },
+          });
+          const html = sanitizer.sanitize(SecurityContext.HTML, markedInstance.parse(md ?? "", { async: false }));
           return sanitizer.bypassSecurityTrustHtml(html || "");
         }),
       );
@@ -61,12 +92,20 @@ export class MarkdownHelper {
     return str.replace(MarkdownHelper.ESCAPE_REGEX, '\\$&');
   }
 
+  /**
+   * Removes CommonMark backslash escapes: a backslash before any ASCII punctuation character. This is the same set marked
+   * unescapes in `[label](url)` links, and a superset of what markdownEscape escapes, so it reverses markdownEscape.
+   */
+  public static markdownUnescape(str: string): string {
+    return str.replace(MarkdownHelper.UNESCAPE_REGEX, '$1');
+  }
+
   private static replaceWhitespaceInLinks(markdown: string) {
     // The markdown spec specifies that MD-links with whitespace in the URL are invalid.
     // A link like [test](https://test.nl/some file.pdf) does not get converted properly.
     // Because this is quite common with replaced feature values (file names for example) we want to allow spaces in URL.
     // With this regex-replace we replace all white space in the URL by %20.
-    return markdown.replace(new RegExp(HtmlifyHelper.MD_PART, 'ig'), MarkdownHelper.replaceWhitespaceInLink);
+    return HtmlifyHelper.replaceMarkdownLinks(markdown, MarkdownHelper.replaceWhitespaceInLink);
   }
 
   private static replaceWhitespaceInLink(link: string) {

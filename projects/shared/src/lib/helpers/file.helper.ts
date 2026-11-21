@@ -10,6 +10,8 @@ export interface FileContents {
 
 export class FileHelper {
 
+  public static readonly UPLOAD_URL_PREFIX = 'upload://';
+
   public static saveAsFile(data: object | Blob, filename: string) {
     const a = document.createElement('a');
     const file = FileHelper.getData(data);
@@ -63,7 +65,7 @@ export class FileHelper {
       .format(size);
   }
 
-  public static readFileContents(file: File): Observable<FileContents | null> {
+  public static readFileContents(file: File | Blob): Observable<FileContents | null> {
     const subject = new Subject<FileContents | null>();
     const reader = new FileReader();
     reader.onload = (e: ProgressEvent<FileReader>) => {
@@ -72,11 +74,14 @@ export class FileHelper {
         subject.complete();
         return;
       }
-      // result is string because we call readAsDataURL()
-      const result: string = e.target.result as string;
+      if (typeof e.target.result !== 'string') {
+        subject.error(new Error('Expected string because we called readAsDataURL()'));
+        return;
+      }
+      const result: string = e.target.result;
       const parsed = result != null ? FileHelper.parseDataUrl(result) : null;
       if (parsed != null) {
-        subject.next({ filename: file.name, dataURL: result, ...parsed });
+        subject.next({ filename: file instanceof File ? file.name : 'blob', dataURL: result, ...parsed });
       } else {
         subject.next(null);
       }

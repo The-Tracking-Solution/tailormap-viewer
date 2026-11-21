@@ -1,7 +1,6 @@
 @if (featureType) {
   @if (field) {
     <form [formGroup]="fieldForm">
-      <h2 i18n="@@admin-core.forms.edit-form-field">Edit form field {{field.name}}</h2>
       <div class="form-wrapper">
         <mat-form-field>
           <mat-label i18n="@@admin-core.common.label">Label</mat-label>
@@ -13,21 +12,12 @@
             />
         </mat-form-field>
         <mat-form-field>
-          <mat-label i18n="@@admin-core.common.type">Type</mat-label>
-          <mat-select formControlName="type" placeholder="Type" i18n-placeholder="@@admin-core.common.type">
-            @for (fieldType of filteredFieldTypes; track fieldType) {
-              <mat-option [value]="fieldType.value">
-                {{ fieldType.label }}
+          <mat-label i18n="@@admin-core.form.control-type">Edit control</mat-label>
+          <mat-select formControlName="controlType" placeholder="Edit control" i18n-placeholder="@@admin-core.form.control-type">
+            @for (controlType of filteredControlTypes; track controlType) {
+              <mat-option [value]="controlType.value">
+                {{ controlType.label }}
               </mat-option>
-            }
-          </mat-select>
-        </mat-form-field>
-        <mat-form-field>
-          <mat-label i18n="@@admin-core.form.tab">Tab</mat-label>
-          <mat-select formControlName="tab">
-            <mat-option [value]="null" i18n="@@admin-core.form.no-tab">No tab</mat-option>
-            @for (tab of tabs(); track tab.id) {
-              <mat-option [value]="tab.id">{{ tab.name }}</mat-option>
             }
           </mat-select>
         </mat-form-field>
@@ -35,62 +25,69 @@
           <mat-checkbox color="primary" formControlName="required" i18n="@@admin-core.form.required-field">Required field</mat-checkbox>
         </div>
         <div class="form-control">
-          <mat-checkbox color="primary" formControlName="disabled" i18n="@@admin-core.common.disabled">Disabled</mat-checkbox>
+          <mat-checkbox color="primary" formControlName="readOnly" i18n="@@admin-core.form.read-only">Read-only</mat-checkbox>
         </div>
-        @if (fieldForm.get('type')?.value === 'text') {
+        @if (fieldForm.get('controlType')?.value === 'text') {
           <div class="form-control">
             <mat-checkbox color="primary" formControlName="autoFillUser" i18n="@@admin-core.form.autoFillUser">Autofill Username</mat-checkbox>
           </div>
         }
-        @if (fieldForm.get('type')?.value === 'date' || fieldForm.get('type')?.value === 'timestamp') {
+        @if (fieldForm.get('controlType')?.value === 'date' || fieldForm.get('controlType')?.value === 'datetime') {
           <div class="form-control">
             <mat-checkbox color="primary" formControlName="autoFillDate" i18n="@@admin-core.form.autoFillDate">Autofill Date/Time</mat-checkbox>
           </div>
         }
       </div>
-      @if(fieldForm.get('type')?.value === 'select') {
-        <div class="form-control">
-          <ng-container formArrayName="valueList">
-            <div cdkDropList #valueList="cdkDropList"
-                 [cdkDropListData]="getValueListFormArray().controls"
-                 (cdkDropListDropped)="onValueListDrop($event)">
-              @for(valueForm of getValueListFormArray().controls; track valueForm; let i = $index) {
-                <div class="value-form-row" [formGroup]="valueForm" cdkDrag [cdkDragData]="i">
-                  <mat-icon svgIcon="reorder" class="drag-handle" cdkDragHandle></mat-icon>
-                  <mat-form-field>
-                    <mat-label i18n="@@admin-core.form.value-list-value">Value</mat-label>
-                    <input matInput
-                      tmAutoFocus
-                      placeholder="Value"
-                      (keydown.enter)="stopEnter($event)"
-                      i18n-placeholder="@@admin-core.form.value-list-value"
-                      formControlName="value"
-                      />
-                  </mat-form-field>
-                  <mat-form-field>
-                    <mat-label i18n="@@admin-core.form.value-list-label">Label</mat-label>
-                    <input matInput
-                      placeholder="Label"
-                      (keydown.enter)="stopEnter($event, true, i)"
-                      i18n-placeholder="@@admin-core.form.label-list-label"
-                      formControlName="label"
-                      />
-                  </mat-form-field>
-                  <button mat-icon-button class="delete-btn" (click)="removeValue(i)">
-                    <mat-icon svgIcon="trash_filled"></mat-icon>
-                  </button>
-                </div>
-              }
-            </div>
-          </ng-container>
-          <button mat-flat-button color="primary" class="add-btn" (click)="addValue()">
-            <mat-icon svgIcon="plus"></mat-icon>
-            <ng-container i18n="@@admin-core.form.add-choice">Add choice</ng-container>
-          </button>
-        </div>
-        <div class="form-control">
-          <mat-checkbox color="primary" formControlName="uniqueValuesAsOptions" i18n="@@admin-core.form.unique-values-as-options">Use unique values from this column as options</mat-checkbox>
-        </div>
+      @if(fieldForm.get('controlType')?.value === 'select') {
+        <mat-form-field>
+          <mat-label i18n="@@admin-core.form.choice-list-source">Choices</mat-label>
+          <mat-select formControlName="choiceListSource">
+            @for (source of choiceListSources; track source.value) {
+              <mat-option [value]="source.value">{{ source.label }}</mat-option>
+            }
+          </mat-select>
+        </mat-form-field>
+        @if (fieldForm.get('choiceListSource')?.value === choiceListSourceList) {
+          <div class="form-control select-form-control">
+            <ng-container formArrayName="valueList">
+              <div cdkDropList #valueList="cdkDropList"
+                   [cdkDropListData]="getValueListFormArray().controls"
+                   (cdkDropListDropped)="onValueListDrop($event)">
+                @for(valueForm of getValueListFormArray().controls; track valueForm; let i = $index) {
+                  <div class="value-form-row" [formGroup]="valueForm" cdkDrag [cdkDragData]="i">
+                    <mat-icon svgIcon="reorder" class="drag-handle" cdkDragHandle></mat-icon>
+                    <mat-form-field>
+                      <mat-label i18n="@@admin-core.form.value-list-value">Value</mat-label>
+                      <input matInput
+                        tmAutoFocus
+                        placeholder="Value"
+                        (keydown.enter)="stopEnter($event)"
+                        i18n-placeholder="@@admin-core.form.value-list-value"
+                        formControlName="value"
+                        />
+                    </mat-form-field>
+                    <mat-form-field floatLabel="always">
+                      <mat-label i18n="@@admin-core.form.value-list-label">Label</mat-label>
+                      <!-- Without a label the viewer shows the value, so show the value as placeholder -->
+                      <input matInput
+                        [placeholder]="valueForm.controls.value.value"
+                        (keydown.enter)="stopEnter($event, true, i)"
+                        formControlName="label"
+                        />
+                    </mat-form-field>
+                    <button mat-icon-button class="delete-btn" (click)="removeValue(i)">
+                      <mat-icon svgIcon="trash_filled"></mat-icon>
+                    </button>
+                  </div>
+                }
+              </div>
+            </ng-container>
+            <button mat-flat-button color="primary" class="add-btn" (click)="addValue()">
+              <mat-icon svgIcon="plus"></mat-icon>
+              <ng-container i18n="@@admin-core.form.add-choice">Add choice</ng-container>
+            </button>
+          </div>
+        }
         <div class="form-control">
           <mat-checkbox color="primary" formControlName="allowFreeInput" i18n="@@admin-core.form.allow-free-input">Allow the user to enter custom input</mat-checkbox>
         </div>

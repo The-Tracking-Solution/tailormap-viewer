@@ -3,6 +3,7 @@ import {
 } from '@tailormap-admin/admin-api';
 import { ChangePositionHelper, TreeHelper, TreeNodePosition } from '@tailormap-viewer/shared';
 import { ExtendedGeoServiceLayerModel } from '../../catalog/models/extended-geo-service-layer.model';
+import { Routes } from '../../routes';
 
 export class ApplicationModelHelper {
 
@@ -14,27 +15,55 @@ export class ApplicationModelHelper {
     return node.objectType === 'AppTreeLayerNode';
   }
 
+  public static getApplicationLabel(application: ApplicationModel): string {
+    const label = application.title || application.name;
+    return application.applicationType === 'stories'
+      ? `${label} (${$localize `:@@admin-core.applications.stories:Stories`})`
+      : label;
+  }
+
+  /**
+   * Admin URL for an application. Stories are edited in the stories editor (Tailormap Pro) at `/admin/stories/:name`,
+   * which has no sub pages, so `detailsPage` (e.g. Routes.APPLICATION_DETAILS_LAYERS) is only used for normal applications.
+   */
+  public static getApplicationUrl(application: ApplicationModel, detailsPage?: string): string {
+    if (application.applicationType === 'stories') {
+      return `/admin/stories/${encodeURIComponent(application.name)}`;
+    }
+    return [
+      '/admin',
+      Routes.APPLICATION,
+      Routes.APPLICATION_DETAILS.replace(':applicationId', application.id),
+      ...(detailsPage ? [detailsPage] : []),
+    ].join('/');
+  }
+
   public static getApplicationContentRoot(application: ApplicationModel): AppContentModel {
     return application.contentRoot || { layerNodes: [], baseLayerNodes: [], terrainLayerNodes: [] };
+  }
+
+  /**
+   * A free id for a new app layer node: `lyr:<service id>:<layer name>`, or with `_1`, `_2`, … added when
+   * that's already in `usedIds`. The one place this rule lives, also used by Tailormap Pro (stories).
+   */
+  public static createLayerNodeId(layer: { serviceId: string; layerName: string }, usedIds: ReadonlySet<string>): string {
+    const baseId = `lyr:${layer.serviceId}:${layer.layerName}`;
+    let idx = 0;
+    let id = baseId;
+    while (usedIds.has(id)) {
+      id = `${baseId}_${++idx}`;
+    }
+    return id;
   }
 
   public static newApplicationTreeLayerNode(
     layer: ExtendedGeoServiceLayerModel,
     applicationNodes: AppTreeNodeModel[],
   ): AppTreeLayerNodeModel {
-    const existingLayers = applicationNodes.filter(node => {
-      if (!ApplicationModelHelper.isLayerTreeNode(node)) {
-        return false;
-      }
-      return node.serviceId === layer.serviceId && node.layerName === layer.name;
-    });
-    const existingLayerIds = new Set(existingLayers.map(node => node.id));
-    const baseId = `lyr:${layer.serviceId}:${layer.name}`;
-    let idx = 0;
-    let id = baseId;
-    while (existingLayerIds.has(id)) {
-      id = `${baseId}_${++idx}`;
-    }
+    const id = ApplicationModelHelper.createLayerNodeId(
+      { serviceId: layer.serviceId, layerName: layer.name },
+      new Set(applicationNodes.map(node => node.id)),
+    );
     return {
       id,
       description: '',

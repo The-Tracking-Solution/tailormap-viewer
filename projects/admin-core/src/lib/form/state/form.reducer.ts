@@ -3,7 +3,8 @@ import { Action, createReducer, on } from '@ngrx/store';
 import { FormState, initialFormState } from './form.state';
 import { LoadingStateEnum } from '@tailormap-viewer/shared';
 import { FormModel, FormSummaryModel } from '@tailormap-admin/admin-api';
-import { FormFieldTypeEnum } from '@tailormap-viewer/api';
+import { FormFieldControlTypeEnum } from '@tailormap-viewer/api';
+import { EditFormFieldHelper } from '../helpers/edit-form-field.helper';
 
 const summaryFromForm = (form: FormModel): FormSummaryModel => ({
   id: form.id,
@@ -53,18 +54,21 @@ const onClearSelectedForm = (
   ...state,
   draftFormId: null,
   draftFormSelectedAttribute: null,
+  draftFormSelectedTabId: null,
 });
 
 const onLoadDraftForm = (state: FormState, payload: ReturnType<typeof FormActions.loadDraftForm>): FormState => ({
   ...state,
   draftFormId: payload.id,
   draftFormSelectedAttribute: null,
+  draftFormSelectedTabId: null,
 });
 
 const onLoadDraftFormStart = (state: FormState): FormState => ({
   ...state,
   draftFormLoadStatus: LoadingStateEnum.LOADING,
   draftFormSelectedAttribute: null,
+  draftFormSelectedTabId: null,
   draftForm: null,
 });
 
@@ -72,8 +76,10 @@ const onLoadDraftFormSuccess = (state: FormState, payload: ReturnType<typeof For
   ...state,
   draftFormLoadStatus: LoadingStateEnum.LOADED,
   draftFormSelectedAttribute: null,
+  draftFormSelectedTabId: null,
   draftForm: payload.form,
   draftFormValid: true,
+  draftFormFieldValid: true,
   draftFormUpdated: false,
 });
 
@@ -82,6 +88,7 @@ const onLoadDraftFormFailed = (state: FormState): FormState => ({
   draftFormId: null,
   draftFormLoadStatus: LoadingStateEnum.FAILED,
   draftFormSelectedAttribute: null,
+  draftFormSelectedTabId: null,
   draftForm: null,
 });
 
@@ -178,10 +185,11 @@ const onDraftFormAddField = (
       ...state.draftForm,
       fields: [
         ...state.draftForm.fields,
-        { name: payload.name, type: FormFieldTypeEnum.TEXT, label: payload.name },
+        { name: payload.name, controlType: payload.controlType || FormFieldControlTypeEnum.TEXT, label: payload.name },
       ],
     },
     draftFormSelectedAttribute: payload.name,
+    draftFormSelectedTabId: null,
     draftFormUpdated: true,
   };
 };
@@ -200,8 +208,32 @@ const onDraftFormSetSelectedField = (
   return {
     ...state,
     draftFormSelectedAttribute: payload.name,
+    draftFormSelectedTabId: null,
   };
 };
+
+const onDraftFormSetSelectedTabId = (
+  state: FormState,
+  payload: ReturnType<typeof FormActions.draftFormSetSelectedTabId>,
+): FormState => {
+  if (!state.draftForm) {
+    return state;
+  }
+  if (!(state.draftForm.options?.tabs || []).some(t => t.id === payload.tabId)) {
+    return state;
+  }
+  return {
+    ...state,
+    draftFormSelectedAttribute: null,
+    draftFormSelectedTabId: payload.tabId,
+  };
+};
+
+const onDraftFormClearSelection = (state: FormState): FormState => ({
+  ...state,
+  draftFormSelectedAttribute: null,
+  draftFormSelectedTabId: null,
+});
 
 const onDraftFormUpdateField = (
   state: FormState,
@@ -248,6 +280,9 @@ const onDraftFormRemoveField = (
         ...state.draftForm.fields.slice(fieldIdx + 1),
       ],
     },
+    draftFormSelectedAttribute: state.draftFormSelectedAttribute === payload.field
+      ? null
+      : state.draftFormSelectedAttribute,
     draftFormUpdated: true,
   };
 };
@@ -260,6 +295,32 @@ const onUpdateDraftFormValid = (
   draftFormValid: payload.isValid,
 });
 
+const onUpdateDraftFormFieldValid = (
+  state: FormState,
+  payload: ReturnType<typeof FormActions.updateDraftFormFieldValid>,
+): FormState => ({
+  ...state,
+  draftFormFieldValid: payload.isValid,
+});
+
+const onDraftFormCorrectControlTypes = (
+  state: FormState,
+  payload: ReturnType<typeof FormActions.draftFormCorrectControlTypes>,
+): FormState => {
+  if (!state.draftForm) {
+    return state;
+  }
+  const correctedFields = EditFormFieldHelper.correctControlTypes(state.draftForm.fields, payload.attributes);
+  if (!correctedFields) {
+    return state;
+  }
+  return {
+    ...state,
+    draftForm: { ...state.draftForm, fields: correctedFields },
+    draftFormUpdated: true,
+  };
+};
+
 const onDraftFormAddTab = (
   state: FormState,
   payload: ReturnType<typeof FormActions.draftFormAddTab>,
@@ -269,7 +330,7 @@ const onDraftFormAddTab = (
   }
 
   const tabs = state.draftForm.options?.tabs || [];
-  const tabExists = tabs.some(tab => tab.id === payload.tabId || tab.name === payload.tabName);
+  const tabExists = tabs.some(tab => tab.id === payload.tabId || tab.label === payload.tabLabel);
 
   if (tabExists) {
     return state;
@@ -284,7 +345,7 @@ const onDraftFormAddTab = (
         ...state.draftForm.options,
         tabs: [
           ...tabs,
-          { id: payload.tabId, name: payload.tabName },
+          { id: payload.tabId, label: payload.tabLabel },
         ],
       },
     },
@@ -299,9 +360,13 @@ const onDraftFormUpdateTabs = (
     return state;
   }
 
+  const selectedTabRemoved = !!state.draftFormSelectedTabId
+    && !payload.tabs.some(t => t.id === state.draftFormSelectedTabId);
+
   return {
     ...state,
     draftFormUpdated: true,
+    draftFormSelectedTabId: selectedTabRemoved ? null : state.draftFormSelectedTabId,
     draftForm: {
       ...state.draftForm,
       options: {
@@ -330,9 +395,13 @@ const formReducerImpl = createReducer<FormState>(
   on(FormActions.draftFormUpdateFields, onDraftFormUpdateFields),
   on(FormActions.draftFormAddField, onDraftFormAddField),
   on(FormActions.draftFormSetSelectedField, onDraftFormSetSelectedField),
+  on(FormActions.draftFormSetSelectedTabId, onDraftFormSetSelectedTabId),
+  on(FormActions.draftFormClearSelection, onDraftFormClearSelection),
   on(FormActions.draftFormUpdateField, onDraftFormUpdateField),
   on(FormActions.draftFormRemoveField, onDraftFormRemoveField),
   on(FormActions.updateDraftFormValid, onUpdateDraftFormValid),
+  on(FormActions.updateDraftFormFieldValid, onUpdateDraftFormFieldValid),
+  on(FormActions.draftFormCorrectControlTypes, onDraftFormCorrectControlTypes),
   on(FormActions.draftFormAddTab, onDraftFormAddTab),
   on(FormActions.draftFormUpdateTabs, onDraftFormUpdateTabs),
 );
