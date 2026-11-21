@@ -17,10 +17,21 @@
           }
         }
       }
+      @if (sourceState() === 'ready' && sourceProblems().length) {
+        <ul>
+          @for (problem of sourceProblems(); track problem.id) {
+            <li>
+              <strong>{{ problem.label }}</strong>
+              <span i18n="@@core.layer-alerts.rule-unavailable">Waiting for complete data for this rule. Retrying shortly.</span>
+            </li>
+          }
+        </ul>
+      }
       @if (visibleAlerts().length) {
         <ul>
           @for (alert of visibleAlerts(); track alert.sequence) {
             <li>
+              <strong>{{ alert.ruleLabel }}</strong>
               @if (alert.objectId !== undefined) {
                 <span>{{ alert.label }}</span>
               } @else {

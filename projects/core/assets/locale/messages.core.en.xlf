@@ -1402,6 +1402,10 @@
       <trans-unit id="core.layer-alerts.outside-view" datatype="html">
         <source>Outside the map</source>
       </trans-unit>
+      <trans-unit id="core.layer-alerts.rule-unavailable" datatype="html">
+        <source>Waiting for complete data for this rule. Retrying shortly.</source>
+        <target>Waiting for complete data for this rule. Retrying shortly.</target>
+      </trans-unit>
     </body>
   </file>
 </xliff>

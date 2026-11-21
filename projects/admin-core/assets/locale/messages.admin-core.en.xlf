@@ -2233,6 +2233,34 @@
       <trans-unit id="admin-core.layer-alerts.buffer" datatype="html">
         <source>Distance outside the map (km)</source>
       </trans-unit>
+      <trans-unit id="admin-core.layer-alerts.rule-number" datatype="html">
+        <source>Rule <x id="INTERPOLATION" equiv-text="{{ index + 1 }}"/></source>
+        <target>Rule <x id="INTERPOLATION" equiv-text="{{ index + 1 }}"/></target>
+      </trans-unit>
+      <trans-unit id="admin-core.layer-alerts.rule-enabled" datatype="html">
+        <source>Rule enabled</source>
+        <target>Rule enabled</target>
+      </trans-unit>
+      <trans-unit id="admin-core.layer-alerts.remove-rule" datatype="html">
+        <source>Remove rule</source>
+        <target>Remove rule</target>
+      </trans-unit>
+      <trans-unit id="admin-core.layer-alerts.rule-name" datatype="html">
+        <source>Rule name (optional)</source>
+        <target>Rule name (optional)</target>
+      </trans-unit>
+      <trans-unit id="admin-core.layer-alerts.add-rule" datatype="html">
+        <source>Add rule</source>
+        <target>Add rule</target>
+      </trans-unit>
+      <trans-unit id="admin-core.layer-alerts.apply-rules" datatype="html">
+        <source>Apply rules</source>
+        <target>Apply rules</target>
+      </trans-unit>
+      <trans-unit id="admin-core.layer-alerts.save-rules" datatype="html">
+        <source>Save the application to publish the rules.</source>
+        <target>Save the application to publish the rules.</target>
+      </trans-unit>
     </body>
   </file>
 </xliff>
