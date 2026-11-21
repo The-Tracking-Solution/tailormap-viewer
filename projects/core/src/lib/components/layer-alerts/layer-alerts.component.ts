@@ -98,6 +98,7 @@ export class LayerAlertsComponent {
             layerId: rule.layerId,
             page: 1,
             pageSize: LAYER_ALERT_PAGE_SIZE,
+            geometryInAttributes: rule.mode === 'new-object',
             withAttachments: false,
             background: true,
           }).pipe(

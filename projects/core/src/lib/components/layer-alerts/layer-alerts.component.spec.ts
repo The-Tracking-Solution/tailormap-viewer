@@ -1,6 +1,6 @@
 import { TestBed } from '@angular/core/testing';
 import { provideMockStore } from '@ngrx/store/testing';
-import { BaseComponentTypeEnum, TAILORMAP_API_V1_SERVICE } from '@tailormap-viewer/api';
+import { BaseComponentTypeEnum, FeaturesResponseModel, TAILORMAP_API_V1_SERVICE } from '@tailormap-viewer/api';
 import { MapService } from '@tailormap-viewer/map';
 import { BehaviorSubject, EMPTY, of } from 'rxjs';
 import { afterEach, expect, test, vi } from 'vitest';
@@ -11,6 +11,56 @@ import { LayerAlertsComponent } from './layer-alerts.component';
 vi.unmock('jsts/org/locationtech/jts/io');
 
 afterEach(() => vi.useRealTimers());
+
+test('requests geometry and detects new objects inside and just outside the map after an empty baseline', () => {
+  vi.useFakeTimers({ toFake: [ 'Date', 'setInterval', 'clearInterval' ] });
+  let added = false;
+  const getFeatures = vi.fn((params: { geometryInAttributes?: boolean }) => {
+    const positions = [ 105000, 118000, 140000 ];
+    const response: FeaturesResponseModel = {
+      page: 1, pageSize: 500, total: added ? positions.length : 0, template: null, columnMetadata: [],
+      features: added ? positions.map((x, index) => ({
+        __fid: String(index),
+        attributes: { id: index, name: `Danger ${index}` },
+        geometry: params.geometryInAttributes ? `POINT (${x} 405000)` : undefined,
+      })) : [],
+    };
+    return of(response);
+  });
+  const fixture = TestBed.configureTestingModule({
+    providers: [
+      provideMockStore({ selectors: [
+        { selector: selectLayers, value: [{ id: 'warnings', hasAttributes: true }] },
+        { selector: selectComponentsConfig, value: [{
+          type: BaseComponentTypeEnum.LAYER_ALERTS,
+          config: { enabled: true, rule: {
+            mode: 'new-object', layerId: 'warnings', idAttribute: 'id', labelAttribute: 'name', bufferKm: 10,
+          } },
+        }] },
+        { selector: selectViewerId, value: 'app/test' },
+      ] }),
+      { provide: TAILORMAP_API_V1_SERVICE, useValue: { getFeatures$: getFeatures } },
+      { provide: MapService, useValue: {
+        getMapViewDetails$: () => of({ extent: [ 100000, 400000, 110000, 410000 ] }),
+        getProjectionCode$: () => of('EPSG:28992'),
+      } },
+    ],
+  }).createComponent(LayerAlertsComponent);
+  fixture.detectChanges();
+  vi.advanceTimersByTime(0);
+  expect(fixture.componentInstance.sourceState()).toBe('ready');
+  expect(fixture.componentInstance.visibleAlerts()).toEqual([]);
+
+  added = true;
+  vi.advanceTimersByTime(60_000);
+  expect(getFeatures).toHaveBeenLastCalledWith(expect.objectContaining({ geometryInAttributes: true }));
+  expect(fixture.componentInstance.visibleAlerts().map(alert => [ alert.label, alert.outsideView ])).toEqual([
+    [ 'Danger 0', false ], [ 'Danger 1', true ],
+  ]);
+  vi.advanceTimersByTime(60_000);
+  expect(fixture.componentInstance.visibleAlerts()).toHaveLength(2);
+  fixture.destroy();
+});
 
 test('expires each alert one hour after observation without a new source response', () => {
   vi.useFakeTimers({ toFake: [ 'Date', 'setInterval', 'clearInterval' ] });
