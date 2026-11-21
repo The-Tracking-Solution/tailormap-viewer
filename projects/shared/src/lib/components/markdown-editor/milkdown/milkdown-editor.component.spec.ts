@@ -1,0 +1,176 @@
+import { fireEvent, render } from '@testing-library/angular';
+import { describe, expect, test, vi } from 'vitest';
+import { MilkdownEditorComponent } from './milkdown-editor.component';
+import { MarkdownEditorService } from '../markdown-editor.service';
+import { MilkdownHelper } from './milkdown.helper';
+import { placeholder } from '@milkdown/crepe/feature/placeholder';
+
+type MarkdownUpdatedFn = (ctx: unknown, markdown: string, prevMarkdown: string) => void;
+
+const mocks = vi.hoisted(() => {
+  const viewFocus = vi.fn();
+  const editorView = { focus: viewFocus };
+  const editorViewCtx = Symbol('editorViewCtx');
+  let resolveCreate: () => void = () => undefined;
+  let created = Promise.resolve();
+  const resetCreate = () => {
+    created = new Promise<void>(resolve => resolveCreate = resolve);
+  };
+  resetCreate();
+  const crepeOptions: Array<Record<string, unknown>> = [];
+  const crepeBuilders: Array<{ features: Array<{ feature: unknown; config: unknown }> }> = [];
+  const editorDestroy = vi.fn();
+  const listenerCtx = Symbol('listenerCtx');
+  /** The callback registered with the listener plugin's `markdownUpdated`, captured by the fake ctx below. */
+  let markdownUpdated: MarkdownUpdatedFn | undefined;
+  const ctx = {
+    update: () => undefined,
+    get: (key: unknown) => {
+      if (key === editorViewCtx) {
+        return editorView;
+      }
+      if (key === listenerCtx) {
+        return { markdownUpdated: (fn: MarkdownUpdatedFn) => markdownUpdated = fn };
+      }
+      return undefined;
+    },
+  };
+  return {
+    viewFocus, editorView, editorViewCtx, get created() { return created; }, resolveCreate: () => resolveCreate(), resetCreate, crepeOptions, crepeBuilders,
+    listenerCtx, ctx, get markdownUpdated() { return markdownUpdated; }, editorDestroy,
+  };
+});
+
+// Crepe does not run in jsdom. These mocks hold with `isolate: false`: this spec passes whether or not
+// markdown-editor.component.spec.ts (which loads the real editor) ran first in the same worker.
+/* eslint-disable @vitest/no-restricted-vi-methods */
+/* eslint-disable @typescript-eslint/naming-convention -- mirrors the names of the Crepe API */
+vi.mock('@milkdown/crepe/builder', () => {
+  class CrepeBuilder {
+    public features: Array<{ feature: unknown; config: unknown }> = [];
+    public editor = {
+      ctx: mocks.ctx,
+      destroy: mocks.editorDestroy,
+      use: () => this.editor,
+      config: (fn: (ctx: unknown) => void) => {
+        fn(mocks.ctx);
+        return this.editor;
+      },
+    };
+    constructor(options: Record<string, unknown>) {
+      mocks.crepeOptions.push(options);
+      mocks.crepeBuilders.push(this);
+    }
+    public addFeature(feature: unknown, config?: unknown) {
+      this.features.push({ feature, config });
+      return this;
+    }
+    public async create() {
+      await mocks.created;
+      return this.editor;
+    }
+  }
+  return { CrepeBuilder };
+});
+/* eslint-enable @typescript-eslint/naming-convention */
+vi.mock('@milkdown/kit/core', () => ({ editorViewCtx: mocks.editorViewCtx }));
+vi.mock('@milkdown/plugin-listener', () => ({ listener: {}, listenerCtx: mocks.listenerCtx }));
+/* eslint-enable @vitest/no-restricted-vi-methods */
+
+/** Renders the editor and waits until the (mocked) Crepe editor has been created. */
+const setupCreatedEditor = async () => {
+  mocks.viewFocus.mockClear();
+  mocks.resetCreate();
+  const updateContent = vi.spyOn(MilkdownHelper, 'updateContent').mockImplementation(() => undefined);
+  const { fixture, debugElement } = await render(MilkdownEditorComponent, {
+    providers: [MarkdownEditorService],
+  });
+  const service = debugElement.injector.get(MarkdownEditorService);
+  const userChanges = vi.fn();
+  service.getUserChanges$().subscribe(userChanges);
+  // Focusing before creation focuses the view once the editor is created, which tells the test the editor exists
+  fixture.componentInstance.focus();
+  mocks.resolveCreate();
+  await vi.waitFor(() => expect(mocks.viewFocus).toHaveBeenCalled());
+  const editorEl = fixture.componentInstance.editorEl!.nativeElement;
+  const markdownUpdated = (markdown: string, prevMarkdown: string) => mocks.markdownUpdated?.(mocks.ctx, markdown, prevMarkdown);
+  return { service, userChanges, updateContent, editorEl, markdownUpdated };
+};
+
+describe('MilkdownEditorComponent', () => {
+
+  test('focus() before the editor is created focuses it once created', async () => {
+    mocks.viewFocus.mockClear();
+    mocks.resetCreate();
+    const { fixture } = await render(MilkdownEditorComponent, {
+      inputs: { placeholder: 'Write something' },
+      providers: [MarkdownEditorService],
+    });
+    fixture.componentInstance.focus();
+    expect(mocks.viewFocus).not.toHaveBeenCalled();
+    mocks.resolveCreate();
+    // The first lazy import of the editor features can exceed one second in the full suite.
+    await vi.waitFor(() => expect(mocks.viewFocus).toHaveBeenCalledTimes(1), { timeout: 5000 });
+    fixture.componentInstance.focus();
+    expect(mocks.viewFocus).toHaveBeenCalledTimes(2);
+    const features = mocks.crepeBuilders[mocks.crepeBuilders.length - 1].features;
+    expect(features.find(f => f.feature === placeholder)?.config).toEqual({ mode: 'doc', text: 'Write something' });
+    expect(features).toHaveLength(8);
+  });
+
+  test('destroy() prevents a pending create callback from focusing after teardown', async () => {
+    mocks.viewFocus.mockClear();
+    mocks.resetCreate();
+    const { fixture } = await render(MilkdownEditorComponent, {
+      inputs: { placeholder: 'Write something' },
+      providers: [MarkdownEditorService],
+    });
+    fixture.componentInstance.focus();
+    fixture.componentInstance.ngOnDestroy();
+    mocks.resolveCreate();
+    await vi.waitFor(() => expect(mocks.viewFocus).not.toHaveBeenCalled());
+  });
+
+  test('destroying the component while the editor is being created still destroys the editor', async () => {
+    mocks.resetCreate();
+    mocks.editorDestroy.mockClear();
+    const crepeCount = mocks.crepeOptions.length;
+    const { fixture } = await render(MilkdownEditorComponent, {
+      providers: [MarkdownEditorService],
+    });
+    await vi.waitFor(() => expect(mocks.crepeOptions.length).toBe(crepeCount + 1));
+    fixture.destroy();
+    expect(mocks.editorDestroy).toHaveBeenCalledWith(true);
+    mocks.resolveCreate();
+  });
+
+  test('does not report Markdown updates after loading content as user changes', async () => {
+    const { userChanges, markdownUpdated } = await setupCreatedEditor();
+    markdownUpdated('normalised', '');
+    expect(userChanges).not.toHaveBeenCalled();
+  });
+
+  test('reports Markdown updates after an edit gesture inside the editor', async () => {
+    const { userChanges, markdownUpdated, editorEl, service } = await setupCreatedEditor();
+    fireEvent.keyDown(editorEl, { key: 'F' });
+    markdownUpdated('Foo', '');
+    expect(userChanges).toHaveBeenCalledWith('Foo');
+    expect(service.getCurrentContent()).toBe('Foo');
+  });
+
+  test('drops an update still pending from the previous content and reloads content equal to the last edit', async () => {
+    const { userChanges, markdownUpdated, editorEl, service, updateContent } = await setupCreatedEditor();
+    fireEvent.keyDown(editorEl, { key: 'F' });
+    markdownUpdated('Foo', '');
+    userChanges.mockClear();
+    // Other content is loaded while a debounced update with the previous content was still pending
+    service.resetContent('Bar');
+    expect(updateContent).toHaveBeenLastCalledWith(mocks.ctx, 'Bar');
+    markdownUpdated('Foo2', 'Foo');
+    expect(userChanges).not.toHaveBeenCalled();
+    // Loading the last edited content again must reload the editor
+    service.resetContent('Foo');
+    expect(updateContent).toHaveBeenLastCalledWith(mocks.ctx, 'Foo');
+  });
+
+});

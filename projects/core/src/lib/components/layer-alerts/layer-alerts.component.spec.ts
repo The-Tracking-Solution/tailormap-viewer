@@ -4,12 +4,20 @@ import { MockStore, provideMockStore } from '@ngrx/store/testing';
 import { BaseComponentTypeEnum, FeaturesResponseModel, TAILORMAP_API_V1_SERVICE } from '@tailormap-viewer/api';
 import { MapService } from '@tailormap-viewer/map';
 import { BehaviorSubject, EMPTY, of, throwError } from 'rxjs';
-import { afterEach, expect, test, vi } from 'vitest';
+import { afterEach, beforeEach, expect, test, vi } from 'vitest';
 import { selectLayers } from '../../map/state/map.selectors';
 import { selectComponentsConfig, selectViewerId } from '../../state/core.selectors';
 import { LayerAlertsComponent } from './layer-alerts.component';
 
-vi.unmock('jsts/org/locationtech/jts/io');
+// test-setup stubs JSTS for legacy map tests. Restore real parsing for spatial alert tests
+// through a spy, even if another spec already loaded GeometryHelper in this shared module graph.
+beforeEach(async () => {
+  const actual = await vi.importActual<typeof import('jsts/org/locationtech/jts/io.js')>('jsts/org/locationtech/jts/io.js');
+  const loaded = await import('jsts/org/locationtech/jts/io.js');
+  const reader = new actual.WKTReader();
+  const read = reader.read.bind(reader);
+  vi.spyOn(loaded.WKTReader.prototype, 'read').mockImplementation(wkt => read(wkt));
+});
 
 afterEach(() => vi.useRealTimers());
 

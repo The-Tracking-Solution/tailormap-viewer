@@ -7,6 +7,8 @@ import { ApplicationService } from '../../application/services/application.servi
 import { CatalogRouteHelper } from '../../catalog/helpers/catalog-route.helper';
 import { Routes } from '../../routes';
 import { ApplicationTreeHelper } from '../../application/helpers/application-tree.helper';
+import { ApplicationModelHelper } from '../../application/helpers/application-model.helper';
+import { FileHelper } from '@tailormap-viewer/shared';
 
 @Injectable()
 export class LayerAttachedFileRemoveService implements UploadRemoveServiceModel {
@@ -17,7 +19,7 @@ export class LayerAttachedFileRemoveService implements UploadRemoveServiceModel 
     const servicesAndLayers$ = this.geoServiceService.getGeoServicesAndLayers$();
     const applications$ = this.applicationService.getApplications$();
 
-    const search = "upload://" + fileId;
+    const search = FileHelper.UPLOAD_URL_PREFIX + fileId;
 
     return combineLatest([ servicesAndLayers$, applications$ ]).pipe(
       take(1),
@@ -68,13 +70,8 @@ export class LayerAttachedFileRemoveService implements UploadRemoveServiceModel 
               const appLayerTitle = ApplicationTreeHelper.getTreeModelLabel(layerNode, layerMap, app.settings?.layerSettings || null, 'layer');
               return {
                 id: app.id,
-                name: (app.title || app.name) + ': ' + appLayerTitle,
-                url: [
-                  '/admin',
-                  Routes.APPLICATION,
-                  Routes.APPLICATION_DETAILS.replace(':applicationId', app.id),
-                  Routes.APPLICATION_DETAILS_LAYERS,
-                ].join('/'),
+                name: ApplicationModelHelper.getApplicationLabel(app) + ': ' + appLayerTitle,
+                url: ApplicationModelHelper.getApplicationUrl(app, Routes.APPLICATION_DETAILS_LAYERS),
               };
             })
             .filter((item): item is UploadInUseItem => !!item);

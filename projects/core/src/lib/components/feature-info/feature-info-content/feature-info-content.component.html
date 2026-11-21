@@ -18,7 +18,7 @@
                 <strong>{{att.label}}</strong>
                 <div class="row-content">
                   <div class="attribute-value">
-                    <div [innerHTML]="att.attributeValue | htmlify"></div>
+                    <tm-htmlify [text]="att.attributeValue" />
                     @if (showEmbeddedVideos() && att.displayType === 'video' && mediaVisible() && !(attributesCollapsed() && layer.template)) {
                       <tm-feature-info-video [source]="att.attributeValue"
                                              [featureKey]="feature.layer.id + ':' + feature.__fid"></tm-feature-info-video>

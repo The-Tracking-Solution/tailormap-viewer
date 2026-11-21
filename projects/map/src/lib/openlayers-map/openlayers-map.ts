@@ -3,7 +3,7 @@ import { Map as OlMap } from 'ol';
 import { Projection } from 'ol/proj.js';
 import { View } from 'ol';
 import { NgZone } from '@angular/core';
-import { defaults as defaultInteractions, DragPan, Interaction, MouseWheelZoom } from 'ol/interaction.js';
+import { defaults as defaultInteractions, DragPan, Interaction, MouseWheelZoom, PinchZoom } from 'ol/interaction.js';
 import {
   LayerManagerModel, LayerSwipeModel, MapExportOptions, MapExportResult, MapViewDetailsModel, MapViewerModel, MapViewerOptionsModel, OlMapStyleType,
 } from '../models';
@@ -65,6 +65,7 @@ export class OpenLayersMap implements MapViewerModel {
   constructor(
     private ngZone: NgZone,
     private httpXsrfTokenExtractor: HttpXsrfTokenExtractor,
+    private cooperativeGestures = false,
   ) {
     this.resizeObserver = new ResizeObserver(() => this.updateMapSize());
     this.made3d = false;
@@ -102,14 +103,13 @@ export class OpenLayersMap implements MapViewerModel {
       }
       return;
     }
-    const isInIframe = window.self !== window.top;
     const olMap = new OlMap({
       controls: [],
       interactions: defaultInteractions({
         altShiftDragRotate: false,
         pinchRotate: false,
-        mouseWheelZoom: !isInIframe,
-        dragPan: !isInIframe,
+        mouseWheelZoom: !this.cooperativeGestures,
+        dragPan: !this.cooperativeGestures,
       }).extend([
         new Interaction({
           handleEvent: event => {
@@ -122,7 +122,7 @@ export class OpenLayersMap implements MapViewerModel {
             return true;
           },
         }),
-        ...(isInIframe ? [
+        ...(this.cooperativeGestures ? [
           new DragPan({
             condition: function (event) {
               return event.activePointers?.length === 2 || mouseOnly(event);
@@ -262,11 +262,12 @@ export class OpenLayersMap implements MapViewerModel {
    * method: this is meant for pages that embed the map inline in a scrolling document and want the
    * page's own scroll to win over the map's default zoom-by-wheel behaviour.
    */
-  public disableMouseWheelZoom() {
+  public setMapGesturesEnabled(enabled: boolean) {
     this.executeMapAction(olMap => {
+      const interactionsToSet = [ MouseWheelZoom, DragPan, PinchZoom ];
       olMap.getInteractions().getArray()
-        .filter((interaction): interaction is MouseWheelZoom => interaction instanceof MouseWheelZoom)
-        .forEach(interaction => olMap.removeInteraction(interaction));
+        .filter((interaction)=> interactionsToSet.some(i => interaction instanceof i))
+        .forEach(interaction => interaction.setActive(enabled));
     });
   }
 

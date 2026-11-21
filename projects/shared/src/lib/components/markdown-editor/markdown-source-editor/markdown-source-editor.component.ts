@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, DestroyRef, ElementRef, Input, OnInit, ViewChild, inject } from '@angular/core';
+import { ChangeDetectionStrategy, Component, DestroyRef, ElementRef, Input, OnInit, ViewChild, inject, input } from '@angular/core';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { MatFormField } from '@angular/material/select';
@@ -9,6 +9,8 @@ import { concatMap, Observable, of } from 'rxjs';
 import { MarkdownHelper } from '../../../helpers';
 import { MarkdownEditorService } from '../markdown-editor.service';
 import { AsyncPipe } from '@angular/common';
+import { MarkdownEditorResolveImageUrlFn } from '../markdown-editor-upload.model';
+import { debounceTime } from 'rxjs/operators';
 
 @Component({
   selector: 'tm-markdown-source-editor',
@@ -25,6 +27,11 @@ export class MarkdownSourceEditorComponent implements OnInit {
 
   @Input()
   public useInfoPanelWidth = false;
+
+  /** Shown while the text is empty. */
+  public placeholder = input<string>();
+
+  public resolveImageUrl = input<MarkdownEditorResolveImageUrlFn>();
 
   @ViewChild('editor', { read: ElementRef, static: true })
   public editorEl: ElementRef<HTMLTextAreaElement> | undefined;
@@ -52,9 +59,17 @@ export class MarkdownSourceEditorComponent implements OnInit {
     this.mdEditorService.getInsertedVariables$()
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe(value => this.insertVariable(value));
-    this.htmlPreview$ = this.mdEditorService.getUpdatedContent$().pipe(concatMap(content => {
-      return MarkdownHelper.getSafeHtmlForMarkdown$(content || '', this.sanitizer);
-    }));
+    this.htmlPreview$ = this.mdEditorService.getUpdatedContent$().pipe(
+      debounceTime(250),
+      concatMap(content => {
+        return MarkdownHelper.getSafeHtmlForMarkdown$(content || '', this.sanitizer, this.resolveImageUrl());
+      }),
+    );
+  }
+
+  /** Moves keyboard focus into the source textarea. */
+  public focus() {
+    this.editorEl?.nativeElement.focus();
   }
 
   public insertVariable(value: string) {
