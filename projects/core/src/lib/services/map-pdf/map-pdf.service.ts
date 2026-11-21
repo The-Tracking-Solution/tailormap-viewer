@@ -2,13 +2,14 @@ import { Injectable, LOCALE_ID, inject } from '@angular/core';
 import { concatMap, forkJoin, from, map, Observable, of, tap, take } from 'rxjs';
 import { LayerModel, MapExportResult, MapExportScaleBarPosition, MapService, OlLayerFilter, OpenlayersExtent } from '@tailormap-viewer/map';
 import { HttpClient } from '@angular/common/http';
-import { IconService } from '@tailormap-viewer/shared';
+import { IconService, SvgHelper } from '@tailormap-viewer/shared';
 import type { jsPDF } from 'jspdf';
 import type { Svg2pdfOptions } from 'svg2pdf.js';
 import { LegendService } from '../../components/legend/services/legend.service';
 import { ExtendedAppLayerModel } from '../../map/models';
 import { ServerType } from '@tailormap-viewer/api';
-import { ImageHelper } from '../../shared/helpers/image.helper';
+import { QrCodeHelper } from '../../shared/helpers/qr-code.helper';
+import { ImageToPNGConverter } from '../../shared/helpers/image-to-png-converter';
 
 interface Size {
   width: number;
@@ -191,7 +192,7 @@ export class MapPdfService {
     return this.legendService.getLegendImages$(layers$, legendURLCallback).pipe(
       tap(legendImages => {
         legendImages.forEach(legendImage => {
-          if (legendImage.imageData != null) {
+          if (legendImage.imageDataURL != null) {
             // XXX put legend images on top of each other for now, more complex layout to be implemented later
             const dpi = legendDpiByLayer.get(legendImage.appLayer) || 90;
             const extraShrinkFactor = 1.25;
@@ -199,7 +200,7 @@ export class MapPdfService {
             const heightMm = legendImage.height / (dpi / 25.4) / extraShrinkFactor;
             const x = width - widthMm - 10;
             const y = height - heightMm - 10;
-            doc.addImage(legendImage.imageData, 'PNG', x, y, widthMm, heightMm, '', 'FAST');
+            doc.addImage(legendImage.imageDataURL, 'PNG', x, y, widthMm, heightMm, '', 'FAST');
             doc.setDrawColor(0);
             doc.rect(x, y, widthMm, heightMm, 'S');
           }
@@ -212,7 +213,7 @@ export class MapPdfService {
     return this.httpClient.get(url, { responseType: 'text' }).pipe(
       concatMap(svg => {
         const element = document.createElement('div');
-        element.innerHTML = svg;
+        element.innerHTML = SvgHelper.getCleanSvg(svg);
         const svgEl = Array.from(element.children).find(c => c.nodeName.toLowerCase() === 'svg');
         if (!svgEl) {
           return of(doc);
@@ -223,10 +224,10 @@ export class MapPdfService {
   }
 
   private addImage2PDF$(doc: jsPDF, url: string, x: number, y: number): Observable<jsPDF> {
-    return ImageHelper.imageUrlToPng$(url)
+    return ImageToPNGConverter.loadImageFromUrlAndConvertToPNGDataURL$(url)
       .pipe(take(1), map(img => {
         const ratio = img.width / img.height;
-        return doc.addImage(img.imageData, 'PNG', x, y, 20, 20 / ratio, '', 'FAST');
+        return doc.addImage(img.imageDataURL, 'PNG', x, y, 20, 20 / ratio, '', 'FAST');
       }));
   }
 
@@ -248,7 +249,7 @@ export class MapPdfService {
     const pdfWidthPx = size.width * 72 / 25.4;
     const minimumQrOutputWidthPx = Math.ceil((this.minimumBookmarkQrWidthMm / size.width) * pdfWidthPx);
 
-    return ImageHelper.string2Base64QRcode$(bookmarkUrl, foreground, background, minimumQrOutputWidthPx).pipe(take(1), map(imgData => {
+    return QrCodeHelper.string2Base64QRcode$(bookmarkUrl, foreground, background, minimumQrOutputWidthPx).pipe(take(1), map(imgData => {
       const bookmarkText = $localize`:@@core.print.bookmark-text:Bookmark`;
       const bookmarkTextFontSize = 8;
       const bookmarkTextWidthInMM = (doc.getStringUnitWidth(bookmarkText) * bookmarkTextFontSize) / (72 / 25.6);

@@ -221,6 +221,10 @@
         <source>Copy</source>
         <target>Kopiëren</target>
       </trans-unit>
+      <trans-unit id="shared.color-picker.invalid-color" datatype="html">
+        <source>This is an invalid color. Only hexadecimal colors or rgb codes are allowed</source>
+        <target>Dit is een ongeldige kleur. Alleen hexadecimale kleuren of rgb codes zijn toegestaan</target>
+      </trans-unit>
       <trans-unit id="shared.color-picker.no-color" datatype="html">
         <source>No color</source>
         <target>Geen kleur</target>
@@ -228,6 +232,10 @@
       <trans-unit id="shared.color-picker.pick" datatype="html">
         <source>Pick <x id="PH" equiv-text="colorLabel"/></source>
         <target>Kies <x id="PH" equiv-text="colorLabel"/></target>
+      </trans-unit>
+      <trans-unit id="shared.color-picker.picker" datatype="html">
+        <source>Color picker</source>
+        <target>Kleurkiezer</target>
       </trans-unit>
       <trans-unit id="shared.common.close" datatype="html">
         <source>Close</source>
@@ -240,6 +248,22 @@
       <trans-unit id="shared.common.yes" datatype="html">
         <source>Yes</source>
         <target>Ja</target>
+      </trans-unit>
+      <trans-unit id="shared.cooperative-gestures-helper.mac" datatype="html">
+        <source>Use cmd (⌘) + scroll to zoom the map</source>
+        <target>Gebruik cmd (⌘) + scroll om in te zoomen op de kaart.</target>
+      </trans-unit>
+      <trans-unit id="shared.cooperative-gestures-helper.touch" datatype="html">
+        <source>Use two fingers to move the map</source>
+        <target>Gebruik twee vingers om de kaart te verplaatsen.</target>
+      </trans-unit>
+      <trans-unit id="shared.cooperative-gestures-helper.windows" datatype="html">
+        <source>Use ctrl + scroll to zoom the map</source>
+        <target>Gebruik ctrl + scroll om in te zoomen op de kaart.</target>
+      </trans-unit>
+      <trans-unit id="shared.icon-picker.picker" datatype="html">
+        <source>Icon picker</source>
+        <target>Icoonkiezer</target>
       </trans-unit>
       <trans-unit id="shared.language.dutch" datatype="html">
         <source>Dutch</source>
@@ -260,6 +284,10 @@
       <trans-unit id="shared.login-form.forgot-password" datatype="html">
         <source>Forgot your password?</source>
         <target>Wachtwoord vergeten?</target>
+      </trans-unit>
+      <trans-unit id="shared.login-form.login" datatype="html">
+        <source>Login</source>
+        <target>Inloggen</target>
       </trans-unit>
       <trans-unit id="shared.login-form.password" datatype="html">
         <source>Password</source>
@@ -329,6 +357,10 @@
         <source>Image</source>
         <target>Afbeelding</target>
       </trans-unit>
+      <trans-unit id="shared.markdown-editor.image-or-file" datatype="html">
+        <source>Image or file</source>
+        <target>Afbeelding of bestand</target>
+      </trans-unit>
       <trans-unit id="shared.markdown-editor.listgroup" datatype="html">
         <source>List</source>
         <target>Lijst</target>
@@ -360,18 +392,6 @@
       <trans-unit id="shared.markdown-editor.visual-editor" datatype="html">
         <source>Visual editor</source>
         <target>Visuele editor</target>
-      </trans-unit>
-      <trans-unit id="shared.overlay-helper.mac" datatype="html">
-        <source>Use cmd (⌘) + scroll to zoom the map</source>
-        <target>Gebruik cmd (⌘) + scroll om in te zoomen op de kaart.</target>
-      </trans-unit>
-      <trans-unit id="shared.overlay-helper.touch" datatype="html">
-        <source>Use two fingers to move the map</source>
-        <target>Gebruik twee vingers om de kaart te verplaatsen.</target>
-      </trans-unit>
-      <trans-unit id="shared.overlay-helper.windows" datatype="html">
-        <source>Use ctrl + scroll to zoom the map</source>
-        <target>Gebruik ctrl + scroll om in te zoomen op de kaart.</target>
       </trans-unit>
       <trans-unit id="shared.paginator.first-page" datatype="html">
         <source>First page</source>
@@ -436,6 +456,10 @@
       <trans-unit id="shared.password-reset-request-form.title" datatype="html">
         <source>Reset Password</source>
         <target>Wachtwoord opnieuw instellen</target>
+      </trans-unit>
+      <trans-unit id="shared.popover.close" datatype="html">
+        <source>Close</source>
+        <target>Sluiten</target>
       </trans-unit>
       <trans-unit id="shared.split-button.cycle-aria-label" datatype="html">
         <source>Showing <x id="PH" equiv-text="this.getLabel()"/> – click to switch to <x id="PH_1" equiv-text="nextLabel"/></source>
