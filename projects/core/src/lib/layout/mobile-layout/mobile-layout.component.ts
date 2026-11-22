@@ -45,6 +45,7 @@ import { AsyncPipe } from '@angular/common';
         MobileMenubarHomeComponent,
         ProfileComponent,
         InfoComponent,
+        MissingPersonsComponent,
         TerrainControlsComponent,
         FilterComponent,
         CoordinateLinkWindowComponent,
@@ -58,3 +59,4 @@ export class MobileLayoutComponent {
   public layoutService = inject(LayoutService);
   public componentTypes = BaseComponentTypeEnum;
 }
+import { MissingPersonsComponent } from '../../components/missing-persons/missing-persons.component';

@@ -15,3 +15,4 @@ export * from './extract-progress-events.service';
 export * from './cross-origin-api.service.injection-token';
 export * from './cross-origin-api.service.model';
 export * from './cross-origin-post-message-api.service';
+export * from './missing-persons-api.service';

@@ -1,4 +1,5 @@
 export enum BaseComponentTypeEnum {
+  MISSING_PERSONS = 'missing-persons',
   TOC = 'TOC',
   ATTRIBUTE_LIST = 'ATTRIBUTE_LIST',
   DRAWING = 'DRAWING',

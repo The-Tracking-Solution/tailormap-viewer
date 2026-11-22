@@ -1,0 +1,28 @@
+:host { display: block; }
+.missing-panel { padding: 12px; color: #172b40; }
+.tabs, .actions, .pair { display: flex; gap: 8px; flex-wrap: wrap; margin: 8px 0; }
+.pair > label { flex: 1 1 100px; min-width: 0; }
+label { display: flex; flex-direction: column; gap: 4px; margin: 12px 0; font-size: 13px; font-weight: 600; }
+input, select, textarea { box-sizing: border-box; width: 100%; min-height: 40px; padding: 8px; color: #172b40; background: #fff; border: 1px solid #64748b; border-radius: 4px; font: inherit; }
+textarea { min-height: 70px; resize: vertical; }
+select[multiple] { min-height: 110px; }
+.check { flex-direction: row; align-items: flex-start; font-weight: 400; }
+.check input { width: 20px; min-width: 20px; min-height: 20px; margin: 0 4px 0 0; }
+button { border: 1px solid #52667b; border-radius: 4px; padding: 9px 10px; min-height: 40px; background: #fff; color: #173b63; cursor: pointer; font: inherit; }
+button:disabled { cursor: default; opacity: .6; }
+button[aria-pressed="true"], .primary { background: #173b63; color: #fff; }
+.full, .case { width: 100%; }
+.case { margin: 8px 0; display: flex; flex-direction: column; gap: 6px; text-align: left; }
+.urgent, .error { color: #8c2800; font-weight: 600; }
+.error, .notice, .guidance { padding: 10px; background: #fff2df; border-left: 3px solid #a43c00; }
+.notice { background: #eaf5ef; border-color: #087542; color: #15482e; }
+.hint { color: #455469; font-size: 12px; }
+summary { font-weight: 600; cursor: pointer; padding: 12px 0; }
+details { border-top: 1px solid #ccd3da; margin-top: 12px; }
+fieldset { border: 0; padding: 0; margin: 0; min-width: 0; }
+.danger { color: #fff; background: #922a20; border-color: #922a20; }
+.person-photo { display: block; width: 100%; max-height: 240px; object-fit: contain; background: #eef2f5; }
+.timeline { padding-left: 20px; }
+.timeline p { white-space: pre-wrap; overflow-wrap: anywhere; }
+.stat { padding: 10px 0; border-bottom: 1px solid #ccd3da; overflow-wrap: anywhere; }
+:is(button, input, select, textarea, summary):focus-visible { outline: 3px solid #0075a8; outline-offset: 2px; }
