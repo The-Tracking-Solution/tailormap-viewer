@@ -38,6 +38,14 @@ class StartProbeTests(unittest.TestCase):
   with self.assertRaises(ValueError):r.load_start_probe(self.path)
   log.write_text('no main manifest attribute, in /probe-api.jar\n');self.data['api_start_mode']='classpath-v2';self.save()
   with self.assertRaises(ValueError):r.load_start_probe(self.path)
+ def test_allows_only_the_known_wrong_http_field_retry(self):
+  self.data.update(state='API_START_ATTEMPTED_ON_COPY',application_started=True,probe_runtime_removed=True,api_start_mode='classpath-v2')
+  folder=self.work/'api-start-classpath';folder.mkdir()
+  (folder/'api.log').write_text('Started TailormapApiApplication in 15.5 seconds')
+  (folder/'health.log').write_text('Anonymous /api/user readiness check failed')
+  self.save();self.assertEqual(r.load_start_probe(self.path)['database'],self.data['database'])
+  self.data['api_start_mode']='classpath-http-field-v3';self.save()
+  with self.assertRaises(ValueError):r.load_start_probe(self.path)
  def exercise(self,fail):
   commands=[]
   def run(args,**kwargs):
@@ -58,7 +66,7 @@ class StartProbeTests(unittest.TestCase):
    if fail:
     with self.assertRaises(RuntimeError):r.main()
    else:r.main()
-  self.assertFalse((self.work/'api-start-classpath/connection.env').exists())
+  self.assertFalse((self.work/'api-start-http-field/connection.env').exists())
   self.assertIn(['docker','rm','-f','tts-api-probe-e863f0c7'],commands)
   self.assertFalse(any('compose' in c or 'restart' in c for c in commands))
   return json.loads(self.path.read_text())

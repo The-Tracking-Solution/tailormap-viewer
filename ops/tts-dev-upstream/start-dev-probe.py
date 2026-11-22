@@ -33,8 +33,18 @@ def load_start_probe(path):
         old_log=path.parent/'api-start/api.log'
         known_failure=(old_log.is_file() and old_log.read_text().strip()
                        =='no main manifest attribute, in /probe-api.jar')
-    if not data.get('official_migrations_applied') or not (fresh or known_failure):
-        raise ValueError('Verwacht een gemigreerde kopie of uitsluitend de bekende jar-manifestfout')
+    # The previous HTTP client used the wrong JSON property. Permit exactly that known failed probe.
+    field_failure=(data.get('state')=='API_START_ATTEMPTED_ON_COPY'
+                   and data.get('api_start_mode')=='classpath-v2' and data.get('probe_runtime_removed') is True)
+    if field_failure:
+        api_log=path.parent/'api-start-classpath/api.log'
+        health_log=path.parent/'api-start-classpath/health.log'
+        field_failure=(api_log.is_file() and health_log.is_file()
+                       and 'Started TailormapApiApplication in ' in api_log.read_text()
+                       and 'Anonymous /api/user readiness check failed' in health_log.read_text()
+                       and not data.get('api_start_verified'))
+    if not data.get('official_migrations_applied') or not (fresh or known_failure or field_failure):
+        raise ValueError('Verwacht een gemigreerde kopie of een precies bekende proefcontrolefout')
     if data.get('api_source_commit')!=helpers.SOURCE_COMMIT or data.get('api_source_tree')!=helpers.SOURCE_TREE:
         raise ValueError('Onverwachte API-bron')
     jar=path.parent/'api-build/source/target/tailormap-api.jar'
@@ -76,7 +86,7 @@ def main():
     with (work/'migration.lock').open('w') as lock:
         fcntl.flock(lock,fcntl.LOCK_EX|fcntl.LOCK_NB)
         data=load_start_probe(args.probe)
-        runtime=work/'api-start-classpath';runtime.mkdir()
+        runtime=work/'api-start-http-field';runtime.mkdir()
         name='tts-api-probe-'+data['database'].rsplit('_',1)[1]
         # Refuse to replace any existing container, even one using the same probe token.
         found=subprocess.run(['docker','container','inspect',name],capture_output=True)
@@ -109,7 +119,7 @@ def main():
                   '--spring.web.resources.static-locations=file:/probe/static/',
                   '--management.endpoints.web.exposure.include=health,info']
         data['state']='API_START_ATTEMPTED_ON_COPY';data['application_started']=True
-        data['api_start_mode']='classpath-v2'
+        data['api_start_mode']='classpath-http-field-v3'
         data['api_start_log']=str(runtime/'api.log')
         args.probe.write_text(json.dumps(data,indent=2)+'\n')
         attempted=False
