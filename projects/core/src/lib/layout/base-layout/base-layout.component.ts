@@ -46,6 +46,7 @@ import { LayerAlertsComponent } from '../../components/layer-alerts/layer-alerts
         TocComponent,
         LegendComponent,
         DrawingComponent,
+        MissingPersonsComponent,
         PrintComponent,
         FilterComponent,
         RegisteredComponentsRendererComponent,
@@ -76,3 +77,4 @@ export class BaseLayoutComponent {
   public layoutService = inject(LayoutService);
   public componentTypes = BaseComponentTypeEnum;
 }
+import { MissingPersonsComponent } from '../../components/missing-persons/missing-persons.component';

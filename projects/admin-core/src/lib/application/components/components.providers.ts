@@ -20,6 +20,7 @@ export function provideConfigurationComponents(): Array<Provider | EnvironmentPr
   return [
     provideEnvironmentInitializer(() => {
       const configurationComponentService = inject(ConfigurationComponentRegistryService);
+      configurationComponentService.registerConfigurationComponents(BaseComponentTypeEnum.MISSING_PERSONS, 'Vermissingen', BaseComponentConfigComponent);
       /* eslint-disable max-len */
       configurationComponentService.registerConfigurationComponents(BaseComponentTypeEnum.LAYER_ALERTS, $localize `:@@admin-core.application.component-layer-alerts:Map alerts`, LayerAlertsConfigComponent);
       configurationComponentService.registerConfigurationComponents(BaseComponentTypeEnum.TOC, $localize `:@@admin-core.application.component-table-of-contents:Table of contents`, BaseComponentConfigComponent);

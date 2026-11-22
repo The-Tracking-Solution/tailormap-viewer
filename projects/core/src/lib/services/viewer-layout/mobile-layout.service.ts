@@ -26,6 +26,7 @@ export class MobileLayoutService {
   ];
 
   public static readonly MOBILE_MENUBAR_HOME_COMPONENTS: string[] = [
+    BaseComponentTypeEnum.MISSING_PERSONS,
     BaseComponentTypeEnum.INFO,
     BaseComponentTypeEnum.FILTER,
     BaseComponentTypeEnum.TERRAIN_CONTROLS,

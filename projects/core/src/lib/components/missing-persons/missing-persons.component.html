@@ -1,0 +1,121 @@
+@if (visible$ | async) {
+  <section class="missing-panel" aria-label="Vermissingen">
+    <div class="tabs">
+      <button type="button" [attr.aria-pressed]="tab() === 'active'" (click)="showTab('active')">Actief</button>
+      <button type="button" [attr.aria-pressed]="tab() === 'closed'" (click)="showTab('closed')">Afgesloten</button>
+      <button type="button" (click)="refresh()" [disabled]="busy()">Verversen</button>
+    </div>
+    @if (error()) { <p class="error" role="alert">{{error()}}</p> }
+    @if (notice()) { <p class="notice" role="status">{{notice()}}</p> }
+    @if (busy()) { <p role="status">Bezig…</p> }
+
+    @if (tab() === 'active') {
+      <button type="button" class="primary full" (click)="create()" [disabled]="busy() || !configuration()">+ Nieuwe vermissing</button>
+      @for (item of cases(); track item.id) {
+        <button type="button" class="case" (click)="open(item.id)" [disabled]="busy()">
+          <strong>{{item.intake.description || 'Vermissing'}} · {{item.age === null ? 'Leeftijd onbekend' : item.age + ' jaar'}}</strong>
+          <span>{{item.lastSeenAt | date:'dd-MM HH:mm'}} · {{elapsed(item.lastSeenAt, now())}} min vermist</span>
+          @if (item.urgent || item.waterRisk) { <span class="urgent">{{item.waterRisk ? 'Mogelijke watervermissing' : 'Urgent'}}</span> }
+          @if (elapsed(item.lastSeenAt, now()) >= 30) {
+            <span class="urgent">{{elapsed(item.lastSeenAt, now()) >= 60 ? '60' : '30'}} minuten verstreken: controleer opschaling</span>
+          }
+        </button>
+      } @empty { <p>Geen actieve vermissingen zichtbaar.</p> }
+
+      @if (editing()) {
+        <hr>
+        <h3>{{selected() ? 'Vermissing bijwerken' : 'Nieuwe vermissing'}}</h3>
+        <p class="guidance">Bij watergevaar direct kustwacht/brandweer inschakelen. Bij kwetsbaarheid of onrustwekkende omstandigheden direct politie. Wacht niet op de 30/60-minutenindicatie.</p>
+        @if (photo(); as url) { <img class="person-photo" [src]="url" alt="Foto van de vermiste persoon"> }
+        <form [formGroup]="form" (ngSubmit)="save()" autocomplete="off">
+          <fieldset [disabled]="busy()">
+            <label>Laatste waarneming<input type="datetime-local" formControlName="lastSeenAt" required></label>
+            <div class="pair">
+              <label>Lengtegraad (WGS84)<input type="number" step="any" formControlName="lon" required (change)="render()"></label>
+              <label>Breedtegraad (WGS84)<input type="number" step="any" formControlName="lat" required (change)="render()"></label>
+            </div>
+            <div class="actions"><button type="button" (click)="pick('lastSeen')">Vermistlocatie prikken</button><button type="button" (click)="zoom()">Toon op kaart</button></div>
+            @if (picking()) { <p role="status">Klik op de kaart voor {{picking() === 'found' ? 'de vindlocatie' : 'de laatste waarneming'}}. <button type="button" (click)="stopPicking()">Annuleren</button></p> }
+            <div class="pair">
+              <label>Leeftijd (optioneel)<input type="number" min="0" max="120" step="1" formControlName="age"></label>
+              <label>Geslacht<select formControlName="sex"><option value="unknown">Onbekend</option><option value="female">Vrouw</option><option value="male">Man</option><option value="other">Anders</option><option value="not_specified">Niet opgegeven</option></select></label>
+            </div>
+            <label>Korte omschrijving<input formControlName="description" maxlength="500"></label>
+            <label class="check"><input type="checkbox" formControlName="waterRisk">Mogelijke watervermissing</label>
+            <label class="check"><input type="checkbox" formControlName="urgent">Kwetsbaar / medische nood / onrustwekkend</label>
+            <label>Eigen organisatie<select formControlName="ownerOrganisation">
+              @for (org of configuration()?.organisations; track org.id) {
+                @if (org.member || org.id === selected()?.ownerOrganisation) { <option [value]="org.id">{{org.label}}</option> }
+              }
+            </select></label>
+            <label>Organisaties met toegang<select formControlName="organisations" multiple size="4">
+              @for (org of configuration()?.organisations; track org.id) { <option [value]="org.id">{{org.label}}</option> }
+            </select></label>
+            <p class="hint">Geselecteerde organisaties bekijken en bewerken samen. Alleen de eigenaar mag de organisatiekeuze wijzigen.</p>
+            <label>Foto (optioneel, JPEG/PNG, maximaal 10 MB)<input type="file" accept="image/jpeg,image/png" capture="environment" (change)="chooseFile($event)"></label>
+            <details>
+              <summary>Signalement en contactgegevens</summary>
+              <label>Naam / roepnaam<input formControlName="name" maxlength="100"></label>
+              <label>Kleding / signalement<textarea formControlName="clothing" maxlength="1000"></textarea></label>
+              <label>Melder<input formControlName="reporter" maxlength="150"></label>
+              <label>Telefoon melder<input type="tel" formControlName="telephone" maxlength="80"></label>
+              <label>Bijzonderheden<textarea formControlName="details" maxlength="2000"></textarea></label>
+            </details>
+            <details>
+              <summary>Indicatief zoekgebied</summary>
+              <p>De cirkel toont theoretische loopafstand. Paden, obstakels, zee, rusten en vervoer zijn niet verwerkt. Dit is geen kansgebied of gegarandeerde buitengrens.</p>
+              <label>Aangenomen loopsnelheid (km/u)<input type="number" step="0.1" min="0.1" max="15" formControlName="speedKmh" list="missing-speed-options"></label>
+              <datalist id="missing-speed-options"><option value="1.5">Lage snelheid</option><option value="3">Rustig lopen</option><option value="5">Stevig lopen, vlak terrein</option></datalist>
+              <label class="check"><input type="checkbox" formControlName="speedConfirmed">Ik heb de snelheid beoordeeld voor deze persoon en dit terrein.</label>
+              <p class="hint">Geen automatische leeftijdsnorm. 1,5 / 3 / 5 km/u zijn scenario-aannames, geen gevalideerde Nederlandse zoeknormen.</p>
+            </details>
+            @if (form.invalid && form.touched) { <p class="error" role="alert">Controleer de verplichte velden en geldige waarden.</p> }
+            <button type="submit" class="primary">{{selected() ? 'Wijzigingen opslaan' : 'Vermissing starten'}}</button>
+          </fieldset>
+        </form>
+
+        @if (selected(); as item) {
+          <div class="actions"><button type="button" (click)="calculate()" [disabled]="busy() || item.waterRisk || item.speedKmh === null || form.dirty">Zoekcirkel berekenen</button></div>
+          @if (area(); as search) { <p>Indicatieve straal: {{search.radiusMeters | number:'1.0-0'}} m · berekend {{search.calculatedAt | date:'HH:mm:ss'}}. Opnieuw berekenen voor de actuele tijd.</p> }
+          <h3>Acties en updates</h3>
+          <ol class="timeline">
+            @for (entry of item.events || []; track entry.id) { <li><time>{{entry.occurredAt | date:'dd-MM HH:mm'}}</time> · {{entry.kind}}<p>{{entry.body}}</p></li> }
+          </ol>
+          <label>Soort update<select [formControl]="eventKind"><option value="note">Notitie</option><option value="police">Contact politie</option><option value="handover">Overdracht</option><option value="found">Aangetroffen</option></select></label>
+          <label>Update<textarea [formControl]="event" maxlength="2000"></textarea></label>
+          <button type="button" (click)="addEvent()" [disabled]="busy() || form.dirty">Update opslaan</button>
+
+          <details class="closing">
+            <summary>Vindlocatie en afsluiten</summary>
+            <form [formGroup]="closing" (ngSubmit)="close()" autocomplete="off">
+              <fieldset [disabled]="busy()">
+                <label>Uitkomst<select formControlName="outcome"><option value="found">Gevonden</option><option value="transferred">Overgedragen</option><option value="not_found">Niet gevonden</option><option value="other">Anders</option></select></label>
+                @if (closing.controls.outcome.value === 'found') {
+                  <label>Vindtijd<input type="datetime-local" formControlName="foundAt"></label>
+                  <div class="pair"><label>Lengtegraad vindlocatie<input type="number" step="any" formControlName="lon" (change)="render()"></label><label>Breedtegraad vindlocatie<input type="number" step="any" formControlName="lat" (change)="render()"></label></div>
+                  <button type="button" (click)="pick('found')">Vindlocatie prikken</button>
+                  <label class="check"><input type="checkbox" formControlName="personVerified">Vastgesteld dat dit de vermiste persoon is</label>
+                }
+                <label class="check"><input type="checkbox" formControlName="policeConsidered">Terugmelding politie gecontroleerd indien betrokken</label>
+                <label class="check"><input type="checkbox" formControlName="careConsidered">Eventuele hulpverlening beoordeeld</label>
+                <p>Controleer de casus hierboven. Afsluiten verwijdert foto, signalement, contactgegevens en alle notities. Heropenen is niet mogelijk.</p>
+                <label class="check"><input type="checkbox" formControlName="confirmDelete">Dit is de juiste casus. Verwijder de operationele persoonsgegevens.</label>
+                <button type="submit" class="danger">Definitief afsluiten en persoonsgegevens verwijderen</button>
+              </fieldset>
+            </form>
+          </details>
+        }
+      }
+    } @else {
+      <p>Afgeschermde statistiek · bewaartermijn {{configuration()?.statisticsRetentionDays}} dagen.</p>
+      @if (!configuration()?.retainExactLocations) { <p>Exacte vermist- en vindlocaties worden in deze configuratie niet bewaard.</p> }
+      @for (item of statistics(); track item.id) {
+        <article class="stat"><strong>{{item.age === null ? 'Leeftijd onbekend' : item.age + ' jaar'}} · {{item.sex}} · {{item.outcome}}</strong><p>{{item.lastSeenAt | date:'dd-MM-yyyy HH:mm'}} → {{item.foundAt | date:'dd-MM-yyyy HH:mm'}}</p>
+          @if (item.lastSeenGeometry) { <p>Vermistlocatie: {{item.lastSeenGeometry}}</p> }
+          @if (item.foundGeometry) { <p>Vindlocatie: {{item.foundGeometry}}</p> }
+          <p class="hint">Weer en water: onbekend. Geen bronwaarneming gekoppeld.</p>
+        </article>
+      } @empty { <p>Geen afgesloten registraties zichtbaar.</p> }
+    }
+  </section>
+}

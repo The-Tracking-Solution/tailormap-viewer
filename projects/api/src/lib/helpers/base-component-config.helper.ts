@@ -3,6 +3,7 @@ import { BaseComponentTypeEnum, ComponentModel } from '../models';
 export class BaseComponentConfigHelper {
 
   public static componentsDisabledByDefault = new Set<string>([
+    BaseComponentTypeEnum.MISSING_PERSONS,
     BaseComponentTypeEnum.EDIT,
     BaseComponentTypeEnum.COORDINATE_LINK_WINDOW,
     BaseComponentTypeEnum.HEADER,
