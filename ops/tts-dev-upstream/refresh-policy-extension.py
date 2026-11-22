@@ -61,3 +61,21 @@ def replica_port_updates(source,target):
         if str(new.get('port'))=='5433':continue
         result.append({'table':'feature_source','id':new['id'],'column':'jdbc_connection','path':['port'],'value':old['port']})
     return result
+
+
+def component_updates(source_app,target_app):
+    import copy
+    virtual=copy.deepcopy(source_app)
+    result=component_video_plan(target_app,virtual)
+    components=virtual.get('components') or []
+    virtual['components']=components
+    for item in result:
+        path=item['path'];value=copy.deepcopy(item['value'])
+        if len(path)==1:
+            require(int(path[0])==len(components),'Onverwachte componentpositie.')
+            components.append(value)
+        elif len(path)==2:
+            components[int(path[0])][path[1]]=value
+        else:
+            components[int(path[0])][path[1]][path[2]]=value
+    return result+layer_alert_updates(virtual,target_app)

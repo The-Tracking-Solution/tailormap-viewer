@@ -11,7 +11,7 @@ class UpgradeTests(unittest.TestCase):
   with tempfile.TemporaryDirectory() as folder:
    root=Path(folder);installed=root/'installed';installed.mkdir();old=b'# old helper\n';new=b'# new helper\n'
    (installed/'refresh-lt3-data.sh').write_bytes(b'script');(installed/'refresh-geodata.py').write_bytes(b'geodata');p=installed/'refresh-policy.py';p.write_bytes(old);p.chmod(0o700)
-   with patch.object(m,'DIRECTORY',installed),patch.object(m,'SCRIPT_SHA',m.sha(b'script')),patch.object(m,'GEODATA_SHA',m.sha(b'geodata')),patch.object(m,'OLD_SHA',m.sha(old)),patch.object(m,'NEW_SHA',m.sha(new)),patch.object(m,'transform',return_value=new.decode()):
+   with patch.object(m,'DIRECTORY',installed),patch.object(m,'SCRIPT_SHA',m.sha(b'script')),patch.object(m,'GEODATA_SHA',m.sha(b'geodata')),patch.object(m,'OLD_SHA','different'),patch.object(m,'INSTALLED_SHA',m.sha(old)),patch.object(m,'NEW_SHA',m.sha(new)),patch.object(m,'transform',return_value=new.decode()):
     self.assertEqual(m.install(root/'backup'),'UPDATED');self.assertEqual((root/'backup/refresh-policy.before').read_bytes(),old);self.assertEqual(p.read_bytes(),new);self.assertEqual(p.stat().st_mode & 0o777,0o700);self.assertEqual(m.install(root/'backup'),'ALREADY_CURRENT')
  def test_unknown_helper_is_never_overwritten(self):
   with tempfile.TemporaryDirectory() as folder:

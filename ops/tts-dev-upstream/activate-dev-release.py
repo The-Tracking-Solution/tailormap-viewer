@@ -168,7 +168,7 @@ def activate(prepared):
     data=validate_prepared(prepared);probe=prep.load_probe(Path(data['probe']))
     stamp=datetime.datetime.now(datetime.timezone.utc).strftime('%Y%m%dt%H%M%Sz');token=secrets.token_hex(4)
     backup=BACKUPS/f'upstream-20261122-{stamp}-{token}';backup.mkdir(parents=True)
-    for file in ['activate-dev-release.py','prepare-dev-release.py','migrate-dev-probe.py','upgrade-refresh-policy.py','refresh-policy-extension.py']:
+    for file in ['activate-dev-release.py','prepare-dev-release.py','migrate-dev-probe.py','upgrade-refresh-policy.py','refresh-policy-extension.py','refresh-video-extension.py']:
         shutil.copy2(Path(__file__).with_name(file),backup/file)
     state={**data,'kind':'tts-dev-upstream-20261122','phase':'PREPARED','active':False,
            'old_database':f'tailormap_before_upstream_{stamp}_{token}',

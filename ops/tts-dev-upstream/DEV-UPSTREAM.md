@@ -1,3 +1,18 @@
+## Installed refresh-policy compatibility correction — 22 November
+
+The actual LT3 policy has SHA256 fc31f9950f5d21df8f21ebcbfb00fe943a1e783811e2a3726ae05e9670164fbb.
+The supplied script was reconstructed exactly and differs from the older repository
+revision by a bounded FEATURE_INFO video mapping/default/verification fix. Preserve
+that fix; do not overwrite it with the older helper. Both reviewed inputs converge
+to policy SHA256 24d48c0cf484ca83412137e9927cb3d76bebe73eb96859ec0cc38865e7978848.
+The previous activation stopped before interruption or database changes.
+
+Video and alert overlays allocate separate append positions even when both source
+components are absent. Tested: actual supplied-file installation, backup and
+idempotence; 34 refresh tests, 10 activation/installer tests, PostgreSQL 18.1 JSON
+append and subsequent V38–V40 fixture, transactional database swap and rollback.
+Actual LT3 activation remains pending. Use the updated pinned bootstrap.
+
 # DEV upstream release — 22 November 2026
 
 The prepared release is /srv/tailormap-releases/dev-upstream-20261121/prepare-lxywtiz8/prepared.json.
